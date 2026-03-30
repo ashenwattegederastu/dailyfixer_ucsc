@@ -1,0 +1,392 @@
+/* ===================== Base Styles ===================== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom, #ffffff, #c8d9ff);
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+/* ===================== Main Navbar ===================== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #7c8cff;
+    padding: 10px 30px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+/* ===================== Subnav ===================== */
+.sub-nav {
+    background-color: #cfe0ff;
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    padding: 12px 20px;
+    border-radius: 50px;
+    margin-top: 5px;
+    border: 1px solid #a6c0ff;
+}
+
+.sub-nav a {
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+}
+
+/* ===================== Hero Section ===================== */
+.hero {
+    position: relative;
+    border-radius: 12px;
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    margin-top: 120px;
+    background-size: cover;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    padding: 0 20px;
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.hero-content p {
+    font-size: 1.1rem;
+    margin: 10px 0 25px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ===================== Hero Search Box ===================== */
+.hero .search-box {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero .search-box input {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 25px 0 0 25px;
+    border: 2px solid #fff;
+    outline: none;
+}
+
+.hero .search-box button {
+    padding: 12px 20px;
+    background-color: #fff;
+    color: #7c8cff;
+    font-weight: bold;
+    border: none;
+    border-radius: 0 25px 25px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hero .search-box button:hover {
+    background-color: #e6eaff;
+}
+
+/* ===================== Container ===================== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* ===================== Upload Guide + Categories ===================== */
+.category-upload-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin: 40px 0;
+}
+
+.category-select select {
+    padding: 16px 24px;
+    font-size: 1.3rem;
+    border-radius: 16px;
+    border: 2px solid #7c8cff;
+    background-color: #f5f8ff;
+    cursor: pointer;
+    min-width: 260px;
+    max-width: 320px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.category-select select:hover {
+    border-color: #5c6fe0;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.category-select select:focus {
+    outline: none;
+    border-color: #3f51ff;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.category-upload-wrapper .upload-guide-btn {
+    display: inline-block;
+    padding: 16px 32px;
+    font-size: 1.2rem;
+    background-color: #7c8cff;
+    color: white;
+    font-weight: bold;
+    border-radius: 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.category-upload-wrapper .upload-guide-btn:hover {
+    background-color: #5c6fe0;
+    transform: translateY(-2px);
+}
+
+/* ===================== Guides Section ===================== */
+.guides h2 {
+    font-family: 'Arial', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #000;
+    margin: 3rem 0 1rem 0;
+    text-align: center;
+}
+
+.guide-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    padding: 0 1rem;
+}
+
+.card {
+    display: block;
+    text-decoration: none;
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    object-fit: cover;
+}
+
+.card p {
+    font-size: 0.95rem;
+    color: #333;
+    line-height: 1.4;
+}
+
+/* ===================== Volunteer Registration Page ===================== */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 60px 0;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 500px;
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.login-card h2 {
+    text-align: center;
+    font-size: 28px;
+    color: #222;
+    margin-bottom: 25px;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.input-field label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+.input-field input {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s ease-in-out;
+}
+
+.input-field input:focus {
+    border-color: #0077cc;
+    box-shadow: 0 0 6px rgba(0, 119, 204, 0.3);
+}
+
+/* Password Toggle Styles for input-field */
+.input-field {
+    position: relative;
+}
+
+.input-field.password-input-wrapper,
+.input-field .password-input-wrapper {
+    position: relative;
+}
+
+.input-field .password-toggle-btn,
+.password-input-wrapper .password-toggle-btn,
+.password-toggle-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    color: #666;
+    transition: color 0.2s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.input-field input[type="password"],
+.input-field .password-input-wrapper input[type="password"],
+.input-field .password-input-wrapper input[type="text"],
+.input-field input[type="text"] {
+    padding-right: 3rem;
+}
+
+.password-toggle-btn:hover {
+    color: #333;
+}
+
+.password-toggle-btn:focus {
+    outline: 2px solid #0077cc;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.login-btn {
+    background: #0077cc;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s ease-in-out;
+}
+
+.login-btn:hover {
+    background: #005fa3;
+}
+
+.note {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #777;
+}
+
+/* ===================== Responsive ===================== */
+@media screen and (max-width: 768px) {
+    .category-upload-wrapper {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .category-upload-wrapper .upload-guide-btn,
+    .category-select select {
+        width: 90%;
+        max-width: 350px;
+        text-align: center;
+    }
+
+    .login-wrapper {
+        margin: 40px 20px;
+    }
+
+    .login-card {
+        padding: 30px 20px;
+    }
+}

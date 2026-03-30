@@ -1,0 +1,1 @@
+ALTER TABLE delivery_assignments ADD COLUMN delivery_pin CHAR(6) DEFAULT NULL AFTER delivery_lng;
