@@ -277,46 +277,6 @@
             </a>
         </div>
     </section>
-
-    <!-- Suggested Products Section -->
-    <section class="suggested-section">
-        <h2 class="section-title">You Might Also Like</h2>
-        <div class="product-grid">
-            <a href="${pageContext.request.contextPath}/product_details" class="product-card">
-                <img src="${pageContext.request.contextPath}/assets/images/glass_cutter.jpg" alt="Glass Cutter" class="product-card-image">
-                <div class="product-card-body">
-                    <h3 class="product-card-title">Glass Cutter</h3>
-                    <p class="product-card-price">Rs 1,200</p>
-                    <p class="product-card-desc">Durable tool for precise glass cutting at home or DIY projects.</p>
-                </div>
-            </a>
-            <a href="${pageContext.request.contextPath}/product_details" class="product-card">
-                <img src="${pageContext.request.contextPath}/assets/images/sawmachine.jpg" alt="Saw Machine" class="product-card-image">
-                <div class="product-card-body">
-                    <h3 class="product-card-title">Saw Machine</h3>
-                    <p class="product-card-price">Rs 7,250</p>
-                    <p class="product-card-desc">Efficient cutting tool for wood, metal, and plastic surfaces.</p>
-                </div>
-            </a>
-            <a href="${pageContext.request.contextPath}/product_details" class="product-card">
-                <img src="${pageContext.request.contextPath}/assets/images/drill.jpg" alt="Drill Machine" class="product-card-image">
-                <div class="product-card-body">
-                    <h3 class="product-card-title">Drill Machine</h3>
-                    <p class="product-card-price">Rs 4,500</p>
-                    <p class="product-card-desc">Compact drill for versatile DIY and home repair tasks.</p>
-                </div>
-            </a>
-            <a href="${pageContext.request.contextPath}/product_details" class="product-card">
-                <img src="${pageContext.request.contextPath}/assets/images/roller.jpg" alt="Paint Roller" class="product-card-image">
-                <div class="product-card-body">
-                    <h3 class="product-card-title">Paint Roller</h3>
-                    <p class="product-card-price">Rs 1,200</p>
-                    <p class="product-card-desc">Smooth finish roller for walls, ceilings, and furniture.</p>
-                </div>
-            </a>
-        </div>
-    </section>
 </div>
-
 </body>
 </html>

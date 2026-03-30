@@ -8,7 +8,7 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Create Booking - Daily Fixer</title>
             <jsp:include page="../shared/header.jsp" />
-            <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places"></script>
+            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8zSes6UGbYKIHNzCp3tny5RgccFruILI&libraries=places"></script>
         </head>
 
         <body>
