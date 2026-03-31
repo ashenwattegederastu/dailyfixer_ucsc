@@ -15,6 +15,11 @@ public class User {
     private String status;
     private Double latitude;   // home base lat (drivers) — null if not set
     private Double longitude;  // home base lng (drivers) — null if not set
+    private String nicNumber;
+    private String nicFrontPath;
+    private String nicBackPath;
+    private String licenseFrontPath;
+    private String licenseBackPath;
 
     public int getUserId() {
         return userId;
@@ -117,4 +122,19 @@ public class User {
 
     public Double getLongitude() { return longitude; }
     public void setLongitude(Double longitude) { this.longitude = longitude; }
+
+    public String getNicNumber() { return nicNumber; }
+    public void setNicNumber(String nicNumber) { this.nicNumber = nicNumber; }
+
+    public String getNicFrontPath() { return nicFrontPath; }
+    public void setNicFrontPath(String nicFrontPath) { this.nicFrontPath = nicFrontPath; }
+
+    public String getNicBackPath() { return nicBackPath; }
+    public void setNicBackPath(String nicBackPath) { this.nicBackPath = nicBackPath; }
+
+    public String getLicenseFrontPath() { return licenseFrontPath; }
+    public void setLicenseFrontPath(String licenseFrontPath) { this.licenseFrontPath = licenseFrontPath; }
+
+    public String getLicenseBackPath() { return licenseBackPath; }
+    public void setLicenseBackPath(String licenseBackPath) { this.licenseBackPath = licenseBackPath; }
 }

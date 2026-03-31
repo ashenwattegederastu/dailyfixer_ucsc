@@ -157,29 +157,39 @@ public class UserDAO {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    User u = new User();
-                    u.setUserId(rs.getInt("user_id"));
-                    u.setFirstName(rs.getString("first_name"));
-                    u.setLastName(rs.getString("last_name"));
-                    u.setUsername(rs.getString("username"));
-                    u.setEmail(rs.getString("email"));
-                    u.setPassword(rs.getString("password"));
-                    u.setPhoneNumber(rs.getString("phone_number"));
-                    u.setCity(rs.getString("city"));
-                    u.setBio(rs.getString("bio"));
-                    u.setProfilePicturePath(rs.getString("profile_picture_path"));
-                    u.setRole(rs.getString("role"));
-                    double lat = rs.getDouble("latitude");
-                    if (!rs.wasNull()) u.setLatitude(lat);
-                    double lng = rs.getDouble("longitude");
-                    if (!rs.wasNull()) u.setLongitude(lng);
-                    return u;
+                    return mapUser(rs);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private User mapUser(ResultSet rs) throws SQLException {
+        User u = new User();
+        u.setUserId(rs.getInt("user_id"));
+        u.setFirstName(rs.getString("first_name"));
+        u.setLastName(rs.getString("last_name"));
+        u.setUsername(rs.getString("username"));
+        u.setEmail(rs.getString("email"));
+        u.setPassword(rs.getString("password"));
+        u.setPhoneNumber(rs.getString("phone_number"));
+        u.setCity(rs.getString("city"));
+        u.setBio(rs.getString("bio"));
+        u.setProfilePicturePath(rs.getString("profile_picture_path"));
+        u.setRole(rs.getString("role"));
+        u.setStatus(rs.getString("status"));
+        double lat = rs.getDouble("latitude");
+        if (!rs.wasNull()) u.setLatitude(lat);
+        double lng = rs.getDouble("longitude");
+        if (!rs.wasNull()) u.setLongitude(lng);
+        u.setNicNumber(rs.getString("nic_number"));
+        u.setNicFrontPath(rs.getString("nic_front_path"));
+        u.setNicBackPath(rs.getString("nic_back_path"));
+        u.setLicenseFrontPath(rs.getString("license_front_path"));
+        u.setLicenseBackPath(rs.getString("license_back_path"));
+        return u;
     }
 
     public User getUserByEmail(String email) throws Exception {
@@ -212,22 +222,7 @@ public class UserDAO {
             ps.setString(2, hashedPassword);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    User u = new User();
-                    u.setUserId(rs.getInt("user_id"));
-                    u.setFirstName(rs.getString("first_name"));
-                    u.setLastName(rs.getString("last_name"));
-                    u.setUsername(rs.getString("username"));
-                    u.setEmail(rs.getString("email"));
-                    u.setPhoneNumber(rs.getString("phone_number"));
-                    u.setCity(rs.getString("city"));
-                    u.setBio(rs.getString("bio"));
-                    u.setProfilePicturePath(rs.getString("profile_picture_path"));
-                    u.setRole(rs.getString("role"));
-                    double lat = rs.getDouble("latitude");
-                    if (!rs.wasNull()) u.setLatitude(lat);
-                    double lng = rs.getDouble("longitude");
-                    if (!rs.wasNull()) u.setLongitude(lng);
-                    return u;
+                    return mapUser(rs);
                 }
             }
         }

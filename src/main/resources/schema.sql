@@ -1014,6 +1014,11 @@ CREATE TABLE `users` (
   `profile_picture_path` varchar(255) DEFAULT NULL,
   `role` enum('user','volunteer','technician','driver','store','admin') DEFAULT 'user',
   `status` enum('active','suspended') DEFAULT 'active',
+  `nic_number` varchar(20) DEFAULT NULL,
+  `nic_front_path` varchar(255) DEFAULT NULL,
+  `nic_back_path` varchar(255) DEFAULT NULL,
+  `license_front_path` varchar(255) DEFAULT NULL,
+  `license_back_path` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
@@ -1141,6 +1146,39 @@ CREATE TABLE `volunteers` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `volunteers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `driver_requests`
+--
+
+DROP TABLE IF EXISTS `driver_requests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `driver_requests` (
+  `request_id` int NOT NULL AUTO_INCREMENT,
+  `full_name` varchar(100) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `city` varchar(50) DEFAULT NULL,
+  `nic_number` varchar(20) NOT NULL,
+  `nic_front_path` varchar(255) NOT NULL,
+  `nic_back_path` varchar(255) NOT NULL,
+  `profile_picture_path` varchar(255) DEFAULT NULL,
+  `license_front_path` varchar(255) NOT NULL,
+  `license_back_path` varchar(255) NOT NULL,
+  `policy_accepted` tinyint(1) NOT NULL DEFAULT '0',
+  `status` enum('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
+  `rejection_reason` text,
+  `submitted_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `reviewed_date` timestamp NULL DEFAULT NULL,
+  `reviewed_by` int DEFAULT NULL,
+  PRIMARY KEY (`request_id`),
+  KEY `fk_reviewed_by` (`reviewed_by`),
+  CONSTRAINT `fk_reviewed_by` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

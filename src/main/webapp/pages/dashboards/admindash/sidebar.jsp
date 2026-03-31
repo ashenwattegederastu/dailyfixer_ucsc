@@ -74,6 +74,13 @@
                             </a>
                         </li>
                         <li>
+                            <a href="${pageContext.request.contextPath}/admin/driver-requests"
+                                id="nav-driver-requests">
+                                <i class="ph ph-steering-wheel"></i>
+                                Driver Requests
+                            </a>
+                        </li>
+                        <li>
                             <a href="${pageContext.request.contextPath}/admin/deliveryRates"
                                 id="nav-delivery-rates">
                                 <i class="ph ph-truck"></i>
@@ -164,6 +171,8 @@
                         document.getElementById('nav-refunds')?.classList.add('active');
                     } else if (currentPath.includes('/admin/driver-incidents')) {
                         document.getElementById('nav-driver-incidents')?.classList.add('active');
+                    } else if (currentPath.includes('/admin/driver-requests') || currentPath.includes('/driver-request')) {
+                        document.getElementById('nav-driver-requests')?.classList.add('active');
                     }
                 });
 

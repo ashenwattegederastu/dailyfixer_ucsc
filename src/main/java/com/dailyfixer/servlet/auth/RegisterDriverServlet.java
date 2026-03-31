@@ -1,60 +1,160 @@
 package com.dailyfixer.servlet.auth;
 
+import com.dailyfixer.dao.DriverRequestDAO;
+import com.dailyfixer.model.DriverRequest;
 import com.dailyfixer.util.HashUtil;
-import com.dailyfixer.util.DBConnection;
+import com.dailyfixer.util.ImageUploadUtil;
 
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 
 @WebServlet("/RegisterDriverServlet")
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,      // 1 MB
+    maxFileSize       = 1024 * 1024 * 5,   // 5 MB per file
+    maxRequestSize    = 1024 * 1024 * 30   // 30 MB total
+)
 public class RegisterDriverServlet extends HttpServlet {
+
+    private DriverRequestDAO requestDAO = new DriverRequestDAO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        String webAppPath = getServletContext().getRealPath("/");
 
-        String firstName = request.getParameter("first_name");
-        String lastName = request.getParameter("last_name");
-        String username = request.getParameter("username");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String phone = request.getParameter("phone_number");
-        String city = request.getParameter("city");
+        try {
+            // === Basic Account Info ===
+            String firstName = request.getParameter("first_name");
+            String lastName  = request.getParameter("last_name");
+            String username  = request.getParameter("username");
+            String email     = request.getParameter("email");
+            String password  = request.getParameter("password");
+            String confirmPw = request.getParameter("confirmPassword");
+            String phone     = request.getParameter("phone_number");
+            String city      = request.getParameter("city");
+            String nicNumber = request.getParameter("nic_number");
+            String policyParam = request.getParameter("policy_accepted");
 
-        // ✅ Use same hashing method as RegisterUserServlet
-        String hashedPassword = HashUtil.sha256(password);
+            String fullName = (firstName != null ? firstName.trim() : "") + " " + (lastName != null ? lastName.trim() : "");
+            fullName = fullName.trim();
 
-        try (Connection conn = DBConnection.getConnection()) {
-            String sql = "INSERT INTO users (first_name, last_name, username, email, password, phone_number, city, role) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, 'driver')";
+            // === Server-side validation ===
+            if (fullName.isEmpty() || username == null || username.trim().isEmpty()
+                    || email == null || email.trim().isEmpty()
+                    || password == null || password.trim().isEmpty()) {
+                response.sendRedirect("registerDriver.jsp?error=Please+fill+in+all+required+fields");
+                return;
+            }
 
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, firstName);
-            stmt.setString(2, lastName);
-            stmt.setString(3, username);
-            stmt.setString(4, email);
-            stmt.setString(5, hashedPassword);
-            stmt.setString(6, phone);
-            stmt.setString(7, city);
+            if (!password.equals(confirmPw)) {
+                response.sendRedirect("registerDriver.jsp?error=Passwords+do+not+match");
+                return;
+            }
 
-            int rows = stmt.executeUpdate();
+            if (password.length() < 6) {
+                response.sendRedirect("registerDriver.jsp?error=Password+must+be+at+least+6+characters");
+                return;
+            }
 
-            if (rows > 0) {
-                response.sendRedirect("login.jsp?msg=Driver+account+created+successfully");
+            // NIC validation: 9 digits + V/X or 12 digits
+            if (nicNumber == null || nicNumber.trim().isEmpty()
+                    || !nicNumber.trim().matches("^\\d{9}[VvXx]$|^\\d{12}$")) {
+                response.sendRedirect("registerDriver.jsp?error=Invalid+NIC+number+format");
+                return;
+            }
+
+            if (!"on".equals(policyParam) && !"true".equals(policyParam)) {
+                response.sendRedirect("registerDriver.jsp?error=You+must+accept+the+driver+policies");
+                return;
+            }
+
+            // Duplicate checks
+            if (requestDAO.usernameExists(username.trim())) {
+                response.sendRedirect("registerDriver.jsp?error=Username+already+exists+or+is+pending+review");
+                return;
+            }
+            if (requestDAO.emailExists(email.trim())) {
+                response.sendRedirect("registerDriver.jsp?error=Email+already+exists+or+is+pending+review");
+                return;
+            }
+
+            // === File uploads ===
+            Part nicFrontPart     = request.getPart("nic_front");
+            Part nicBackPart      = request.getPart("nic_back");
+            Part profilePicPart   = request.getPart("profile_picture");
+            Part licenseFrontPart = request.getPart("license_front");
+            Part licenseBackPart  = request.getPart("license_back");
+
+            // Validate required file uploads
+            if (nicFrontPart == null || nicFrontPart.getSize() == 0
+                    || nicBackPart == null || nicBackPart.getSize() == 0
+                    || profilePicPart == null || profilePicPart.getSize() == 0
+                    || licenseFrontPart == null || licenseFrontPart.getSize() == 0) {
+                response.sendRedirect("registerDriver.jsp?error=Please+upload+all+required+documents");
+                return;
+            }
+
+            // Validate file types (images only)
+            Part[] requiredParts = {nicFrontPart, nicBackPart, profilePicPart, licenseFrontPart};
+            for (Part p : requiredParts) {
+                if (p.getContentType() == null || !p.getContentType().startsWith("image/")) {
+                    response.sendRedirect("registerDriver.jsp?error=Only+image+files+are+accepted+for+uploads");
+                    return;
+                }
+            }
+            if (licenseBackPart != null && licenseBackPart.getSize() > 0
+                    && (licenseBackPart.getContentType() == null || !licenseBackPart.getContentType().startsWith("image/"))) {
+                response.sendRedirect("registerDriver.jsp?error=Only+image+files+are+accepted+for+uploads");
+                return;
+            }
+
+            String safeUsername = username.trim().replaceAll("[^a-zA-Z0-9_]", "_");
+
+            String nicFrontPath     = ImageUploadUtil.saveDriverUpload(nicFrontPart, "nic_front_" + safeUsername, webAppPath);
+            String nicBackPath      = ImageUploadUtil.saveDriverUpload(nicBackPart, "nic_back_" + safeUsername, webAppPath);
+            String profilePicPath   = ImageUploadUtil.saveDriverUpload(profilePicPart, "profile_" + safeUsername, webAppPath);
+            String licenseFrontPath = ImageUploadUtil.saveDriverUpload(licenseFrontPart, "license_front_" + safeUsername, webAppPath);
+            String licenseBackPath  = null;
+            if (licenseBackPart != null && licenseBackPart.getSize() > 0) {
+                licenseBackPath = ImageUploadUtil.saveDriverUpload(licenseBackPart, "license_back_" + safeUsername, webAppPath);
+            }
+
+            // === Build request object ===
+            String hashedPassword = HashUtil.sha256(password);
+
+            DriverRequest driverRequest = new DriverRequest();
+            driverRequest.setFullName(fullName);
+            driverRequest.setUsername(username.trim());
+            driverRequest.setEmail(email.trim());
+            driverRequest.setPhone(phone != null ? phone.trim() : null);
+            driverRequest.setPasswordHash(hashedPassword);
+            driverRequest.setCity(city != null ? city.trim() : null);
+            driverRequest.setNicNumber(nicNumber.trim());
+            driverRequest.setNicFrontPath(nicFrontPath);
+            driverRequest.setNicBackPath(nicBackPath);
+            driverRequest.setProfilePicturePath(profilePicPath);
+            driverRequest.setLicenseFrontPath(licenseFrontPath);
+            driverRequest.setLicenseBackPath(licenseBackPath);
+            driverRequest.setPolicyAccepted(true);
+
+            int requestId = requestDAO.submitRequest(driverRequest);
+
+            if (requestId > 0) {
+                response.sendRedirect("login.jsp?msg=Driver+registration+submitted+successfully.+Your+application+is+pending+admin+verification.");
             } else {
-                response.sendRedirect("registerDriver.jsp?error=Signup+failed");
+                response.sendRedirect("registerDriver.jsp?error=Registration+failed.+Please+try+again.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("registerDriver.jsp?error=Database+error");
+            response.sendRedirect("registerDriver.jsp?error=An+unexpected+error+occurred.+Please+try+again.");
         }
     }
 }
