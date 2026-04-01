@@ -14,6 +14,8 @@ public class Service {
     private String availableDates;
     private byte[] serviceImage;
     private String imageType;
+    private boolean recurringEnabled;
+    private double recurringFee;
 
     // Getters and setters
     public int getServiceId() { return serviceId; }
@@ -54,4 +56,10 @@ public class Service {
 
     public String getImageType() { return imageType; }
     public void setImageType(String imageType) { this.imageType = imageType; }
+
+    public boolean isRecurringEnabled() { return recurringEnabled; }
+    public void setRecurringEnabled(boolean recurringEnabled) { this.recurringEnabled = recurringEnabled; }
+
+    public double getRecurringFee() { return recurringFee; }
+    public void setRecurringFee(double recurringFee) { this.recurringFee = recurringFee; }
 }

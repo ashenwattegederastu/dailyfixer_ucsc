@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
     <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+    <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
         <!DOCTYPE html>
         <html lang="en">
 
@@ -64,6 +65,7 @@
                     <input type="hidden" name="serviceId" value="${service.serviceId}">
                     <input type="hidden" name="latitude" id="latitude">
                     <input type="hidden" name="longitude" id="longitude">
+                    <input type="hidden" name="isRecurring" id="isRecurringInput" value="false">
 
                     <div
                         style="background: var(--card); padding: 1.5rem; border-radius: 0; box-shadow: var(--shadow-sm);">
@@ -110,6 +112,35 @@
                                 style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0; background: var(--input); margin-top: 0.5rem;">
                         </div>
 
+                        <!-- Recurring Booking Option (only shown when service supports it) -->
+                        <c:if test="${service.recurringEnabled}">
+                        <div style="margin-bottom: 1rem; padding: 1rem; border: 1px solid #93c5fd; border-radius: 0; background: #eff6ff;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
+                                <input type="checkbox" id="recurringCheckbox" onchange="toggleRecurringPanel()"
+                                    style="width: 18px; height: 18px; cursor: pointer; accent-color: #1d4ed8;">
+                                <label for="recurringCheckbox" style="font-weight: 600; color: #1e40af; cursor: pointer; margin: 0;">
+                                    &#8635; Book as Recurring Service (Monthly, 1-Year Contract)
+                                </label>
+                            </div>
+                            <div id="recurringInfoPanel" style="display: none; margin-top: 0.75rem;">
+                                <div style="background: white; border: 1px solid #bfdbfe; border-radius: 0; padding: 1rem; margin-bottom: 0.5rem;">
+                                    <p style="font-weight: 700; color: #1e40af; font-size: 1.05rem; margin: 0 0 0.5rem 0;">
+                                        Monthly Recurring Fee: Rs. <fmt:formatNumber value="${service.recurringFee}" maxFractionDigits="2" minFractionDigits="2"/>
+                                    </p>
+                                    <ul style="margin: 0; padding-left: 1.25rem; color: #374151; font-size: 0.9rem; line-height: 1.7;">
+                                        <li>This creates a <strong>1-year contract</strong> — the service is booked on the same day every month for 12 months.</li>
+                                        <li>The date you choose below will repeat each month (day must be between 1st and 28th).</li>
+                                        <li><strong>Payments are handled directly with the technician</strong> — not through DailyFixer.</li>
+                                        <li>Either party can cancel the contract at any time; only future bookings are affected.</li>
+                                    </ul>
+                                </div>
+                                <p style="font-size: 0.8rem; color: #6b7280; margin: 0;">
+                                    By checking this box you agree to the 1-year recurring service contract terms as stated above.
+                                </p>
+                            </div>
+                        </div>
+                        </c:if>
+
                         <button type="submit"
                             style="width: 100%; background: var(--primary); color: var(--primary-foreground); padding: 0.75rem; border: none; border-radius: 0; font-weight: 600; font-size: 1rem; cursor: pointer;">
                             Submit Booking Request
@@ -119,6 +150,39 @@
             </div>
 
             <script>
+                function toggleRecurringPanel() {
+                    var checked = document.getElementById('recurringCheckbox').checked;
+                    document.getElementById('isRecurringInput').value = checked ? 'true' : 'false';
+                    document.getElementById('recurringInfoPanel').style.display = checked ? 'block' : 'none';
+                    if (checked) validateRecurringDay();
+                }
+
+                function validateRecurringDay() {
+                    var checkbox = document.getElementById('recurringCheckbox');
+                    if (!checkbox || !checkbox.checked) return;
+                    var dateInput = document.querySelector('input[name="bookingDate"]');
+                    if (dateInput && dateInput.value) {
+                        var day = new Date(dateInput.value + 'T00:00:00').getDate();
+                        var existing = document.getElementById('recurringDayWarning');
+                        if (day > 28) {
+                            if (!existing) {
+                                var warn = document.createElement('p');
+                                warn.id = 'recurringDayWarning';
+                                warn.style.cssText = 'color:#dc2626;font-weight:600;font-size:0.85rem;margin-top:6px;';
+                                warn.innerText = '\u26A0 Recurring bookings require a date between the 1st and 28th of the month.';
+                                document.getElementById('recurringInfoPanel').appendChild(warn);
+                            }
+                        } else {
+                            if (existing) existing.remove();
+                        }
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', function() {
+                    var dateInput = document.querySelector('input[name="bookingDate"]');
+                    if (dateInput) dateInput.addEventListener('change', validateRecurringDay);
+                });
+
                 let map, marker, geocoder;
 
                 function initMap() {

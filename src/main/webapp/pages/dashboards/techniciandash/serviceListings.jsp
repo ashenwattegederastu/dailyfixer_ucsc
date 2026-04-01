@@ -73,6 +73,7 @@
                                                 <th>Category</th>
                                                 <th>Pricing Type</th>
                                                 <th>Charges</th>
+                                                <th>Recurring</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -105,6 +106,15 @@
                                                             style="font-weight: 600; color: var(--foreground);">Rs.
                                                             <%=s.getTransportCharge()%>
                                                         </span>
+                                                    </td>
+                                                    <td>
+                                                        <% if (s.isRecurringEnabled()) { %>
+                                                            <span style="display: inline-block; background: #dbeafe; color: #1e40af; padding: 3px 9px; border-radius: 4px; font-size: 0.82em; font-weight: 600; white-space: nowrap;">
+                                                                &#8635; Rs. <%=(int)s.getRecurringFee()%>/mo
+                                                            </span>
+                                                        <% } else { %>
+                                                            <span style="color: var(--muted-foreground); font-size: 0.85em;">—</span>
+                                                        <% } %>
                                                     </td>
                                                     <td class="actions">
                                                         <a href="${pageContext.request.contextPath}/EditServiceServlet?id=<%= s.getServiceId() %>"

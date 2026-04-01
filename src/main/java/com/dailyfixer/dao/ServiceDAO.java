@@ -11,7 +11,7 @@ public class ServiceDAO {
 
     // Insert new service
     public void addService(Service s) throws Exception {
-        String sql = "INSERT INTO services (technician_id, service_name, description, category, pricing_type, fixed_rate, hourly_rate, inspection_charge, transport_charge, available_dates, service_image, image_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO services (technician_id, service_name, description, category, pricing_type, fixed_rate, hourly_rate, inspection_charge, transport_charge, available_dates, service_image, image_type, recurring_enabled, recurring_fee) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -27,6 +27,8 @@ public class ServiceDAO {
             ps.setString(10, s.getAvailableDates());
             ps.setBytes(11, s.getServiceImage());
             ps.setString(12, s.getImageType());
+            ps.setBoolean(13, s.isRecurringEnabled());
+            ps.setObject(14, s.isRecurringEnabled() && s.getRecurringFee() > 0 ? s.getRecurringFee() : null);
             ps.executeUpdate();
         }
     }
@@ -52,6 +54,8 @@ public class ServiceDAO {
                     s.setAvailableDates(rs.getString("available_dates"));
                     s.setServiceImage(rs.getBytes("service_image"));
                     s.setImageType(rs.getString("image_type"));
+                    s.setRecurringEnabled(rs.getBoolean("recurring_enabled"));
+                    s.setRecurringFee(rs.getDouble("recurring_fee"));
                     return s;
                 }
             }
@@ -60,7 +64,7 @@ public class ServiceDAO {
     }
 
     public void updateService(Service service) throws Exception {
-        String sql = "UPDATE services SET service_name=?, description=?, category=?, pricing_type=?, fixed_rate=?, hourly_rate=?, inspection_charge=?, transport_charge=?, available_dates=?, service_image=?, image_type=? WHERE service_id=?";
+        String sql = "UPDATE services SET service_name=?, description=?, category=?, pricing_type=?, fixed_rate=?, hourly_rate=?, inspection_charge=?, transport_charge=?, available_dates=?, service_image=?, image_type=?, recurring_enabled=?, recurring_fee=? WHERE service_id=?";
         try (Connection con = DBConnection.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, service.getServiceName());
@@ -74,7 +78,9 @@ public class ServiceDAO {
             ps.setString(9, service.getAvailableDates());
             ps.setBytes(10, service.getServiceImage());
             ps.setString(11, service.getImageType());
-            ps.setInt(12, service.getServiceId());
+            ps.setBoolean(12, service.isRecurringEnabled());
+            ps.setObject(13, service.isRecurringEnabled() && service.getRecurringFee() > 0 ? service.getRecurringFee() : null);
+            ps.setInt(14, service.getServiceId());
             ps.executeUpdate();
         }
     }
@@ -101,6 +107,8 @@ public class ServiceDAO {
                 s.setTransportCharge(rs.getDouble("transport_charge"));
                 s.setAvailableDates(rs.getString("available_dates"));
                 s.setImageType(rs.getString("image_type"));
+                s.setRecurringEnabled(rs.getBoolean("recurring_enabled"));
+                s.setRecurringFee(rs.getDouble("recurring_fee"));
                 list.add(s);
             }
         }
@@ -157,6 +165,8 @@ public class ServiceDAO {
                 s.setTransportCharge(rs.getDouble("transport_charge"));
                 s.setAvailableDates(rs.getString("available_dates"));
                 s.setImageType(rs.getString("image_type"));
+                s.setRecurringEnabled(rs.getBoolean("recurring_enabled"));
+                s.setRecurringFee(rs.getDouble("recurring_fee"));
                 list.add(s);
             }
         }

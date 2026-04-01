@@ -2,6 +2,7 @@ package com.dailyfixer.servlet.booking;
 
 import com.dailyfixer.dao.BookingDAO;
 import com.dailyfixer.dao.ChatDAO;
+import com.dailyfixer.dao.RecurringContractDAO;
 import com.dailyfixer.model.Booking;
 import com.dailyfixer.model.Chat;
 import com.dailyfixer.model.User;
@@ -35,7 +36,15 @@ public class AcceptBookingServlet extends HttpServlet {
             
             // Update booking status
             bookingDAO.updateBookingStatus(bookingId, "ACCEPTED");
-            
+
+            // If this is the first booking of a recurring contract, activate the
+            // contract and auto-generate months 2-12 as ACCEPTED bookings.
+            if (booking.getRecurringContractId() != null && Integer.valueOf(1).equals(booking.getRecurringSequence())) {
+                RecurringContractDAO contractDAO = new RecurringContractDAO();
+                contractDAO.updateContractStatus(booking.getRecurringContractId(), "ACTIVE");
+                bookingDAO.createRecurringBookings(booking.getRecurringContractId(), booking);
+            }
+
             // Create chat for this booking
             ChatDAO chatDAO = new ChatDAO();
             Chat existingChat = chatDAO.getChatByBookingId(bookingId);

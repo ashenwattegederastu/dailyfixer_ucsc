@@ -416,6 +416,70 @@
                         min-width: auto;
                     }
                 }
+
+                /* ── Recurring Contract Group (list view) ─────── */
+                .recurring-contract-card {
+                    border-left: 4px solid var(--primary);
+                }
+
+                .recurring-badge {
+                    display: inline-block;
+                    padding: 0.18rem 0.55rem;
+                    border-radius: var(--radius-sm);
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                    background: var(--primary);
+                    color: var(--primary-foreground);
+                    margin-left: 0.4rem;
+                    vertical-align: middle;
+                }
+
+                .months-toggle-btn {
+                    background: none;
+                    border: none;
+                    color: var(--primary);
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    cursor: pointer;
+                    padding: 0;
+                    text-decoration: underline;
+                    font-family: var(--font-sans);
+                    margin-top: 0.5rem;
+                    display: inline-block;
+                }
+
+                .months-list {
+                    display: none;
+                    margin-top: 0.75rem;
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius-md);
+                    overflow: hidden;
+                }
+
+                .months-list table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 0.875rem;
+                }
+
+                .months-list th {
+                    background: var(--muted);
+                    padding: 0.5rem 0.75rem;
+                    text-align: left;
+                    font-weight: 600;
+                    color: var(--muted-foreground);
+                    font-size: 0.8rem;
+                }
+
+                .months-list td {
+                    padding: 0.5rem 0.75rem;
+                    border-top: 1px solid var(--border);
+                    color: var(--foreground);
+                }
+
+                .months-list tr:hover td {
+                    background: var(--accent);
+                }
             </style>
         </head>
 
@@ -449,64 +513,7 @@
 
                 <!-- ════════════ LIST VIEW ════════════ -->
                 <div id="list-view">
-                    <div class="booking-list">
-                        <c:forEach var="booking" items="${bookings}">
-                            <div class="booking-card">
-                                <div class="booking-card-header">
-                                    <div>
-                                        <h3>${booking.serviceName}</h3>
-                                        <p><strong>Customer:</strong> ${booking.userName}</p>
-                                        <p><strong>Phone:</strong> ${booking.phoneNumber}</p>
-                                        <p><strong>Date:</strong> ${booking.bookingDate} at ${booking.bookingTime}</p>
-                                    </div>
-                                    <div>
-                                        <c:choose>
-                                            <c:when test="${booking.status == 'ACCEPTED'}">
-                                                <span class="status-badge accepted">ACCEPTED</span>
-                                            </c:when>
-                                            <c:when test="${booking.status == 'TECHNICIAN_COMPLETED'}">
-                                                <span class="status-badge awaiting">AWAITING USER CONFIRM</span>
-                                            </c:when>
-                                        </c:choose>
-                                    </div>
-                                </div>
-
-                                <div class="info-block">
-                                    <p class="label">Problem Description:</p>
-                                    <p>${booking.problemDescription}</p>
-                                </div>
-
-                                <div class="info-block">
-                                    <p class="label">Location:</p>
-                                    <p>${booking.locationAddress}</p>
-                                    <c:if
-                                        test="${not empty booking.locationLatitude && not empty booking.locationLongitude}">
-                                        <a href="https://www.google.com/maps?q=${booking.locationLatitude},${booking.locationLongitude}"
-                                            target="_blank"
-                                            style="color: var(--primary); text-decoration: underline; margin-top: 0.25rem; display: inline-block;">View
-                                            on Google Maps</a>
-                                    </c:if>
-                                </div>
-
-                                <div class="booking-actions">
-                                    <a href="${pageContext.request.contextPath}/chats/view?chatId=${booking.bookingId}"
-                                        class="btn-chat">Open Chat</a>
-                                    <c:if test="${booking.status == 'ACCEPTED'}">
-                                        <form method="post"
-                                            action="${pageContext.request.contextPath}/bookings/complete"
-                                            style="flex: 1; min-width: 150px;">
-                                            <input type="hidden" name="bookingId" value="${booking.bookingId}">
-                                            <input type="hidden" name="completionType" value="technician">
-                                            <button type="submit" class="btn-complete" style="width: 100%;">Mark as
-                                                Complete</button>
-                                        </form>
-                                    </c:if>
-                                    <button onclick="showCancelModal(${booking.bookingId})"
-                                        class="btn-cancel-booking">Cancel Booking</button>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </div>
+                    <div class="booking-list" id="listViewContainer"></div>
                 </div>
 
                 <!-- ════════════ CALENDAR VIEW ════════════ -->
@@ -590,7 +597,10 @@
                         problem: "${booking.problemDescription}",
                         address: "${booking.locationAddress}",
                         lat: "${booking.locationLatitude}",
-                        lng: "${booking.locationLongitude}"
+                        lng: "${booking.locationLongitude}",
+                        recurring: ${not empty booking.recurringContractId ? 'true' : 'false'},
+                        recurringSeq: ${not empty booking.recurringSequence ? booking.recurringSequence : 0},
+                        contractId: ${not empty booking.recurringContractId ? booking.recurringContractId : 0}
             }<c:if test="${!loop.last}">,</c:if>
                     </c:forEach>
                 ];
@@ -689,7 +699,9 @@
                         dayBookings.forEach(function (b) {
                             var pill = document.createElement('div');
                             pill.className = 'cal-booking-pill ' + (b.status === 'ACCEPTED' ? 'accepted' : 'awaiting');
-                            pill.textContent = formatTime(b.time) + ' ' + b.service;
+                            var pillLabel = formatTime(b.time) + ' ' + b.service;
+                            if (b.recurring) pillLabel = '\u21BB ' + pillLabel + ' (' + b.recurringSeq + '/12)';
+                            pill.textContent = pillLabel;
                             pill.title = b.service + ' — ' + b.customer;
                             pill.onclick = function () { showDetailModal(b); };
                             cell.appendChild(pill);
@@ -732,7 +744,9 @@
                     document.getElementById('detailServiceName').textContent = b.service;
                     document.getElementById('detailCustomer').textContent = b.customer;
                     document.getElementById('detailPhone').textContent = b.phone;
-                    document.getElementById('detailDate').textContent = b.date + ' at ' + formatTime(b.time);
+                    var dateText = b.date + ' at ' + formatTime(b.time);
+                    if (b.recurring) dateText += '  \u2014  \u21BB Recurring (Month ' + b.recurringSeq + ' of 12)';
+                    document.getElementById('detailDate').textContent = dateText;
                     document.getElementById('detailProblem').textContent = b.problem;
                     document.getElementById('detailAddress').textContent = b.address;
 
@@ -809,6 +823,152 @@
                 document.getElementById('detailModal').addEventListener('click', function (e) {
                     if (e.target === this) closeDetailModal();
                 });
+
+                /* ── List view rendering with recurring grouping ── */
+                function escHtml(str) {
+                    if (!str) return '';
+                    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                }
+
+                function toggleMonths(listId, toggleId, total) {
+                    var list = document.getElementById(listId);
+                    var btn = document.getElementById(toggleId);
+                    if (list.style.display === 'block') {
+                        list.style.display = 'none';
+                        btn.textContent = 'Show all ' + total + ' months \u25BC';
+                    } else {
+                        list.style.display = 'block';
+                        btn.textContent = 'Hide months \u25B2';
+                    }
+                }
+
+                function renderListView() {
+                    var container = document.getElementById('listViewContainer');
+                    container.innerHTML = '';
+
+                    var nonRecurring = [];
+                    var recurringGroups = {};
+                    var recurringOrder = [];
+
+                    bookings.forEach(function (b) {
+                        if (!b.recurring || !b.contractId) {
+                            nonRecurring.push(b);
+                        } else {
+                            var key = b.contractId;
+                            if (!recurringGroups[key]) {
+                                recurringGroups[key] = { contractId: key, months: [] };
+                                recurringOrder.push(key);
+                            }
+                            recurringGroups[key].months.push(b);
+                        }
+                    });
+
+                    recurringOrder.forEach(function (key) {
+                        recurringGroups[key].months.sort(function (a, b) { return a.recurringSeq - b.recurringSeq; });
+                    });
+
+                    function statusBadgeHtml(status) {
+                        if (status === 'ACCEPTED') return '<span class="status-badge accepted">ACCEPTED</span>';
+                        return '<span class="status-badge awaiting">AWAITING USER CONFIRM</span>';
+                    }
+
+                    /* Recurring contract group cards */
+                    recurringOrder.forEach(function (key) {
+                        var group = recurringGroups[key];
+                        var rep = group.months[0];
+                        var total = group.months.length;
+                        var today = new Date().toISOString().split('T')[0];
+                        var next = group.months.find(function (m) { return m.date >= today; }) || rep;
+
+                        var groupId = 'months-' + key;
+                        var toggleId = 'toggle-' + key;
+
+                        var monthRows = group.months.map(function (m) {
+                            return '<tr>' +
+                                '<td>Month ' + m.recurringSeq + '</td>' +
+                                '<td>' + m.date + ' at ' + formatTime(m.time) + '</td>' +
+                                '<td>' + statusBadgeHtml(m.status) + '</td>' +
+                                '<td><button onclick="showCancelModal(' + m.id + ')" class="btn-cancel-booking" style="padding:0.25rem 0.6rem;font-size:0.75rem;min-width:auto;flex:none;">Cancel</button></td>' +
+                                '</tr>';
+                        }).join('');
+
+                        var mapHtml = (rep.lat && rep.lng && rep.lat !== '' && rep.lng !== '')
+                            ? '<a href="https://www.google.com/maps?q=' + rep.lat + ',' + rep.lng + '" target="_blank" style="color:var(--primary);text-decoration:underline;margin-top:0.25rem;display:inline-block;">View on Google Maps</a>'
+                            : '';
+
+                        var completeHtml = next.status === 'ACCEPTED'
+                            ? '<form method="post" action="' + contextPath + '/bookings/complete" style="flex:1;min-width:150px;">'
+                              + '<input type="hidden" name="bookingId" value="' + next.id + '">'
+                              + '<input type="hidden" name="completionType" value="technician">'
+                              + '<button type="submit" class="btn-complete" style="width:100%;">Mark as Complete</button>'
+                              + '</form>'
+                            : '';
+
+                        var card = document.createElement('div');
+                        card.className = 'booking-card recurring-contract-card';
+                        card.innerHTML =
+                            '<div class="booking-card-header">'
+                            + '<div>'
+                            + '<h3>' + escHtml(rep.service) + ' <span class="recurring-badge">\u21BB Recurring (' + total + ' months)</span></h3>'
+                            + '<p><strong>Customer:</strong> ' + escHtml(rep.customer) + '</p>'
+                            + '<p><strong>Phone:</strong> ' + escHtml(rep.phone) + '</p>'
+                            + '<p><strong>Next:</strong> Month ' + next.recurringSeq + ' \u2014 ' + next.date + ' at ' + formatTime(next.time) + '</p>'
+                            + '</div>'
+                            + '<div>' + statusBadgeHtml(next.status) + '</div>'
+                            + '</div>'
+                            + '<div class="info-block"><p class="label">Problem Description:</p><p>' + escHtml(rep.problem) + '</p></div>'
+                            + '<div class="info-block"><p class="label">Location:</p><p>' + escHtml(rep.address) + '</p>' + mapHtml + '</div>'
+                            + '<button class="months-toggle-btn" id="' + toggleId + '" onclick="toggleMonths(\'' + groupId + '\',\'' + toggleId + '\',' + total + ')">'
+                            + 'Show all ' + total + ' months \u25BC</button>'
+                            + '<div class="months-list" id="' + groupId + '">'
+                            + '<table><thead><tr><th>Month</th><th>Date &amp; Time</th><th>Status</th><th>Action</th></tr></thead>'
+                            + '<tbody>' + monthRows + '</tbody></table></div>'
+                            + '<div class="booking-actions" style="margin-top:1rem;">'
+                            + '<a href="' + contextPath + '/chats/view?chatId=' + next.id + '" class="btn-chat">Open Chat</a>'
+                            + completeHtml
+                            + '<button onclick="showCancelModal(' + next.id + ')" class="btn-cancel-booking">Cancel Next</button>'
+                            + '</div>';
+                        container.appendChild(card);
+                    });
+
+                    /* Individual non-recurring booking cards */
+                    nonRecurring.forEach(function (b) {
+                        var mapHtml = (b.lat && b.lng && b.lat !== '' && b.lng !== '')
+                            ? '<a href="https://www.google.com/maps?q=' + b.lat + ',' + b.lng + '" target="_blank" style="color:var(--primary);text-decoration:underline;margin-top:0.25rem;display:inline-block;">View on Google Maps</a>'
+                            : '';
+
+                        var completeHtml = b.status === 'ACCEPTED'
+                            ? '<form method="post" action="' + contextPath + '/bookings/complete" style="flex:1;min-width:150px;">'
+                              + '<input type="hidden" name="bookingId" value="' + b.id + '">'
+                              + '<input type="hidden" name="completionType" value="technician">'
+                              + '<button type="submit" class="btn-complete" style="width:100%;">Mark as Complete</button>'
+                              + '</form>'
+                            : '';
+
+                        var card = document.createElement('div');
+                        card.className = 'booking-card';
+                        card.innerHTML =
+                            '<div class="booking-card-header">'
+                            + '<div>'
+                            + '<h3>' + escHtml(b.service) + '</h3>'
+                            + '<p><strong>Customer:</strong> ' + escHtml(b.customer) + '</p>'
+                            + '<p><strong>Phone:</strong> ' + escHtml(b.phone) + '</p>'
+                            + '<p><strong>Date:</strong> ' + b.date + ' at ' + formatTime(b.time) + '</p>'
+                            + '</div>'
+                            + '<div>' + statusBadgeHtml(b.status) + '</div>'
+                            + '</div>'
+                            + '<div class="info-block"><p class="label">Problem Description:</p><p>' + escHtml(b.problem) + '</p></div>'
+                            + '<div class="info-block"><p class="label">Location:</p><p>' + escHtml(b.address) + '</p>' + mapHtml + '</div>'
+                            + '<div class="booking-actions">'
+                            + '<a href="' + contextPath + '/chats/view?chatId=' + b.id + '" class="btn-chat">Open Chat</a>'
+                            + completeHtml
+                            + '<button onclick="showCancelModal(' + b.id + ')" class="btn-cancel-booking">Cancel Booking</button>'
+                            + '</div>';
+                        container.appendChild(card);
+                    });
+                }
+
+                renderListView();
             </script>
         </body>
 

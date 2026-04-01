@@ -64,6 +64,12 @@
                                 Cancelled Bookings
                             </a>
                         </li>
+                        <li>
+                            <a href="${pageContext.request.contextPath}/pages/dashboards/userdash/recurringContracts.jsp" id="nav-user-recurring">
+                                <i class="ph ph-arrows-clockwise"></i>
+                                Recurring Contracts
+                            </a>
+                        </li>
 
                         <li class="nav-section-title"
                             style="padding: 12px 20px 4px; color: var(--muted-foreground); font-weight: 600; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 8px;">

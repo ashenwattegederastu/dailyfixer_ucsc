@@ -12,8 +12,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @WebServlet("/user/bookings/*")
@@ -53,7 +56,27 @@ public class UserBookingsServlet extends HttpServlet {
                 case "/active":
                     bookings = bookingDAO.getBookingsByUserAndStatuses(userId, "REQUESTED", "ACCEPTED",
                             "TECHNICIAN_COMPLETED");
-                    request.setAttribute("activeBookings", bookings);
+
+                    // For recurring contracts, show only the next upcoming booking per contract.
+                    // Non-recurring bookings are shown as-is.
+                    Map<Integer, Booking> nextRecurring = new LinkedHashMap<>();
+                    List<Booking> nonRecurring = new ArrayList<>();
+                    for (Booking b : bookings) {
+                        if (b.getRecurringContractId() == null) {
+                            nonRecurring.add(b);
+                        } else {
+                            int cid = b.getRecurringContractId();
+                            if (!nextRecurring.containsKey(cid) ||
+                                b.getBookingDate().before(nextRecurring.get(cid).getBookingDate())) {
+                                nextRecurring.put(cid, b);
+                            }
+                        }
+                    }
+                    List<Booking> displayed = new ArrayList<>(nonRecurring);
+                    displayed.addAll(nextRecurring.values());
+                    displayed.sort((a, z) -> z.getBookingDate().compareTo(a.getBookingDate()));
+
+                    request.setAttribute("activeBookings", displayed);
                     targetJsp = "/pages/dashboards/userdash/activeBookings.jsp";
                     break;
                 case "/completed":

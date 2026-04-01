@@ -138,6 +138,11 @@
                                 <span style="background: var(--muted); color: var(--foreground); padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">
                                     ${service.category}
                                 </span>
+                                <c:if test="${service.recurringEnabled}">
+                                    <span style="background: #dbeafe; color: #1e40af; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                                        &#8635; Recurring Available
+                                    </span>
+                                </c:if>
                             </div>
 
                             <!-- See Profile Button -->

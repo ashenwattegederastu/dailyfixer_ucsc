@@ -27,6 +27,10 @@ public class Booking {
     private String technicianName;
     private String serviceName;
 
+    // Recurring booking fields
+    private Integer recurringContractId;
+    private Integer recurringSequence;
+
     // Getters and setters
     public int getBookingId() { return bookingId; }
     public void setBookingId(int bookingId) { this.bookingId = bookingId; }
@@ -81,4 +85,10 @@ public class Booking {
 
     public String getServiceName() { return serviceName; }
     public void setServiceName(String serviceName) { this.serviceName = serviceName; }
+
+    public Integer getRecurringContractId() { return recurringContractId; }
+    public void setRecurringContractId(Integer recurringContractId) { this.recurringContractId = recurringContractId; }
+
+    public Integer getRecurringSequence() { return recurringSequence; }
+    public void setRecurringSequence(Integer recurringSequence) { this.recurringSequence = recurringSequence; }
 }

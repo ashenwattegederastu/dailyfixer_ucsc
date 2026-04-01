@@ -77,6 +77,15 @@ public class EditServiceServlet extends HttpServlet {
             s.setHourlyRate(request.getParameter("hourlyRate") == null || request.getParameter("hourlyRate").isEmpty() ? 0 : Double.parseDouble(request.getParameter("hourlyRate")));
             s.setInspectionCharge(Double.parseDouble(request.getParameter("inspectionCharge")));
             s.setTransportCharge(Double.parseDouble(request.getParameter("transportCharge")));
+
+            boolean recurringEnabled = "on".equals(request.getParameter("recurringEnabled"));
+            s.setRecurringEnabled(recurringEnabled);
+            String recurringFeeStr = request.getParameter("recurringFee");
+            if (recurringEnabled && recurringFeeStr != null && !recurringFeeStr.isEmpty()) {
+                s.setRecurringFee(Double.parseDouble(recurringFeeStr));
+            } else {
+                s.setRecurringFee(0);
+            }
             
             String description = request.getParameter("description");
             s.setDescription(description != null ? description.trim() : "");

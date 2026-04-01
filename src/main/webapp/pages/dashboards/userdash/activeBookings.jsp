@@ -54,7 +54,13 @@
                         <tbody>
                         <c:forEach var="b" items="${activeBookings}">
                             <tr>
-                                <td><strong>${b.serviceName}</strong><br><small>${b.problemDescription}</small>
+                                <td>
+                                    <strong>${b.serviceName}</strong>
+                                    <c:if test="${not empty b.recurringContractId}">
+                                        <br><span style="display:inline-block; background:#dbeafe; color:#1e40af; border-radius:4px; padding:1px 6px; font-size:0.75rem; font-weight:700; margin-top:2px;">&#8635; Recurring &mdash; Month ${b.recurringSequence}/12</span>
+                                        <br><a href="${pageContext.request.contextPath}/pages/dashboards/userdash/recurringContracts.jsp" style="font-size:0.78rem; color:var(--muted-foreground); text-decoration:underline;">View full contract</a>
+                                    </c:if>
+                                    <br><small>${b.problemDescription}</small>
                                 </td>
                                 <td>${b.technicianName}</td>
                                 <td>

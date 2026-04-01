@@ -1,9 +1,11 @@
 package com.dailyfixer.servlet.booking;
 
 import com.dailyfixer.dao.BookingDAO;
+import com.dailyfixer.dao.RecurringContractDAO;
 import com.dailyfixer.dao.ServiceDAO;
 import com.dailyfixer.dao.TechnicianAvailabilityDAO;
 import com.dailyfixer.model.Booking;
+import com.dailyfixer.model.RecurringContract;
 import com.dailyfixer.model.Service;
 import com.dailyfixer.model.TechnicianAvailability;
 import com.dailyfixer.model.User;
@@ -119,6 +121,49 @@ public class CreateBookingServlet extends HttpServlet {
             booking.setStatus("REQUESTED");
             
             BookingDAO bookingDAO = new BookingDAO();
+            boolean isRecurring = "true".equals(request.getParameter("isRecurring"));
+
+            if (isRecurring && service.isRecurringEnabled()) {
+                // Validate day is ≤ 28 to avoid short-month edge cases
+                if (bookingDate.getDayOfMonth() > 28) {
+                    request.setAttribute("error", "For recurring bookings please choose a date between the 1st and 28th of the month.");
+                    request.setAttribute("service", service);
+                    request.setAttribute("availability", availability);
+                    request.getRequestDispatcher("/pages/bookings/create-booking.jsp").forward(request, response);
+                    return;
+                }
+
+                // Prevent duplicate active contracts for the same user+service
+                RecurringContractDAO contractDAO = new RecurringContractDAO();
+                if (contractDAO.getActiveContractForUserAndService(currentUser.getUserId(), serviceId) != null) {
+                    request.setAttribute("error", "You already have an active recurring contract for this service.");
+                    request.setAttribute("service", service);
+                    request.setAttribute("availability", availability);
+                    request.getRequestDispatcher("/pages/bookings/create-booking.jsp").forward(request, response);
+                    return;
+                }
+
+                // Create the contract (PENDING until technician accepts)
+                LocalDate start = bookingDate;
+                LocalDate end = start.plusMonths(11).withDayOfMonth(
+                        Math.min(start.getDayOfMonth(), 28));
+
+                RecurringContract contract = new RecurringContract();
+                contract.setUserId(currentUser.getUserId());
+                contract.setTechnicianId(service.getTechnicianId());
+                contract.setServiceId(serviceId);
+                contract.setStartDate(Date.valueOf(start));
+                contract.setEndDate(Date.valueOf(end));
+                contract.setBookingDayOfMonth(start.getDayOfMonth());
+                contract.setRecurringFee(BigDecimal.valueOf(service.getRecurringFee()));
+
+                int contractId = contractDAO.createContract(contract);
+
+                // Create first booking linked to this contract
+                booking.setRecurringContractId(contractId);
+                booking.setRecurringSequence(1);
+            }
+
             bookingDAO.createBooking(booking);
             
             response.sendRedirect(request.getContextPath() + "/pages/dashboards/userdash/userdashmain.jsp?bookingSuccess=true");

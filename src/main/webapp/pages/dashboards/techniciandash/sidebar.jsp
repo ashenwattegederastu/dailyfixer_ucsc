@@ -73,6 +73,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="${pageContext.request.contextPath}/pages/dashboards/techniciandash/recurringContracts.jsp" id="nav-recurring">
+                                <i class="ph ph-arrows-clockwise"></i>
+                                Recurring Contracts
+                            </a>
+                        </li>
+                        <li>
                             <a href="${pageContext.request.contextPath}/chats" id="nav-chats">
                                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                                     <div>

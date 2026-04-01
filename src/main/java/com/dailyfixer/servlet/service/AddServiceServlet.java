@@ -64,6 +64,8 @@ public class AddServiceServlet extends HttpServlet {
             String inspectionChargeStr = request.getParameter("inspectionCharge");
             String transportChargeStr = request.getParameter("transportCharge");
             String description = request.getParameter("description");
+            boolean recurringEnabled = "on".equals(request.getParameter("recurringEnabled"));
+            String recurringFeeStr = request.getParameter("recurringFee");
 
             // Handle "Add New Category" selection
             if ("__new__".equals(category)) {
@@ -104,6 +106,11 @@ public class AddServiceServlet extends HttpServlet {
                     : Double.parseDouble(inspectionChargeStr));
             s.setTransportCharge((transportChargeStr == null || transportChargeStr.isEmpty()) ? 0
                     : Double.parseDouble(transportChargeStr));
+
+            s.setRecurringEnabled(recurringEnabled);
+            if (recurringEnabled && recurringFeeStr != null && !recurringFeeStr.isEmpty()) {
+                s.setRecurringFee(Double.parseDouble(recurringFeeStr));
+            }
 
             // Handle image upload
             Part imagePart = request.getPart("serviceImage");

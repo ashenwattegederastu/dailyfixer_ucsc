@@ -149,6 +149,26 @@
                         </div>
                     </div>
 
+                    <!-- Recurring Bookings -->
+                    <div class="form-group" style="margin-top: 8px; padding: 16px; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--muted);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                            <input type="checkbox" name="recurringEnabled" id="recurringEnabled" onchange="toggleRecurring()"
+                                style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);"
+                                <%= s.isRecurringEnabled() ? "checked" : "" %>>
+                            <label for="recurringEnabled" style="font-weight: 600; cursor: pointer; margin: 0;">Enable Recurring Bookings</label>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--muted-foreground); margin: 0 0 12px 28px;">Customers can book this service monthly for 1 year (12 bookings). Payments are handled directly between you and the customer.</p>
+                        <div id="recurringFeeDiv" style="display: <%= s.isRecurringEnabled() ? "block" : "none" %>; margin-top: 8px;">
+                            <label style="font-weight: 500;">Monthly Recurring Fee (Rs):</label>
+                            <input type="number" name="recurringFee" id="recurringFee" min="0" step="1"
+                                value="<%= s.isRecurringEnabled() && s.getRecurringFee() > 0 ? (int)s.getRecurringFee() : "" %>"
+                                style="width: 100%; padding: 10px 15px; border: 2px solid var(--border); border-radius: var(--radius-md); background-color: var(--input); color: var(--foreground);"
+                                placeholder="e.g. 2500"
+                                <%= s.isRecurringEnabled() ? "required" : "" %>>
+                            <p style="font-size: 0.8rem; color: var(--muted-foreground); margin-top: 4px;">This is the total monthly fee shown to the customer for the recurring contract.</p>
+                        </div>
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">Update
                             Service Details</button>
@@ -176,6 +196,14 @@
                             newCatInput.required = false;
                             newCatInput.value = '';
                         }
+                    }
+
+                    function toggleRecurring() {
+                        const enabled = document.getElementById('recurringEnabled').checked;
+                        const feeDiv = document.getElementById('recurringFeeDiv');
+                        const feeInput = document.getElementById('recurringFee');
+                        feeDiv.style.display = enabled ? 'block' : 'none';
+                        feeInput.required = enabled;
                     }
                 </script>
 

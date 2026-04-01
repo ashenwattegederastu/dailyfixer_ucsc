@@ -39,7 +39,14 @@
                 <div style="background: var(--card); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border);">
                     <div style="display: grid; grid-template-columns: 1fr auto; gap: 1rem; margin-bottom: 1rem;">
                         <div>
-                            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">${booking.serviceName}</h3>
+                            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
+                                ${booking.serviceName}
+                                <c:if test="${not empty booking.recurringContractId}">
+                                    <span style="display: inline-block; background: #dbeafe; color: #1e40af; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; margin-left: 6px; vertical-align: middle;">
+                                        &#8635; Recurring
+                                    </span>
+                                </c:if>
+                            </h3>
                             <p style="color: var(--muted-foreground); margin-bottom: 0.25rem;">  
                                 <strong>Customer:</strong> ${booking.userName}
                                 <c:set var="clientRating" value="${userAvgRatings[booking.userId]}"/>
@@ -78,6 +85,15 @@
                         </c:if>
                     </div>
                     
+                    <c:if test="${booking.recurringSequence == 1}">
+                    <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 1rem;">
+                        <p style="color: #92400e; font-size: 0.875rem; margin: 0; font-weight: 600;">
+                            &#9888; Recurring Contract: Accepting this booking will activate a <strong>1-year recurring contract</strong>.
+                            Months 2–12 will be automatically scheduled on the same day each month.
+                        </p>
+                    </div>
+                    </c:if>
+
                     <div style="display: flex; gap: 1rem;">
                         <form method="post" action="${pageContext.request.contextPath}/bookings/accept" style="flex: 1;">
                             <input type="hidden" name="bookingId" value="${booking.bookingId}">
