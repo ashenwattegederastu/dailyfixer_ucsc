@@ -264,7 +264,6 @@ public class DeliveryTimeoutJob implements Runnable {
             orderDAO.markRefundPending(s.orderId,
                     "Driver picked up the package but did not complete delivery within "
                             + PICKUP_DELIVERY_TIMEOUT_HOURS + " hours.");
-            orderDAO.restoreStockForOrder(s.orderId);
 
             if (s.storeOwnerEmail != null && !s.storeOwnerEmail.isBlank()) {
                 tryEmail(s.storeOwnerEmail,

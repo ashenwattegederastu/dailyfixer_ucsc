@@ -43,7 +43,7 @@ public class LoginServlet extends HttpServlet {
                         resp.sendRedirect(req.getContextPath() + "/pages/dashboards/volunteerdash/volunteerdashmain.jsp");
                         break;
                     case "technician":
-                        resp.sendRedirect(req.getContextPath() + "/pages/dashboards/techniciandash/techniciandashmain.jsp");
+                        resp.sendRedirect(req.getContextPath() + "/technician/dashboard");
                         break;
                     case "store":
                         resp.sendRedirect(req.getContextPath() + "/pages/dashboards/storedash/storedashmain.jsp");

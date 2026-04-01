@@ -34,7 +34,7 @@
                     <h3>Navigation</h3>
                     <ul>
                         <li>
-                            <a href="${pageContext.request.contextPath}/pages/dashboards/techniciandash/techniciandashmain.jsp"
+                            <a href="${pageContext.request.contextPath}/technician/dashboard"
                                 id="nav-dashboard">
                                 <i class="ph ph-presentation-chart"></i>
                                 Dashboard

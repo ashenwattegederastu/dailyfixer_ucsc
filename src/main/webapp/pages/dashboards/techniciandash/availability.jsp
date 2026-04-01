@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,12 +66,12 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Start Time *</label>
-                        <input type="time" name="startTime" required value="${not empty availability ? availability.startTime : '09:00'}"
+                        <input type="time" name="startTime" required value="${not empty availability and not empty availability.startTime ? fn:substring(availability.startTime, 0, 5) : '09:00'}"
                                style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--input);">
                     </div>
                     <div>
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">End Time *</label>
-                        <input type="time" name="endTime" required value="${not empty availability ? availability.endTime : '17:00'}"
+                        <input type="time" name="endTime" required value="${not empty availability and not empty availability.endTime ? fn:substring(availability.endTime, 0, 5) : '17:00'}"
                                style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--input);">
                     </div>
                 </div>
@@ -79,7 +80,7 @@
                     <button type="submit" style="flex: 1; background: var(--primary); color: var(--primary-foreground); padding: 0.75rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
                         Save Availability
                     </button>
-                    <a href="${pageContext.request.contextPath}/pages/dashboards/techniciandash/techniciandashmain.jsp" 
+                    <a href="${pageContext.request.contextPath}/technician/dashboard" 
                        style="flex: 1; text-align: center; background: var(--secondary); color: var(--secondary-foreground); padding: 0.75rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; display: flex; align-items: center; justify-content: center;">
                         Cancel
                     </a>

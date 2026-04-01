@@ -72,7 +72,7 @@ CREATE TABLE `bank_details` (
   PRIMARY KEY (`bank_detail_id`),
   UNIQUE KEY `uq_bank_user` (`user_id`),
   CONSTRAINT `fk_bank_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -146,20 +146,16 @@ CREATE TABLE `bookings` (
   `rejection_reason` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `recurring_contract_id` int DEFAULT NULL,
-  `recurring_sequence` tinyint DEFAULT NULL COMMENT '1-12, which month in the contract',
   PRIMARY KEY (`booking_id`),
   KEY `idx_user` (`user_id`),
   KEY `idx_technician` (`technician_id`),
   KEY `idx_service` (`service_id`),
   KEY `idx_status` (`status`),
   KEY `idx_booking_date` (`booking_date`),
-  KEY `idx_recurring_contract` (`recurring_contract_id`),
-  CONSTRAINT `fk_booking_contract` FOREIGN KEY (`recurring_contract_id`) REFERENCES `recurring_contracts` (`contract_id`),
   CONSTRAINT `fk_booking_service` FOREIGN KEY (`service_id`) REFERENCES `services` (`service_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_booking_technician` FOREIGN KEY (`technician_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_booking_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -230,7 +226,7 @@ CREATE TABLE `chats` (
   CONSTRAINT `fk_chat_booking` FOREIGN KEY (`booking_id`) REFERENCES `bookings` (`booking_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_chat_technician` FOREIGN KEY (`technician_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_chat_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -266,7 +262,7 @@ CREATE TABLE `delivery_assignments` (
   CONSTRAINT `fk_da_driver` FOREIGN KEY (`driver_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
   CONSTRAINT `fk_da_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_da_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -451,51 +447,17 @@ CREATE TABLE `driver_incidents` (
   `order_id` varchar(50) NOT NULL,
   `incident_type` enum('PICKUP_NO_DELIVERY','ACCEPT_NO_PICKUP') NOT NULL,
   `description` varchar(500) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `reviewed` tinyint(1) NOT NULL DEFAULT '0',
   `reviewed_by` int DEFAULT NULL,
   `reviewed_at` timestamp NULL DEFAULT NULL,
   `review_notes` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`incident_id`),
   KEY `driver_id` (`driver_id`),
   KEY `assignment_id` (`assignment_id`),
   CONSTRAINT `driver_incidents_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `users` (`user_id`),
   CONSTRAINT `driver_incidents_ibfk_2` FOREIGN KEY (`assignment_id`) REFERENCES `delivery_assignments` (`assignment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `driver_requests`
---
-
-DROP TABLE IF EXISTS `driver_requests`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `driver_requests` (
-  `request_id` int NOT NULL AUTO_INCREMENT,
-  `full_name` varchar(100) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `city` varchar(50) DEFAULT NULL,
-  `nic_number` varchar(20) NOT NULL,
-  `nic_front_path` varchar(255) NOT NULL,
-  `nic_back_path` varchar(255) NOT NULL,
-  `profile_picture_path` varchar(255) NOT NULL,
-  `license_front_path` varchar(255) NOT NULL,
-  `license_back_path` varchar(255) DEFAULT NULL,
-  `policy_accepted` tinyint(1) NOT NULL DEFAULT '0',
-  `status` enum('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
-  `rejection_reason` text,
-  `submitted_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `reviewed_date` timestamp NULL DEFAULT NULL,
-  `reviewed_by` int DEFAULT NULL,
-  PRIMARY KEY (`request_id`),
-  UNIQUE KEY `uq_dr_username` (`username`),
-  UNIQUE KEY `uq_dr_email` (`email`),
-  KEY `idx_dr_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -732,7 +694,7 @@ CREATE TABLE `order_items` (
   CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE,
   CONSTRAINT `order_items_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE SET NULL,
   CONSTRAINT `order_items_ibfk_4` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`variant_id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -772,7 +734,7 @@ CREATE TABLE `orders` (
   UNIQUE KEY `order_id` (`order_id`),
   KEY `fk_orders_store` (`store_id`),
   CONSTRAINT `fk_orders_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -811,7 +773,7 @@ CREATE TABLE `payout_line_items` (
   KEY `idx_pli_payout` (`payout_id`),
   KEY `idx_pli_source` (`source_type`,`source_id`),
   CONSTRAINT `fk_pli_payout` FOREIGN KEY (`payout_id`) REFERENCES `payouts` (`payout_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -837,7 +799,7 @@ CREATE TABLE `payouts` (
   KEY `idx_payouts_payee` (`payee_type`,`payee_id`),
   KEY `idx_payouts_admin` (`locked_by_admin_id`),
   CONSTRAINT `fk_payout_admin` FOREIGN KEY (`locked_by_admin_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -907,37 +869,7 @@ CREATE TABLE `products` (
   PRIMARY KEY (`product_id`),
   KEY `fk_products_store` (`store_id`),
   CONSTRAINT `fk_products_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `recurring_contracts`
---
-
-DROP TABLE IF EXISTS `recurring_contracts`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `recurring_contracts` (
-  `contract_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `technician_id` int NOT NULL,
-  `service_id` int NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
-  `booking_day_of_month` tinyint NOT NULL COMMENT 'Day 1-28 that repeats each month',
-  `recurring_fee` decimal(10,2) NOT NULL COMMENT 'Snapshot of fee at time of contract',
-  `status` enum('PENDING','ACTIVE','CANCELLED','COMPLETED') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`contract_id`),
-  KEY `idx_rc_user` (`user_id`),
-  KEY `idx_rc_technician` (`technician_id`),
-  KEY `idx_rc_service` (`service_id`),
-  KEY `idx_rc_status` (`status`),
-  CONSTRAINT `fk_rc_service` FOREIGN KEY (`service_id`) REFERENCES `services` (`service_id`),
-  CONSTRAINT `fk_rc_technician` FOREIGN KEY (`technician_id`) REFERENCES `users` (`user_id`),
-  CONSTRAINT `fk_rc_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -980,8 +912,6 @@ CREATE TABLE `services` (
   `image_type` varchar(50) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `recurring_enabled` tinyint(1) NOT NULL DEFAULT '0',
-  `recurring_fee` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`service_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1008,7 +938,7 @@ CREATE TABLE `store_orders` (
   KEY `fk_store_orders_store` (`store_id`),
   CONSTRAINT `fk_store_orders_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_store_orders_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1031,7 +961,7 @@ CREATE TABLE `stores` (
   PRIMARY KEY (`store_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `stores_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1080,21 +1010,21 @@ CREATE TABLE `users` (
   `city` varchar(50) DEFAULT NULL,
   `latitude` decimal(10,7) DEFAULT NULL,
   `longitude` decimal(11,7) DEFAULT NULL,
+  `bio` text,
+  `profile_picture_path` varchar(255) DEFAULT NULL,
+  `role` enum('user','volunteer','technician','driver','store','admin') DEFAULT 'user',
+  `status` enum('active','suspended') DEFAULT 'active',
   `nic_number` varchar(20) DEFAULT NULL,
   `nic_front_path` varchar(255) DEFAULT NULL,
   `nic_back_path` varchar(255) DEFAULT NULL,
   `license_front_path` varchar(255) DEFAULT NULL,
   `license_back_path` varchar(255) DEFAULT NULL,
-  `bio` text,
-  `profile_picture_path` varchar(255) DEFAULT NULL,
-  `role` enum('user','volunteer','technician','driver','store','admin') DEFAULT 'user',
-  `status` enum('active','suspended') DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1217,6 +1147,39 @@ CREATE TABLE `volunteers` (
   CONSTRAINT `volunteers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `driver_requests`
+--
+
+DROP TABLE IF EXISTS `driver_requests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `driver_requests` (
+  `request_id` int NOT NULL AUTO_INCREMENT,
+  `full_name` varchar(100) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `city` varchar(50) DEFAULT NULL,
+  `nic_number` varchar(20) NOT NULL,
+  `nic_front_path` varchar(255) NOT NULL,
+  `nic_back_path` varchar(255) NOT NULL,
+  `profile_picture_path` varchar(255) DEFAULT NULL,
+  `license_front_path` varchar(255) NOT NULL,
+  `license_back_path` varchar(255) NOT NULL,
+  `policy_accepted` tinyint(1) NOT NULL DEFAULT '0',
+  `status` enum('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
+  `rejection_reason` text,
+  `submitted_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `reviewed_date` timestamp NULL DEFAULT NULL,
+  `reviewed_by` int DEFAULT NULL,
+  PRIMARY KEY (`request_id`),
+  KEY `fk_reviewed_by` (`reviewed_by`),
+  CONSTRAINT `fk_reviewed_by` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -1227,4 +1190,4 @@ CREATE TABLE `volunteers` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-01 21:47:47
+-- Dump completed on 2026-03-30 15:05:25

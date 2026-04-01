@@ -8,6 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.sql.Time;
 
 @WebServlet("/availability")
@@ -52,8 +53,8 @@ public class AvailabilityServlet extends HttpServlet {
             TechnicianAvailability availability = new TechnicianAvailability();
             availability.setTechnicianId(currentUser.getUserId());
             availability.setAvailabilityMode(availabilityMode);
-            availability.setStartTime(Time.valueOf(startTime + ":00"));
-            availability.setEndTime(Time.valueOf(endTime + ":00"));
+            availability.setStartTime(parseSqlTime(startTime));
+            availability.setEndTime(parseSqlTime(endTime));
             
             // Set days based on mode
             if ("WEEKDAYS".equals(availabilityMode)) {
@@ -91,5 +92,12 @@ public class AvailabilityServlet extends HttpServlet {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error saving availability: " + e.getMessage());
         }
+    }
+
+    private Time parseSqlTime(String rawTime) {
+        if (rawTime == null || rawTime.isBlank()) {
+            throw new IllegalArgumentException("Time value is required");
+        }
+        return Time.valueOf(LocalTime.parse(rawTime.trim()));
     }
 }
