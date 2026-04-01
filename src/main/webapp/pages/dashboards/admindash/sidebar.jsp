@@ -127,8 +127,6 @@
                     </div>
 
                     <div class="sidebar-actions">
-                        <button id="theme-toggle-btn" class="action-btn theme-toggle" onclick="toggleTheme()">🌙 Theme
-                            Setup</button>
                         <a href="${pageContext.request.contextPath}/logout" class="action-btn logout-btn">
                             <i class="ph ph-sign-out"></i>
                             Log Out
