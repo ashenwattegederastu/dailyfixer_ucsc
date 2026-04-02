@@ -63,38 +63,6 @@
 
 <style>
 /* Page-specific: Status dropdown, Vehicle modal, Order details modal */
-.status-options {
-  display: none;
-  position: absolute;
-  background: var(--card);
-  color: var(--card-foreground);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  z-index: 1000;
-  margin-top: 5px;
-  min-width: 150px;
-  padding: 5px 0;
-}
-
-.status-options button {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  font-size: 0.85em;
-  color: var(--foreground);
-  transition: background-color 0.2s ease;
-}
-
-.status-options button:hover {
-  background-color: var(--accent);
-  color: var(--accent-foreground);
-}
-
 .btn-delivery,
 .delivery-btn {
   background-color: var(--destructive);
@@ -464,13 +432,6 @@
                                 data-order-date="<%= orderDate %>"
                                 data-order-items='<%= orderItemsJsonStr %>'
                                 onclick="showOrderDetailsModalFromButton(this)">View Details</button>
-                        <button class="btn update-btn" onclick="toggleStatusOptions(this, <%= orderIndex %>)">Update Status</button>
-                        <div class="status-options" id="status-options-<%= orderIndex %>">
-                            <button onclick="changeStatus(this, 'PENDING', '<%= orderId %>', <%= orderIndex %>)">Pending</button>
-                            <button onclick="changeStatus(this, 'PROCESSING', '<%= orderId %>', <%= orderIndex %>)">Processing</button>
-                            <button onclick="changeStatus(this, 'OUT_FOR_DELIVERY', '<%= orderId %>', <%= orderIndex %>)">Out for Delivery</button>
-                            <button onclick="changeStatus(this, 'DELIVERED', '<%= orderId %>', <%= orderIndex %>)">Delivered</button>
-                        </div>
                         <button class="btn delivery-btn" onclick="showVehicleModal('<%= orderId %>')">Ready to Deliver</button>
                     </td>
                 </tr>
@@ -570,21 +531,6 @@
 <script>
 let selectedOrderId = '';
 let selectedVehicle = '';
-
-function toggleStatusOptions(btn, orderIndex) {
-    // Close all other status option dropdowns first
-    document.querySelectorAll('.status-options').forEach(div => {
-        if (div.id !== 'status-options-' + orderIndex) {
-            div.style.display = 'none';
-        }
-    });
-    
-    const optionsDiv = document.getElementById('status-options-' + orderIndex);
-    if (optionsDiv) {
-        const isVisible = optionsDiv.style.display === 'block';
-        optionsDiv.style.display = isVisible ? 'none' : 'block';
-    }
-}
 
 function showOrderDetailsModalFromButton(button) {
     // Get data from button attributes
@@ -690,77 +636,6 @@ document.getElementById('orderDetailsModal').addEventListener('click', e => {
         closeOrderDetailsModal();
     }
 });
-
-function changeStatus(button, newStatus, orderId, orderIndex) {
-    console.log('changeStatus called:', { newStatus, orderId, orderIndex });
-    
-    // Map status codes to display text and CSS classes
-    const statusMap = {
-        'PENDING': { text: 'Pending', cssClass: 'pending' },
-        'PROCESSING': { text: 'Processing', cssClass: 'processing' },
-        'OUT_FOR_DELIVERY': { text: 'Out for Delivery', cssClass: 'out-delivery' },
-        'DELIVERED': { text: 'Delivered', cssClass: 'delivered' }
-    };
-    
-    const statusInfo = statusMap[newStatus] || { text: newStatus, cssClass: 'pending' };
-    const statusCell = document.getElementById('status-' + orderIndex);
-    
-    if (!statusCell) {
-        console.error('Status cell not found for orderIndex:', orderIndex);
-        alert('Error: Could not find status cell');
-        return;
-    }
-    
-    // Update status visually immediately
-    statusCell.innerHTML = '<span class="status ' + statusInfo.cssClass + '"></span> ' + statusInfo.text;
-    
-    // Hide status options dropdown
-    const dropdown = button.parentElement;
-    if (dropdown) {
-        dropdown.style.display = "none";
-    }
-    
-    // Update order status in database via AJAX
-    const contextPath = '<%= request.getContextPath() %>';
-    const url = contextPath + '/UpdateOrderStatusServlet';
-    console.log('Updating status via:', url);
-    
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'orderId=' + encodeURIComponent(orderId) + '&status=' + encodeURIComponent(newStatus)
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        if (!response.ok) {
-            throw new Error('HTTP error! status: ' + response.status);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response data:', data);
-        if (data.success) {
-            console.log('Order ' + orderId + ' status updated to ' + newStatus);
-            // If status is DELIVERED, reload page after a short delay to move order to completed
-            if (newStatus === 'DELIVERED') {
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            }
-        } else {
-            console.error('Failed to update status:', data.message);
-            alert('Failed to update order status: ' + (data.message || 'Unknown error'));
-            window.location.reload();
-        }
-    })
-    .catch(error => {
-        console.error('Error updating status:', error);
-        alert('Error updating order status: ' + error.message + '. Please try again.');
-        window.location.reload();
-    });
-}
 
 function showVehicleModal(orderId) {
     selectedOrderId = orderId;

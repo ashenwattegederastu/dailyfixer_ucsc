@@ -437,11 +437,13 @@
                 return;
             }
 
-            let url = "checkout.jsp?productId=" + productId + "&quantity=" + quantity;
+            const checkoutUrl = new URL(contextPath + "/pages/stores/checkout.jsp", window.location.origin);
+            checkoutUrl.searchParams.set("productId", productId);
+            checkoutUrl.searchParams.set("quantity", String(quantity));
             if (variantId) {
-                url += "&variantId=" + variantId;
+                checkoutUrl.searchParams.set("variantId", variantId);
             }
-            window.location.href = url;
+            window.location.href = checkoutUrl.toString();
         });
     }
 

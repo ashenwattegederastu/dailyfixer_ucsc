@@ -101,6 +101,10 @@ tbody tr:hover { background-color: var(--muted); }
     background: linear-gradient(135deg, #e67e22, #d35400);
     color: #fff;
 }
+.release-btn {
+    background: linear-gradient(135deg, #dc3545, #b02a37);
+    color: #fff;
+}
 .btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
@@ -271,6 +275,10 @@ tbody tr:hover { background-color: var(--muted); }
                             Navigate to Store
                         </a>
                         <% } %>
+                        <button class="btn release-btn"
+                                onclick="openCancelAcceptedModal(<%= a.getAssignmentId() %>)">
+                            Cancel Before Pickup
+                        </button>
                         <span class="waiting-label">Waiting for store to confirm pickup</span>
                     <% } else { %>
                         <%-- Phase 2: Driver heading to customer --%>
@@ -337,11 +345,38 @@ tbody tr:hover { background-color: var(--muted); }
     </div>
 </div>
 
+<!-- Cancel Accepted Modal -->
+<div id="cancelAcceptedModal" class="pin-modal-overlay">
+    <div class="pin-modal" style="max-width: 460px; text-align: left;">
+        <h3>Cancel Accepted Delivery</h3>
+        <p>Select a reason. The order will return to the delivery pool with no penalty.</p>
+
+        <label style="display:block; font-size:0.85rem; margin-bottom:6px; color: var(--foreground);">Reason</label>
+        <select id="cancelReasonCode" style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px; background: var(--input); color: var(--foreground); margin-bottom: 12px;">
+            <option value="NOT_ENOUGH_SPACE">Not enough space</option>
+            <option value="EMERGENCY">Emergency</option>
+            <option value="VEHICLE_ISSUE">Vehicle issue</option>
+            <option value="OTHER">Other</option>
+        </select>
+
+        <label style="display:block; font-size:0.85rem; margin-bottom:6px; color: var(--foreground);">Optional note</label>
+        <textarea id="cancelReasonNote" rows="3" maxlength="400" style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px; background: var(--input); color: var(--foreground);"></textarea>
+
+        <div id="cancelAcceptedError" class="pin-error" style="margin-top: 10px;"></div>
+
+        <div class="pin-modal-btns" style="margin-top: 12px;">
+            <button class="btn release-btn" id="cancelAcceptedSubmitBtn" onclick="submitCancelAccepted()">Cancel & Return to Pool</button>
+            <button class="btn pin-cancel-btn" onclick="closeCancelAcceptedModal()">Close</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const CONTEXT_PATH = '<%= request.getContextPath() %>';
     let currentAssignmentId = null;
     let currentMarkBtn = null;
     let currentDoorstepAssignmentId = null;
+    let currentCancelAcceptedAssignmentId = null;
 
     function completeDelivery(assignmentId, btn) {
         currentAssignmentId = assignmentId;
@@ -376,6 +411,21 @@ tbody tr:hover { background-color: var(--muted); }
         currentDoorstepAssignmentId = null;
     }
 
+    function openCancelAcceptedModal(assignmentId) {
+        currentCancelAcceptedAssignmentId = assignmentId;
+        document.getElementById('cancelReasonCode').value = 'NOT_ENOUGH_SPACE';
+        document.getElementById('cancelReasonNote').value = '';
+        document.getElementById('cancelAcceptedError').textContent = '';
+        document.getElementById('cancelAcceptedSubmitBtn').disabled = false;
+        document.getElementById('cancelAcceptedSubmitBtn').textContent = 'Cancel & Return to Pool';
+        document.getElementById('cancelAcceptedModal').classList.add('active');
+    }
+
+    function closeCancelAcceptedModal() {
+        document.getElementById('cancelAcceptedModal').classList.remove('active');
+        currentCancelAcceptedAssignmentId = null;
+    }
+
     // Close on overlay click
     document.getElementById('pinModal').addEventListener('click', function(e) {
         if (e.target.id === 'pinModal') closePinModal();
@@ -383,6 +433,10 @@ tbody tr:hover { background-color: var(--muted); }
 
     document.getElementById('doorstepModal').addEventListener('click', function(e) {
         if (e.target.id === 'doorstepModal') closeDoorstepModal();
+    });
+
+    document.getElementById('cancelAcceptedModal').addEventListener('click', function(e) {
+        if (e.target.id === 'cancelAcceptedModal') closeCancelAcceptedModal();
     });
 
     // Allow Enter key in PIN input
@@ -490,6 +544,46 @@ tbody tr:hover { background-color: var(--muted); }
             errorEl.textContent = 'Error: ' + err.message;
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Proof & Complete';
+        });
+    }
+
+    function submitCancelAccepted() {
+        const reasonCode = document.getElementById('cancelReasonCode').value;
+        const reasonNote = document.getElementById('cancelReasonNote').value.trim();
+        const errorEl = document.getElementById('cancelAcceptedError');
+        const submitBtn = document.getElementById('cancelAcceptedSubmitBtn');
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Cancelling...';
+        errorEl.textContent = '';
+
+        fetch(CONTEXT_PATH + '/driver/cancelAccepted', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'assignmentId=' + encodeURIComponent(currentCancelAcceptedAssignmentId) +
+                  '&reasonCode=' + encodeURIComponent(reasonCode) +
+                  '&reasonNote=' + encodeURIComponent(reasonNote)
+        })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById('row-' + currentCancelAcceptedAssignmentId);
+                closeCancelAcceptedModal();
+                if (row) {
+                    row.style.opacity = '0.4';
+                    row.style.textDecoration = 'line-through';
+                    setTimeout(() => row.remove(), 700);
+                }
+            } else {
+                errorEl.textContent = data.message || 'Could not cancel this accepted delivery.';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Cancel & Return to Pool';
+            }
+        })
+        .catch(err => {
+            errorEl.textContent = 'Error: ' + err.message;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Cancel & Return to Pool';
         });
     }
 </script>

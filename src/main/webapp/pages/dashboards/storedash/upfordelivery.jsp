@@ -4,6 +4,7 @@
 <%@ page import="com.dailyfixer.model.DeliveryAssignment" %>
 <%@ page import="com.dailyfixer.dao.StoreDAO" %>
 <%@ page import="com.dailyfixer.dao.DeliveryAssignmentDAO" %>
+<%@ page import="com.dailyfixer.dao.DeliveryRateDAO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.text.SimpleDateFormat" %>
@@ -30,6 +31,9 @@
     // Load delivery assignments for this store
     DeliveryAssignmentDAO assignmentDAO = new DeliveryAssignmentDAO();
     List<DeliveryAssignment> allAssignments = storeId > 0 ? assignmentDAO.getByStore(storeId) : new ArrayList<>();
+
+    DeliveryRateDAO deliveryRateDAO = new DeliveryRateDAO();
+    List<String> vehicleTypes = deliveryRateDAO.getActiveVehicleTypes();
 
     // Show active (PENDING / ACCEPTED / PICKED_UP) and recently cancelled (timed-out) assignments
     List<DeliveryAssignment> assignments = new ArrayList<>();
@@ -133,6 +137,9 @@
                                           ? a.getDeliveryAddress() : "—";
                     String feeStr = a.getDeliveryFeeEarned() != null
                                     ? String.format("LKR %.2f", a.getDeliveryFeeEarned()) : "LKR 0.00";
+                        String currentVehicleTypeEscaped = (a.getRequiredVehicleType() != null ? a.getRequiredVehicleType() : "")
+                            .replace("\\", "\\\\")
+                            .replace("'", "\\'");
             %>
                 <tr>
                     <td><%= a.getOrderId() %></td>
@@ -150,6 +157,12 @@
                                 style="padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem; background:linear-gradient(135deg,#007bff,#0056b3); color:#fff; transition:all 0.2s;">
                             Mark Picked Up
                         </button>
+                        <% } else if ("PENDING".equals(statusVal)) { %>
+                        <button class="btn"
+                                onclick="openVehicleTypeModal(<%= a.getAssignmentId() %>, '<%= currentVehicleTypeEscaped %>')"
+                                style="padding:8px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem; background:linear-gradient(135deg,#6f42c1,#59359a); color:#fff; transition:all 0.2s;">
+                            Change Vehicle
+                        </button>
                         <% } else if ("PICKED_UP".equals(statusVal)) { %>
                         <span style="color: var(--muted-foreground); font-style: italic; font-size: 0.85rem;">Out for delivery</span>
                         <% } else { %>
@@ -162,8 +175,32 @@
     </table>
 </main>
 
+<div id="vehicleTypeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1100; align-items:center; justify-content:center;">
+    <div style="background: var(--card); color: var(--card-foreground); border:1px solid var(--border); border-radius:12px; width:min(92vw,460px); padding:20px; box-shadow: var(--shadow-xl);">
+        <h3 style="margin:0 0 8px; color: var(--foreground);">Change Vehicle Type</h3>
+        <p style="margin:0 0 14px; color: var(--muted-foreground); font-size:0.92rem;">
+            You can change vehicle type only before any driver accepts the order.
+        </p>
+
+        <label for="vehicleTypeSelect" style="display:block; margin-bottom:6px; font-size:0.85rem;">Vehicle Type</label>
+        <select id="vehicleTypeSelect" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:8px; background: var(--input); color: var(--foreground);">
+            <% for (String vt : vehicleTypes) { %>
+            <option value="<%= vt %>"><%= vt %></option>
+            <% } %>
+        </select>
+
+        <div id="vehicleTypeErr" style="min-height:1.2em; margin-top:10px; color:#dc3545; font-size:0.85rem;"></div>
+
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+            <button type="button" onclick="closeVehicleTypeModal()" style="padding:8px 14px; border:1px solid var(--border); background: var(--secondary); color: var(--secondary-foreground); border-radius:8px; cursor:pointer;">Cancel</button>
+            <button type="button" id="saveVehicleTypeBtn" onclick="submitVehicleTypeChange()" style="padding:8px 14px; border:none; background:linear-gradient(135deg,#198754,#157347); color:#fff; border-radius:8px; cursor:pointer;">Save</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const CONTEXT_PATH = '<%= request.getContextPath() %>';
+    let currentVehicleAssignmentId = null;
 
     function markPickedUp(assignmentId, btn) {
         if (!confirm('Confirm the driver has picked up this order?')) return;
@@ -194,6 +231,73 @@
             btn.textContent = 'Mark Picked Up';
         });
     }
+
+    function openVehicleTypeModal(assignmentId, currentVehicleType) {
+        currentVehicleAssignmentId = assignmentId;
+        const modal = document.getElementById('vehicleTypeModal');
+        const select = document.getElementById('vehicleTypeSelect');
+        const err = document.getElementById('vehicleTypeErr');
+        const saveBtn = document.getElementById('saveVehicleTypeBtn');
+
+        if (select && currentVehicleType) {
+            select.value = currentVehicleType;
+        }
+
+        err.textContent = '';
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save';
+        modal.style.display = 'flex';
+    }
+
+    function closeVehicleTypeModal() {
+        document.getElementById('vehicleTypeModal').style.display = 'none';
+        currentVehicleAssignmentId = null;
+    }
+
+    function submitVehicleTypeChange() {
+        const select = document.getElementById('vehicleTypeSelect');
+        const err = document.getElementById('vehicleTypeErr');
+        const saveBtn = document.getElementById('saveVehicleTypeBtn');
+        const selectedType = select.value;
+
+        if (!selectedType) {
+            err.textContent = 'Please select a vehicle type.';
+            return;
+        }
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        err.textContent = '';
+
+        fetch(CONTEXT_PATH + '/store/updateDeliveryVehicleType', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'assignmentId=' + encodeURIComponent(currentVehicleAssignmentId) +
+                  '&vehicleType=' + encodeURIComponent(selectedType)
+        })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(data => {
+            if (data.success) {
+                closeVehicleTypeModal();
+                window.location.reload();
+            } else {
+                err.textContent = data.message || 'Could not change vehicle type.';
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save';
+            }
+        })
+        .catch(errObj => {
+            err.textContent = 'Error: ' + errObj.message;
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save';
+        });
+    }
+
+    document.getElementById('vehicleTypeModal').addEventListener('click', function(e) {
+        if (e.target.id === 'vehicleTypeModal') {
+            closeVehicleTypeModal();
+        }
+    });
 </script>
 
 <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>

@@ -271,6 +271,30 @@ CREATE TABLE `delivery_assignments` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `delivery_requeue_events`
+--
+
+DROP TABLE IF EXISTS `delivery_requeue_events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `delivery_requeue_events` (
+  `requeue_event_id` int NOT NULL AUTO_INCREMENT,
+  `assignment_id` int NOT NULL,
+  `order_id` varchar(50) NOT NULL,
+  `actor_driver_id` int NOT NULL,
+  `reason_code` enum('NOT_ENOUGH_SPACE','EMERGENCY','VEHICLE_ISSUE','OTHER') NOT NULL,
+  `reason_note` varchar(400) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`requeue_event_id`),
+  KEY `idx_dre_assignment` (`assignment_id`),
+  KEY `idx_dre_driver` (`actor_driver_id`),
+  KEY `idx_dre_created_at` (`created_at`),
+  CONSTRAINT `fk_dre_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `delivery_assignments` (`assignment_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_dre_driver` FOREIGN KEY (`actor_driver_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `delivery_drop_proofs`
 --
 

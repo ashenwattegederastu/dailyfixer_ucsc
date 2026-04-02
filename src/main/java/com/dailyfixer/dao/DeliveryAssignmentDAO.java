@@ -90,6 +90,24 @@ public class DeliveryAssignmentDAO {
         "SET status='PENDING', driver_id=NULL, assigned_at=NULL " +
         "WHERE assignment_id=? AND status='ACCEPTED'";
 
+    /** Driver voluntarily releases an accepted assignment back to the pool. */
+    private static final String DRIVER_RELEASE_ACCEPTED =
+        "UPDATE delivery_assignments " +
+        "SET status='PENDING', driver_id=NULL, assigned_at=NULL " +
+        "WHERE assignment_id=? AND driver_id=? AND status='ACCEPTED'";
+
+    /** Audit trail for no-penalty driver re-queues. */
+    private static final String INSERT_REQUEUE_EVENT =
+        "INSERT INTO delivery_requeue_events " +
+        "(assignment_id, order_id, actor_driver_id, reason_code, reason_note) " +
+        "VALUES (?, ?, ?, ?, ?)";
+
+    /** Store can edit vehicle type only while order is still in pending pool. */
+    private static final String UPDATE_VEHICLE_TYPE_PENDING =
+        "UPDATE delivery_assignments " +
+        "SET required_vehicle_type=? " +
+        "WHERE assignment_id=? AND store_id=? AND status='PENDING' AND driver_id IS NULL";
+
     // Rule 3: driver accepted but didn't pick up within N hours
     private static final String SELECT_STALE_ACCEPTED =
         "SELECT da.assignment_id, da.driver_id, da.order_id " +
@@ -405,6 +423,91 @@ public class DeliveryAssignmentDAO {
 
         } catch (Exception e) {
             System.err.println("DeliveryAssignmentDAO.resetAssignmentToPending: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Driver voluntarily releases their ACCEPTED assignment back to PENDING.
+     * This path intentionally does not create a driver incident.
+     */
+    public boolean releaseAcceptedByDriver(int assignmentId, int driverId,
+                                           String reasonCode, String reasonNote) {
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            String orderId = null;
+            try (PreparedStatement get = conn.prepareStatement(
+                    "SELECT order_id FROM delivery_assignments WHERE assignment_id=? AND driver_id=? AND status='ACCEPTED'")) {
+                get.setInt(1, assignmentId);
+                get.setInt(2, driverId);
+                try (ResultSet rs = get.executeQuery()) {
+                    if (rs.next()) {
+                        orderId = rs.getString("order_id");
+                    } else {
+                        conn.rollback();
+                        return false;
+                    }
+                }
+            }
+
+            try (PreparedStatement release = conn.prepareStatement(DRIVER_RELEASE_ACCEPTED)) {
+                release.setInt(1, assignmentId);
+                release.setInt(2, driverId);
+                if (release.executeUpdate() == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            try (PreparedStatement audit = conn.prepareStatement(INSERT_REQUEUE_EVENT)) {
+                audit.setInt(1, assignmentId);
+                audit.setString(2, orderId);
+                audit.setInt(3, driverId);
+                audit.setString(4, reasonCode);
+                if (reasonNote == null || reasonNote.isBlank()) {
+                    audit.setNull(5, Types.VARCHAR);
+                } else {
+                    audit.setString(5, reasonNote);
+                }
+                audit.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (Exception e) {
+            System.err.println("DeliveryAssignmentDAO.releaseAcceptedByDriver: " + e.getMessage());
+            e.printStackTrace();
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ignored) { }
+            }
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ignored) { }
+            }
+        }
+    }
+
+    /**
+     * Allows the owning store to change required vehicle type while still unclaimed.
+     */
+    public boolean updateVehicleTypeIfPending(int assignmentId, int storeId, String vehicleType) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(UPDATE_VEHICLE_TYPE_PENDING)) {
+
+            stmt.setString(1, vehicleType);
+            stmt.setInt(2, assignmentId);
+            stmt.setInt(3, storeId);
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            System.err.println("DeliveryAssignmentDAO.updateVehicleTypeIfPending: " + e.getMessage());
             return false;
         }
     }
