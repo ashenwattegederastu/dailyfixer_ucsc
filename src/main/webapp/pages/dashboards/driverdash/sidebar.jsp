@@ -52,6 +52,12 @@
                 </a>
             </li>
             <li>
+                <a href="${pageContext.request.contextPath}/pages/help/driverprocedure.jsp" id="nav-procedure">
+                    <i class="ph ph-list-checks"></i>
+                    Delivery Procedure
+                </a>
+            </li>
+            <li>
                 <a href="${pageContext.request.contextPath}/pages/dashboards/driverdash/finances.jsp" id="nav-finances">
                     <i class="ph ph-wallet"></i>
                     Finances
@@ -107,6 +113,8 @@
             document.getElementById('nav-accepted')?.classList.add('active');
         } else if (currentPath.includes('/completedOrders')) {
             document.getElementById('nav-completed')?.classList.add('active');
+        } else if (currentPath.includes('/driverprocedure')) {
+            document.getElementById('nav-procedure')?.classList.add('active');
         } else if (currentPath.includes('/myProfile')) {
             document.getElementById('nav-profile')?.classList.add('active');
         }
