@@ -30,6 +30,8 @@
     const discountBadgeEl = document.getElementById("discountBadge");
     const priceLimitBannerEl = document.getElementById("priceLimitBanner");
     const priceLimitMessageEl = document.getElementById("priceLimitMessage");
+    const mainImgEl = document.getElementById("mainProductImage");
+    const defaultImgSrc = mainImgEl ? mainImgEl.src : "";
 
     let currentStock = baseStock;
     let currentPrice = baseDisplayPrice;
@@ -163,6 +165,14 @@
 
             if (priceValueEl) priceValueEl.textContent = currentPrice.toFixed(2);
             if (selectedVariantIdEl) selectedVariantIdEl.value = variant.id;
+
+            if (mainImgEl) {
+                var imgUrl = variant.imagePath && variant.imagePath !== ""
+                    ? contextPath + "/" + variant.imagePath
+                    : defaultImgSrc;
+                setMainImage(imgUrl);
+                syncGalleryToImage(imgUrl);
+            }
 
             if (currentStock > 0) {
                 if (stockStatusEl) {
@@ -483,5 +493,45 @@
         autoSelectFirstVariant();
     } else {
         updateVariantSelection();
+    }
+
+    function setMainImage(url) {
+        if (!mainImgEl || !url) return;
+        mainImgEl.style.transition = "opacity 0.15s ease";
+        mainImgEl.style.opacity = "0";
+        setTimeout(function () {
+            mainImgEl.src = url;
+            mainImgEl.style.opacity = "1";
+        }, 150);
+    }
+
+    function syncGalleryToImage(url) {
+        document.querySelectorAll(".thumbnail-item").forEach(function (t) {
+            if (t.dataset.src === url) {
+                t.classList.add("active");
+            } else {
+                t.classList.remove("active");
+            }
+        });
+    }
+
+    function initGallery() {
+        var thumbs = document.querySelectorAll(".thumbnail-item");
+        thumbs.forEach(function (thumb) {
+            thumb.addEventListener("click", function () {
+                setMainImage(this.dataset.src);
+                thumbs.forEach(function (t) { t.classList.remove("active"); });
+                this.classList.add("active");
+            });
+        });
+        if (thumbs.length > 0 && !document.querySelector(".thumbnail-item.active")) {
+            thumbs[0].classList.add("active");
+        }
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initGallery);
+    } else {
+        initGallery();
     }
 })();

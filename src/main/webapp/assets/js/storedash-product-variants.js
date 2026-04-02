@@ -8,6 +8,10 @@ function addVariantRow() {
         input.value = '';
     });
 
+    /* Clear the hidden variantId so the servlet treats this as a NEW variant, not an update */
+    var hiddenId = newRow.querySelector('input[type="hidden"][name="variantId[]"]');
+    if (hiddenId) hiddenId.value = '';
+
     /* Replace file input with a fresh one (file inputs cannot be cleared by value) */
     var oldFileInput = newRow.querySelector('input[type="file"].variant-image-input');
     if (oldFileInput) {
@@ -96,6 +100,48 @@ function checkVariantFields() {
     }
 }
 
+/* Validate that every non-empty variant row has both price and quantity filled.
+   Returns true if valid (allows form submit), false if invalid (blocks submit). */
+function validateVariantsOnSubmit() {
+    var rows = document.querySelectorAll('.variant-row');
+    var errors = [];
+
+    rows.forEach(function(row, idx) {
+        var color = row.querySelector('input[name="variantColor[]"]');
+        var size  = row.querySelector('input[name="variantSize[]"]');
+        var power = row.querySelector('input[name="variantPower[]"]');
+        var price = row.querySelector('input[name="variantPrice[]"]');
+        var qty   = row.querySelector('input[name="variantQuantity[]"]');
+
+        var hasAttribute = (color && color.value.trim()) ||
+                           (size  && size.value.trim())  ||
+                           (power && power.value.trim());
+
+        if (!hasAttribute) return; // blank row — skip
+
+        var missingPrice = !price || !price.value.trim();
+        var missingQty   = !qty   || !qty.value.trim();
+
+        if (missingPrice || missingQty) {
+            var label = 'Variant ' + (idx + 1);
+            var missing = [];
+            if (missingPrice) { missing.push('price'); if (price) price.style.outline = '2px solid red'; }
+            if (missingQty)   { missing.push('quantity'); if (qty) qty.style.outline = '2px solid red'; }
+            errors.push(label + ': missing ' + missing.join(' and '));
+        } else {
+            // Clear any previous error highlights
+            if (price) price.style.outline = '';
+            if (qty)   qty.style.outline   = '';
+        }
+    });
+
+    if (errors.length > 0) {
+        alert('Please fill in the following before saving:\n\n' + errors.join('\n'));
+        return false;
+    }
+    return true;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     checkVariantFields();
 
@@ -104,7 +150,19 @@ document.addEventListener('DOMContentLoaded', function() {
         variantContainer.addEventListener('input', function(e) {
             if (e.target.name && e.target.name.indexOf('variant') !== -1) {
                 checkVariantFields();
+                // Clear red outline when user starts typing
+                if (e.target.style && e.target.style.outline) e.target.style.outline = '';
             }
         });
+
+        // Attach submit safeguard to the parent form
+        var form = variantContainer.closest('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!validateVariantsOnSubmit()) {
+                    e.preventDefault();
+                }
+            });
+        }
     }
 });

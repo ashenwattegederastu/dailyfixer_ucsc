@@ -4,6 +4,7 @@ import com.dailyfixer.dao.DiscountDAO;
 import com.dailyfixer.dao.ProductDAO;
 import com.dailyfixer.dao.ProductVariantDAO;
 import com.dailyfixer.dao.StoreDAO;
+import com.dailyfixer.dao.UserDAO;
 import com.dailyfixer.model.Discount;
 import com.dailyfixer.model.Product;
 import com.dailyfixer.model.ProductVariant;
@@ -144,6 +145,16 @@ public class ProductDetailsServlet extends HttpServlet {
             if (store == null && product.getStoreUsername() != null && !product.getStoreUsername().isBlank()) {
                 store = storeDAO.getStoreByUsername(product.getStoreUsername());
             }
+            String storePhone = null;
+            if (store != null) {
+                try {
+                    User storeUser = new UserDAO().getUserById(store.getUserId());
+                    if (storeUser != null) {
+                        storePhone = storeUser.getPhoneNumber();
+                    }
+                } catch (Exception ignored) {
+                }
+            }
             Double userLat = getSessionDouble(request, SESSION_USER_LAT);
             Double userLng = getSessionDouble(request, SESSION_USER_LNG);
 
@@ -185,6 +196,8 @@ public class ProductDetailsServlet extends HttpServlet {
             request.setAttribute("purchaseLimit", PurchaseLimitUtil.purchaseLimitValue());
             request.setAttribute("variantDataJson", buildVariantDataJson(variants, product.getProductId(), discountDAO));
             request.setAttribute("baseDiscountJson", buildDiscountJson(activeDiscount));
+            request.setAttribute("store", store);
+            request.setAttribute("storePhone", storePhone);
 
             request.getRequestDispatcher("/pages/stores/product_details.jsp").forward(request, response);
         } catch (Exception e) {
@@ -225,7 +238,8 @@ public class ProductDetailsServlet extends HttpServlet {
               .append("\"price\":").append(variantPrice).append(",")
               .append("\"displayPrice\":").append(variantDisplayPrice).append(",")
               .append("\"quantity\":").append(v.getQuantity()).append(",")
-              .append("\"discount\":").append(buildDiscountJson(active))
+              .append("\"discount\":").append(buildDiscountJson(active)).append(",")
+              .append("\"imagePath\":\"").append(escapeJson(v.getImagePath())).append("\"")
               .append("}");
 
             if (i < variants.size() - 1) {

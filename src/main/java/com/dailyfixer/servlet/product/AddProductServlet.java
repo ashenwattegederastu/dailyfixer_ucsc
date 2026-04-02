@@ -111,17 +111,21 @@ public class AddProductServlet extends HttpServlet {
                         (pStr == null || pStr.trim().isEmpty()) &&
                         (qStr == null || qStr.trim().isEmpty())) continue;
 
-                    if (pStr == null || pStr.trim().isEmpty() || qStr == null || qStr.trim().isEmpty()) continue;
-
                     try {
                         hasVariants = true;
+                        BigDecimal variantPrice = (pStr != null && !pStr.trim().isEmpty())
+                                ? new BigDecimal(pStr.trim()) : BigDecimal.valueOf(price);
+                        int variantQty = 0;
+                        if (qStr != null && !qStr.trim().isEmpty()) {
+                            try { variantQty = Integer.parseInt(qStr.trim()); } catch (NumberFormatException ignored) {}
+                        }
                         ProductVariant variant = new ProductVariant();
                         variant.setProductId(productId);
                         variant.setColor(color.isEmpty() ? null : color);
                         variant.setSize(size.isEmpty()   ? null : size);
                         variant.setPower(power.isEmpty() ? null : power);
-                        variant.setPrice(new BigDecimal(pStr.trim()));
-                        variant.setQuantity(Integer.parseInt(qStr.trim()));
+                        variant.setPrice(variantPrice);
+                        variant.setQuantity(variantQty);
 
                         int variantId = variantDAO.addVariantAndReturnId(variant);
 

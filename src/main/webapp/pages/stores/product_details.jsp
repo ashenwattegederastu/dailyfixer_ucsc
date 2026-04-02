@@ -2,6 +2,7 @@
 <%@ page import="com.dailyfixer.model.ProductVariant" %>
 <%@ page import="com.dailyfixer.model.Discount" %>
 <%@ page import="com.dailyfixer.model.User" %>
+<%@ page import="com.dailyfixer.model.Store" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.LinkedHashSet" %>
@@ -68,6 +69,8 @@
     String baseDiscountJson = (String) request.getAttribute("baseDiscountJson");
     double currentCartTotal = currentCartTotalNum != null ? currentCartTotalNum.doubleValue() : 0.0;
     double purchaseLimit = purchaseLimitNum != null ? purchaseLimitNum.doubleValue() : 10000.0;
+    Store store = (Store) request.getAttribute("store");
+    String storePhone = (String) request.getAttribute("storePhone");
 
     if (variants == null) variants = java.util.Collections.emptyList();
     if (colors == null) colors = new LinkedHashSet<>();
@@ -102,7 +105,6 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title><%= product.getName() %> | Daily Fixer Store</title>
-    <!-- Importing Phosphor Icon Library Locally from assets-->
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/assets/icons/regular/style.css" />
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/assets/icons/fill/style.css" />
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/assets/css/product_details.css" />
@@ -116,28 +118,64 @@
         <i class="ph ph-arrow-left"></i> Back to Products
     </a>
 
+    <!-- ===== PRODUCT HERO ===== -->
     <div class="product-layout">
 
-        <!-- Left Image Section -->
+        <!-- Left: Image Gallery -->
         <div class="image-gallery">
             <div class="main-image">
                 <% String pdImg = product.getImagePath(); %>
-                <img src="<%=pdImg != null && !pdImg.isEmpty() ? request.getContextPath() + "/" + pdImg : request.getContextPath() + "/assets/images/tools.png"%>"
-                     alt="<%=product.getName()%>">
+                <img id="mainProductImage"
+                     src="<%= pdImg != null && !pdImg.isEmpty() ? request.getContextPath() + "/" + pdImg : request.getContextPath() + "/assets/images/tools.png" %>"
+                     alt="<%= product.getName() %>"
+                     style="transition: opacity 0.15s ease;">
             </div>
+
+            <!-- Thumbnail Strip -->
+            <%
+                boolean hasGalleryImages = (pdImg != null && !pdImg.isEmpty());
+                if (!hasGalleryImages) {
+                    for (ProductVariant pv0 : variants) {
+                        if (pv0.getImagePath() != null && !pv0.getImagePath().isEmpty()) {
+                            hasGalleryImages = true;
+                            break;
+                        }
+                    }
+                }
+            %>
+            <% if (hasGalleryImages) { %>
+            <div class="thumbnail-strip">
+                <% if (pdImg != null && !pdImg.isEmpty()) { %>
+                <div class="thumbnail-item active"
+                     data-src="<%= request.getContextPath() + "/" + pdImg %>">
+                    <img src="<%= request.getContextPath() + "/" + pdImg %>" alt="Main">
+                </div>
+                <% } %>
+                <% for (ProductVariant pv : variants) { %>
+                    <% if (pv.getImagePath() != null && !pv.getImagePath().isEmpty()) { %>
+                    <div class="thumbnail-item"
+                         data-src="<%= request.getContextPath() + "/" + pv.getImagePath() %>"
+                         data-variant-id="<%= pv.getVariantId() %>"
+                         title="<% if (pv.getColor() != null && !pv.getColor().isEmpty()) { %><%= pv.getColor() %><% } %><% if (pv.getSize() != null && !pv.getSize().isEmpty()) { %> <%= pv.getSize() %><% } %><% if (pv.getPower() != null && !pv.getPower().isEmpty()) { %> <%= pv.getPower() %><% } %>">
+                        <img src="<%= request.getContextPath() + "/" + pv.getImagePath() %>" alt="Variant">
+                    </div>
+                    <% } %>
+                <% } %>
+            </div>
+            <% } %>
         </div>
 
-        <!-- Right Details Section -->
+        <!-- Right: Product Info -->
         <div class="product-info-panel">
 
             <div class="badge <%= outOfStock ? "badge-out-stock" : "badge-in-stock" %>" style="display: flex; gap: 5px; align-items: center;">
-                <% if(outOfStock) { %>
+                <% if (outOfStock) { %>
                     <i class="ph ph-x-circle"></i>
                 <% } else { %>
                     <i class="ph ph-check-circle"></i>
                 <% } %>
                 <span id="stockStatus">
-                    <%= outOfStock ? "Out of Stock" : "In Stock: " + (hasVariants ? "" : product.getQuantity()) %>
+                    <%= outOfStock ? "Out of Stock" : "In Stock" + (hasVariants ? "" : ": " + product.getQuantity()) %>
                 </span>
             </div>
 
@@ -169,8 +207,8 @@
                     <span class="variant-label">Color</span>
                     <div class="variant-buttons" id="colorButtons">
                         <% for (String color : colors) { %>
-                        <button type="button" 
-                                class="variant-btn color-btn" 
+                        <button type="button"
+                                class="variant-btn color-btn"
                                 data-value="<%= color %>"
                                 data-option="color">
                             <span class="color-indicator" style="background-color: <%= getColorCode(color) %>;"></span>
@@ -180,14 +218,14 @@
                     </div>
                 </div>
                 <% } %>
-                
+
                 <% if (!sizes.isEmpty()) { %>
                 <div class="variant-option">
                     <span class="variant-label">Size</span>
                     <div class="variant-buttons" id="sizeButtons">
                         <% for (String size : sizes) { %>
-                        <button type="button" 
-                                class="variant-btn size-btn" 
+                        <button type="button"
+                                class="variant-btn size-btn"
                                 data-value="<%= size %>"
                                 data-option="size">
                             <%= size %>
@@ -196,14 +234,14 @@
                     </div>
                 </div>
                 <% } %>
-                
+
                 <% if (!powers.isEmpty()) { %>
                 <div class="variant-option">
                     <span class="variant-label">Power</span>
                     <div class="variant-buttons" id="powerButtons">
                         <% for (String power : powers) { %>
-                        <button type="button" 
-                                class="variant-btn power-btn" 
+                        <button type="button"
+                                class="variant-btn power-btn"
                                 data-value="<%= power %>"
                                 data-option="power">
                             <%= power %>
@@ -212,12 +250,13 @@
                     </div>
                 </div>
                 <% } %>
-                
+
                 <input type="hidden" id="selectedVariantId" value="">
                 <input type="hidden" id="selectedColor" value="">
                 <input type="hidden" id="selectedSize" value="">
                 <input type="hidden" id="selectedPower" value="">
             </div>
+            <div class="variant-stock-line" id="variantStockLine"></div>
             <% } %>
 
             <!-- Quantity + Buttons -->
@@ -231,7 +270,7 @@
                            class="qty-input"
                            value="1"
                            min="1"
-                           max="<%=hasVariants ? "" : product.getQuantity()%>"
+                           max="<%= hasVariants ? "" : product.getQuantity() %>"
                         <%= outOfStock ? "disabled" : "" %>>
                     <button class="qty-btn" id="plusBtn" <%= outOfStock ? "disabled" : "" %>>
                         <i class="ph ph-plus"></i>
@@ -241,13 +280,13 @@
                 <div class="buy-actions">
                     <button class="btn-add-cart"
                             id="addBtn"
-                            data-product-id="<%=product.getProductId()%>"
+                            data-product-id="<%= product.getProductId() %>"
                             <%= (!isLoggedIn || outOfStock || !canPurchase) ? "disabled" : "" %>>
                         <i class="ph ph-shopping-cart"></i> Add to Cart
                     </button>
                     <button class="btn-buy-now"
                             id="buyNowBtn"
-                            data-product-id="<%=product.getProductId()%>"
+                            data-product-id="<%= product.getProductId() %>"
                             <%= (!isLoggedIn || outOfStock || !canPurchase) ? "disabled" : "" %>>
                         <i class="ph ph-bag-check"></i> Buy Now
                     </button>
@@ -272,19 +311,103 @@
                 </div>
             </div>
 
-            <!-- Description -->
-            <div class="product-details-content">
-                <div class="description-title"><i class="ph ph-text-align-left"></i> Product Description</div>
-                <div class="description-text"><%= product.getDescription() %></div>
-            </div>
-
         </div>
     </div>
 
-    <!-- Reviews Section -->
+    <!-- ===== INFO GRID: Description + Warranty ===== -->
+    <div class="info-grid">
+
+        <!-- Description Card -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="ph ph-text-align-left"></i> Product Description
+            </div>
+            <div class="description-text"><%= product.getDescription() != null ? product.getDescription() : "" %></div>
+        </div>
+
+        <!-- Warranty Card -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="ph ph-shield-check"></i> Warranty Information
+            </div>
+            <% String warrantyInfo = product.getWarrantyInfo(); %>
+            <% if (warrantyInfo != null && !warrantyInfo.trim().isEmpty()) { %>
+                <div class="warranty-text"><%= warrantyInfo %></div>
+            <% } else { %>
+                <div class="warranty-text empty">No warranty information provided.</div>
+            <% } %>
+            <div class="warranty-disclaimer">
+                <i class="ph ph-info"></i>
+                <span>Warranty is handled directly between the store and the customer. Daily Fixer is not responsible for warranty claims.</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== STORE ROW: Contact + Map ===== -->
+    <% if (store != null) { %>
+    <div class="store-row">
+
+        <!-- Store Contact Card -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="ph ph-storefront"></i> Sold by <%= store.getStoreName() %>
+            </div>
+
+            <div class="store-contact-row">
+                <i class="ph ph-map-pin"></i>
+                <div>
+                    <span><%= store.getStoreAddress() != null ? store.getStoreAddress() : "Address not available" %></span>
+                    <% if (store.getStoreCity() != null && !store.getStoreCity().isEmpty()) { %>
+                        <span class="store-contact-text"><%= store.getStoreCity() %></span>
+                    <% } %>
+                </div>
+            </div>
+
+            <% if (storePhone != null && !storePhone.trim().isEmpty()) { %>
+            <div class="store-contact-row">
+                <i class="ph ph-phone"></i>
+                <span><%= storePhone %></span>
+            </div>
+            <% } %>
+
+            <div class="store-contact-row">
+                <i class="ph ph-tag"></i>
+                <span><%= store.getStoreType() != null ? store.getStoreType() : "General Store" %></span>
+            </div>
+        </div>
+
+        <!-- Store Map Card -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="ph ph-map-trifold"></i> Store Location
+            </div>
+            <%
+                boolean hasStoreMapCoords = store.getLatitude() != 0.0 && store.getLongitude() != 0.0;
+            %>
+            <% if (hasStoreMapCoords) { %>
+                <div id="storeMapDiv" class="store-mini-map"></div>
+                <a href="https://maps.google.com/maps?daddr=<%= store.getLatitude() %>,<%= store.getLongitude() %>"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="navigate-btn">
+                    <i class="ph ph-navigation-arrow"></i> Get Directions
+                </a>
+            <% } else { %>
+                <div class="no-map-placeholder">
+                    <i class="ph ph-map-pin-simple-slash"></i>
+                    <span>Store location not configured</span>
+                </div>
+            <% } %>
+        </div>
+
+    </div>
+    <% } %>
+
+    <!-- ===== REVIEWS SECTION ===== -->
     <div class="reviews-section">
         <h3 class="reviews-header"><i class="ph ph-star-half"></i> Customer Reviews</h3>
-        
+
         <div class="rating-summary-card">
             <div class="avg-rating-big" id="avgRatingDisplay">0.0</div>
             <div>
@@ -296,7 +419,6 @@
         <div id="reviewsList">
             <h4 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px;">All Reviews</h4>
             <div id="reviewsContainer" style="border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
-                <!-- Reviews loaded via JS -->
                 <p style="text-align: center; padding: 40px; color: var(--muted-foreground);">Loading reviews...</p>
             </div>
         </div>
@@ -319,7 +441,30 @@
         variants: <%= variantDataJson %>,
         baseDiscount: <%= baseDiscountJson %>
     };
+<% if (store != null && store.getLatitude() != 0.0 && store.getLongitude() != 0.0) { %>
+    window.STORE_MAP_DATA = {
+        lat: <%= store.getLatitude() %>,
+        lng: <%= store.getLongitude() %>,
+        name: "<%= store.getStoreName() != null ? store.getStoreName().replace("\\", "\\\\").replace("\"", "\\\"") : "" %>"
+    };
+    function initStoreMap() {
+        var d = window.STORE_MAP_DATA;
+        if (!d || !window.google) return;
+        var pos = { lat: d.lat, lng: d.lng };
+        var map = new google.maps.Map(document.getElementById("storeMapDiv"), {
+            center: pos,
+            zoom: 15,
+            disableDefaultUI: true,
+            gestureHandling: "none"
+        });
+        new google.maps.Marker({ position: pos, map: map, title: d.name });
+    }
+<% } %>
 </script>
+
+<% if (store != null && store.getLatitude() != 0.0 && store.getLongitude() != 0.0) { %>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8zSes6UGbYKIHNzCp3tny5RgccFruILI&callback=initStoreMap" async defer></script>
+<% } %>
 <script src="${pageContext.request.contextPath}/assets/js/product_details.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/product_reviews.js"></script>
 

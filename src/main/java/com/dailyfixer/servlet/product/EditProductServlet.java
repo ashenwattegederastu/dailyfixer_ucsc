@@ -108,7 +108,7 @@ public class EditProductServlet extends HttpServlet {
                                 ProductVariant old = variantDAO.getVariantById(variantId);
                                 if (old != null) ProductImageUtil.deleteImage(old.getImagePath(), webAppPath);
                                 variantDAO.deleteVariant(variantId);
-                            } else if (pStr != null && !pStr.trim().isEmpty() && qStr != null && !qStr.trim().isEmpty()) {
+                            } else {
                                 hasVariants = true;
                                 ProductVariant old = variantDAO.getVariantById(variantId);
                                 String vImgPath = (old != null) ? old.getImagePath() : null;
@@ -119,30 +119,44 @@ public class EditProductServlet extends HttpServlet {
                                     vImgPath = ProductImageUtil.saveVariantImage(variantImages[i], variantId, webAppPath);
                                 }
 
+                                BigDecimal variantPrice = (pStr != null && !pStr.trim().isEmpty())
+                                        ? new BigDecimal(pStr.trim()) : BigDecimal.valueOf(price);
+                                int variantQty = 0;
+                                if (qStr != null && !qStr.trim().isEmpty()) {
+                                    try { variantQty = Integer.parseInt(qStr.trim()); } catch (NumberFormatException ignored) {}
+                                }
+
                                 ProductVariant variant = new ProductVariant();
                                 variant.setVariantId(variantId);
                                 variant.setProductId(id);
                                 variant.setColor(color.isEmpty() ? null : color);
                                 variant.setSize(size.isEmpty()   ? null : size);
                                 variant.setPower(power.isEmpty() ? null : power);
-                                variant.setPrice(new BigDecimal(pStr.trim()));
-                                variant.setQuantity(Integer.parseInt(qStr.trim()));
+                                variant.setPrice(variantPrice);
+                                variant.setQuantity(variantQty);
                                 variant.setImagePath(vImgPath);
                                 variantDAO.updateVariant(variant);
                             }
                         } catch (Exception e) { e.printStackTrace(); }
                     } else {
                         // New variant
-                        if (!isEmpty && pStr != null && !pStr.trim().isEmpty() && qStr != null && !qStr.trim().isEmpty()) {
+                        if (!isEmpty) {
                             try {
                                 hasVariants = true;
+                                BigDecimal variantPrice = (pStr != null && !pStr.trim().isEmpty())
+                                        ? new BigDecimal(pStr.trim()) : BigDecimal.valueOf(price);
+                                int variantQty = 0;
+                                if (qStr != null && !qStr.trim().isEmpty()) {
+                                    try { variantQty = Integer.parseInt(qStr.trim()); } catch (NumberFormatException ignored) {}
+                                }
+
                                 ProductVariant variant = new ProductVariant();
                                 variant.setProductId(id);
                                 variant.setColor(color.isEmpty() ? null : color);
                                 variant.setSize(size.isEmpty()   ? null : size);
                                 variant.setPower(power.isEmpty() ? null : power);
-                                variant.setPrice(new BigDecimal(pStr.trim()));
-                                variant.setQuantity(Integer.parseInt(qStr.trim()));
+                                variant.setPrice(variantPrice);
+                                variant.setQuantity(variantQty);
 
                                 int newVId = variantDAO.addVariantAndReturnId(variant);
                                 if (variantImages != null && i < variantImages.length && variantImages[i].getSize() > 0) {
