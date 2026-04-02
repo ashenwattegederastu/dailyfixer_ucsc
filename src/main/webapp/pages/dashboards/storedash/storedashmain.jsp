@@ -389,99 +389,18 @@
     </section>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
 <script>
-(function() {
-    var isDark = document.documentElement.classList.contains('dark');
-    var textColor = isDark ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.8)';
-    var gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
-    
-    // 1. Order Status (doughnut)
-    var statusData = {
-        labels: ['Pending', 'Processing', 'Out for Delivery', 'Delivered'],
-        datasets: [{
-            data: [<%= pendingCount %>, <%= processingCount %>, <%= outForDeliveryCount %>, <%= deliveredCount %>],
-            backgroundColor: ['#f59e0b', '#ec4899', '#06b6d4', '#10b981'],
-            borderWidth: 0
-        }]
-    };
-    if (document.getElementById('chartOrderStatus')) {
-        new Chart(document.getElementById('chartOrderStatus'), {
-            type: 'doughnut',
-            data: statusData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { color: textColor, padding: 16 } }
-                }
-            }
-        });
-    }
-    
-    // 2. Orders & Revenue last 7 days (bar + line)
-    var dayLabels = [<%= "\"" + String.join("\",\"", dayLabels) + "\"" %>];
-    var orderCounts = [<%= orderCountsJs.toString() %>];
-    var revenueByDay = [<%= revenueByDayJs.toString() %>];
-    if (document.getElementById('chartOrdersOverTime')) {
-        new Chart(document.getElementById('chartOrdersOverTime'), {
-            type: 'bar',
-            data: {
-                labels: dayLabels,
-                datasets: [
-                    { label: 'Orders', data: orderCounts, backgroundColor: 'rgba(59,130,246,0.7)', borderColor: '#3b82f6', borderWidth: 1, yAxisID: 'y' },
-                    { label: 'Revenue Excl. Delivery (LKR)', data: revenueByDay, type: 'line', borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1 } },
-                    y1: { beginAtZero: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: textColor, callback: function(v) { return v >= 1000 ? (v/1000)+'k' : v; } } },
-                    x: { grid: { color: gridColor }, ticks: { color: textColor, maxRotation: 45 } }
-                },
-                plugins: { legend: { position: 'top', labels: { color: textColor } } }
-            }
-        });
-    }
-    
-    // 3. Most selling items (horizontal bar)
-    var mostSelling = <%= mostSellingJson.toString() %>;
-    var sellLabels = mostSelling.map(function(x) { return x.name.length > 20 ? x.name.substring(0,19)+'\u2026' : x.name; });
-    var sellQtys = mostSelling.map(function(x) { return x.qty; });
-    if (mostSelling.length === 0) {
-        sellLabels = ['No sales yet'];
-        sellQtys = [0];
-    }
-    if (document.getElementById('chartMostSelling')) {
-        new Chart(document.getElementById('chartMostSelling'), {
-            type: 'bar',
-            data: {
-                labels: sellLabels,
-                datasets: [{
-                    label: 'Units sold',
-                    data: sellQtys,
-                    backgroundColor: 'rgba(59,130,246,0.6)',
-                    borderColor: '#3b82f6',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1 } },
-                    y: { grid: { display: false }, ticks: { color: textColor } }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-})();
+window.storeDashData = {
+    statusLabels: ['Pending', 'Processing', 'Out for Delivery', 'Delivered'],
+    statusValues: [<%= pendingCount %>, <%= processingCount %>, <%= outForDeliveryCount %>, <%= deliveredCount %>],
+    dayLabels: [<%= "\"" + String.join("\",\"", dayLabels) + "\"" %>],
+    orderCounts: [<%= orderCountsJs.toString() %>],
+    revenueByDay: [<%= revenueByDayJs.toString() %>],
+    mostSelling: <%= mostSellingJson.toString() %>
+};
 </script>
+<script src="${pageContext.request.contextPath}/assets/js/storedash-charts.js"></script>
 
 </body>
 </html>

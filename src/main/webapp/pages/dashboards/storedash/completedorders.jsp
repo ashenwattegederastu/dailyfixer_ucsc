@@ -1,5 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="com.dailyfixer.model.User" %>
+<%@ page import="com.dailyfixer.model.Store" %>
+<%@ page import="com.dailyfixer.model.Order" %>
+<%@ page import="com.dailyfixer.model.DeliveryAssignment" %>
+<%@ page import="com.dailyfixer.dao.StoreDAO" %>
+<%@ page import="com.dailyfixer.dao.OrderDAO" %>
+<%@ page import="com.dailyfixer.dao.DeliveryAssignmentDAO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 
 <%
     User user = (User) session.getAttribute("currentUser");
@@ -13,6 +22,25 @@
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
+
+    // Resolve current store and load delivered assignments.
+    StoreDAO storeDAO = new StoreDAO();
+    Store currentStore = storeDAO.getStoreByUsername(user.getUsername());
+    int storeId = currentStore != null ? currentStore.getStoreId() : 0;
+
+    DeliveryAssignmentDAO assignmentDAO = new DeliveryAssignmentDAO();
+    List<DeliveryAssignment> allAssignments = storeId > 0 ? assignmentDAO.getByStore(storeId) : new ArrayList<>();
+    List<DeliveryAssignment> deliveredAssignments = new ArrayList<>();
+
+    for (DeliveryAssignment assignment : allAssignments) {
+        String assignmentStatus = assignment.getStatus() != null ? assignment.getStatus().trim().toUpperCase() : "";
+        if ("DELIVERED".equals(assignmentStatus)) {
+            deliveredAssignments.add(assignment);
+        }
+    }
+
+    OrderDAO orderDAO = new OrderDAO();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 %>
 
 <!DOCTYPE html>
@@ -63,82 +91,59 @@
                 <th>Order Date</th>
                 <th>Delivery Date</th>
                 <th>Status</th>
-                <th>Rating</th>
                 <th>Total</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>002</td>
-                <td>Amal Bandara</td>
-                <td>2025-07-06</td>
-                <td class="delivery-date">2025-07-08</td>
-                <td><span class="status delivered"></span>Delivered</td>
-                <td class="rating">★★★★★ (5.0)</td>
-                <td>LKR 350</td>
-                <td>
-                    <button class="btn view-btn">View Details</button>
-                    <button class="btn receipt-btn">Download Receipt</button>
-                    <button class="btn review-btn">View Review</button>
-                </td>
-            </tr>
-            <tr>
-                <td>007</td>
-                <td>Lakshmi Fernando</td>
-                <td>2025-07-15</td>
-                <td class="delivery-date">2025-07-17</td>
-                <td><span class="status delivered"></span>Delivered</td>
-                <td class="rating">★★★★☆ (4.0)</td>
-                <td>LKR 1,250</td>
-                <td>
-                    <button class="btn view-btn">View Details</button>
-                    <button class="btn receipt-btn">Download Receipt</button>
-                    <button class="btn review-btn">View Review</button>
-                </td>
-            </tr>
-            <tr>
-                <td>008</td>
-                <td>Ravi Jayawardena</td>
-                <td>2025-07-12</td>
-                <td class="delivery-date">2025-07-14</td>
-                <td><span class="status delivered"></span>Delivered</td>
-                <td class="rating">★★★★★ (5.0)</td>
-                <td>LKR 2,100</td>
-                <td>
-                    <button class="btn view-btn">View Details</button>
-                    <button class="btn receipt-btn">Download Receipt</button>
-                    <button class="btn review-btn">View Review</button>
-                </td>
-            </tr>
-            <tr>
-                <td>009</td>
-                <td>Nisha Wickramasinghe</td>
-                <td>2025-07-10</td>
-                <td class="delivery-date">2025-07-12</td>
-                <td><span class="status delivered"></span>Delivered</td>
-                <td class="rating">★★★★☆ (4.5)</td>
-                <td>LKR 750</td>
-                <td>
-                    <button class="btn view-btn">View Details</button>
-                    <button class="btn receipt-btn">Download Receipt</button>
-                    <button class="btn review-btn">View Review</button>
-                </td>
-            </tr>
-            <tr>
-                <td>010</td>
-                <td>Kumar Perera</td>
-                <td>2025-07-08</td>
-                <td class="delivery-date">2025-07-10</td>
-                <td><span class="status delivered"></span>Delivered</td>
-                <td class="rating">★★★★★ (5.0)</td>
-                <td>LKR 3,500</td>
-                <td>
-                    <button class="btn view-btn">View Details</button>
-                    <button class="btn receipt-btn">Download Receipt</button>
-                    <button class="btn review-btn">View Review</button>
-                </td>
-            </tr>
+            <% if (deliveredAssignments.isEmpty()) { %>
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 30px; color: var(--muted-foreground);">
+                        No completed orders yet.
+                    </td>
+                </tr>
+            <% } else {
+                for (DeliveryAssignment assignment : deliveredAssignments) {
+                    Order order = orderDAO.findOrderById(assignment.getOrderId());
+
+                    String customerName = assignment.getCustomerName();
+                    if ((customerName == null || customerName.trim().isEmpty()) && order != null) {
+                        String firstName = order.getFirstName() != null ? order.getFirstName() : "";
+                        String lastName = order.getLastName() != null ? order.getLastName() : "";
+                        customerName = (firstName + " " + lastName).trim();
+                    }
+                    if (customerName == null || customerName.trim().isEmpty()) {
+                        customerName = "—";
+                    }
+
+                    String orderDate = (order != null && order.getCreatedAt() != null)
+                        ? dateFormat.format(order.getCreatedAt()) : "—";
+                    String deliveryDate = assignment.getCompletedAt() != null
+                        ? dateFormat.format(assignment.getCompletedAt()) : "—";
+
+                    String totalDisplay = "LKR 0.00";
+                    if (order != null && order.getAmount() != null) {
+                        String currency = (order.getCurrency() != null && !order.getCurrency().trim().isEmpty())
+                            ? order.getCurrency().trim() : "LKR";
+                        totalDisplay = currency + " " + String.format("%,.2f", order.getAmount());
+                    }
+            %>
+                <tr>
+                    <td><%= assignment.getOrderId() %></td>
+                    <td><%= customerName %></td>
+                    <td><%= orderDate %></td>
+                    <td class="delivery-date"><%= deliveryDate %></td>
+                    <td><span class="status delivered"></span>Delivered</td>
+                    <td><%= totalDisplay %></td>
+                    <td>
+                        <button class="btn review-btn"
+                                onclick="window.location.href='${pageContext.request.contextPath}/StoreReviewsServlet'">
+                            View Reviews
+                        </button>
+                    </td>
+                </tr>
+            <%  }
+            } %>
         </tbody>
     </table>
 </main>
