@@ -93,8 +93,8 @@
                                                     <tr>
                                                         <td>
                                                             <c:choose>
-                                                                <c:when test="${not empty p.base64Image}">
-                                                                    <img src="data:image/jpeg;base64,${p.base64Image}"
+                                                                <c:when test="${not empty p.imagePath}">
+                                                                    <img src="${pageContext.request.contextPath}/${p.imagePath}"
                                                                         alt="${p.name}"
                                                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm);">
                                                                 </c:when>

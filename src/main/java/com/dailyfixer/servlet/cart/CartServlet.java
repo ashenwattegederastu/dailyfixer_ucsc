@@ -221,7 +221,7 @@ public class CartServlet extends HttpServlet {
                         discountedPrice,
                         originalPrice,
                         quantity,
-                        product.getImageBase64(),
+                        product.getImagePath(),
                         variantId,
                         variantColor,
                         variantSize,

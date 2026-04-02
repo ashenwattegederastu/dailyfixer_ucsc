@@ -388,7 +388,8 @@
                         }
                 %>
                 <div class="product-card" data-name="<%= item.getName().toLowerCase() %>" data-price="<%= displayPrice %>">
-                    <img src="data:image/jpeg;base64,<%= item.getImageBase64() %>" alt="<%= item.getName() %>" class="product-card-image">
+                    <% String cpiImg = item.getImagePath(); %>
+                    <img src="<%=cpiImg != null && !cpiImg.isEmpty() ? request.getContextPath() + "/" + cpiImg : request.getContextPath() + "/assets/images/tools.png"%>" alt="<%= item.getName() %>" class="product-card-image">
                     <div class="product-card-body">
                         <h3 class="product-card-title"><%= item.getName() %></h3>
                         <p class="product-card-price">Rs. <%= String.format("%.2f", displayPrice) %></p>

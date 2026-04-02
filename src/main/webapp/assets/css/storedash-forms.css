@@ -198,6 +198,106 @@
   transition: background-color 0.2s ease;
 }
 
+/* Category guidance banner */
+.category-guidance {
+  background: color-mix(in oklch, var(--primary) 8%, var(--card));
+  border: 1px solid color-mix(in oklch, var(--primary) 25%, var(--border));
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.85em;
+  color: var(--muted-foreground);
+  margin-top: 8px;
+  margin-bottom: 4px;
+  line-height: 1.5;
+}
+
+/* Custom category input wrapper */
+.custom-category-wrap {
+  margin-top: 6px;
+  padding: 12px;
+  background: var(--muted);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+}
+
+/* Image preview */
+.image-preview-wrap {
+  margin-top: 8px;
+}
+
+.image-preview {
+  max-width: 180px;
+  max-height: 180px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  object-fit: cover;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Current image (edit form) */
+.image-current-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: var(--muted);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.image-current-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+/* Variant image section */
+.variant-image-wrap {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+.variant-image-preview {
+  max-width: 100px;
+  max-height: 100px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  object-fit: cover;
+  margin-top: 6px;
+}
+
+.variant-current-image {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.variant-current-thumb {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+/* Warranty field */
+.form-help {
+  font-weight: 400;
+  font-size: 0.82em;
+  color: var(--muted-foreground);
+  margin-left: 4px;
+}
+
+.form-help.success {
+  color: oklch(0.6290 0.1902 156.4499);
+}
+
 .product-checkbox:hover {
   background-color: var(--accent);
   color: var(--accent-foreground);

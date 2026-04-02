@@ -266,7 +266,7 @@ productData[<%=productId%>] = {
     price: <%=product.getPrice()%>,
     quantity: <%=product.getQuantity()%>,
     unit: "<%=product.getQuantityUnit() != null ? product.getQuantityUnit() : ""%>",
-    image: "<%=product.getImage() != null ? "data:image/jpeg;base64," + java.util.Base64.getEncoder().encodeToString(product.getImage()) : ""%>",
+    image: "<%=product.getImagePath() != null && !product.getImagePath().isEmpty() ? request.getContextPath() + "/" + product.getImagePath() : ""%>",
     variants: [
         <% if (variants != null && !variants.isEmpty()) {
             for (int i = 0; i < variants.size(); i++) {

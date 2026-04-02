@@ -441,8 +441,8 @@ img.service-thumb {
                     <% } %>
                 </td>
                 <td>
-                    <% if(p.getImage() != null){ %>
-                    <img class="service-thumb" src="data:image/jpeg;base64,<%=java.util.Base64.getEncoder().encodeToString(p.getImage())%>">
+                    <% if(p.getImagePath() != null && !p.getImagePath().isEmpty()){ %>
+                    <img class="service-thumb" src="<%=request.getContextPath()%>/<%=p.getImagePath()%>">
                     <% } else { %>
                     <img class="service-thumb" src="${pageContext.request.contextPath}/assets/images/tools.png" alt="No Image">
                     <% } %>
@@ -617,7 +617,7 @@ productData[<%=p.getProductId()%>] = {
     price: <%=p.getPrice()%>,
     quantity: <%=p.getQuantity()%>,
     unit: "<%=p.getQuantityUnit() != null ? p.getQuantityUnit() : ""%>",
-    image: "<%=p.getImage() != null ? "data:image/jpeg;base64," + java.util.Base64.getEncoder().encodeToString(p.getImage()) : ""%>",
+    image: "<%=p.getImagePath() != null && !p.getImagePath().isEmpty() ? request.getContextPath() + "/" + p.getImagePath() : ""%>",
     variants: [
         <% if (variants != null && !variants.isEmpty()) {
             for (int i = 0; i < variants.size(); i++) {

@@ -9,7 +9,7 @@ import com.dailyfixer.util.DBConnection;
 public class ProductDAO {
 
     public void addProduct(Product p) throws Exception {
-        String sql = "INSERT INTO products (name, type, quantity, quantity_unit, price, image, store_username, description, store_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (name, type, quantity, quantity_unit, price, image_path, warranty_info, store_username, description, store_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection con = DBConnection.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, p.getName());
@@ -17,13 +17,14 @@ public class ProductDAO {
             ps.setDouble(3, p.getQuantity());
             ps.setString(4, p.getQuantityUnit());
             ps.setDouble(5, p.getPrice());
-            ps.setBytes(6, p.getImage());
-            ps.setString(7, p.getStoreUsername());
-            ps.setString(8, p.getDescription());
+            ps.setString(6, p.getImagePath());
+            ps.setString(7, p.getWarrantyInfo());
+            ps.setString(8, p.getStoreUsername());
+            ps.setString(9, p.getDescription());
             if (p.getStoreId() > 0) {
-                ps.setInt(9, p.getStoreId());
+                ps.setInt(10, p.getStoreId());
             } else {
-                ps.setNull(9, java.sql.Types.INTEGER);
+                ps.setNull(10, java.sql.Types.INTEGER);
             }
             ps.executeUpdate();
 
@@ -56,7 +57,8 @@ public class ProductDAO {
                 p.setQuantity(rs.getInt("quantity"));
                 p.setQuantityUnit(rs.getString("quantity_unit"));
                 p.setPrice(rs.getDouble("price"));
-                p.setImage(rs.getBytes("image"));
+                p.setImagePath(rs.getString("image_path"));
+                p.setWarrantyInfo(rs.getString("warranty_info"));
                 p.setDescription(rs.getString("description"));
                 p.setStoreUsername(rs.getString("store_username"));
                 p.setStoreId(rs.getInt("store_id"));
@@ -90,7 +92,8 @@ public class ProductDAO {
                 p.setQuantity(rs.getInt("quantity"));
                 p.setQuantityUnit(rs.getString("quantity_unit"));
                 p.setPrice(rs.getDouble("price"));
-                p.setImage(rs.getBytes("image"));
+                p.setImagePath(rs.getString("image_path"));
+                p.setWarrantyInfo(rs.getString("warranty_info"));
                 p.setDescription(rs.getString("description"));
                 p.setStoreUsername(rs.getString("store_username"));
                 p.setStoreId(rs.getInt("store_id"));
@@ -127,7 +130,8 @@ public class ProductDAO {
                 p.setQuantity(rs.getInt("quantity"));
                 p.setQuantityUnit(rs.getString("quantity_unit"));
                 p.setPrice(rs.getDouble("price"));
-                p.setImage(rs.getBytes("image"));
+                p.setImagePath(rs.getString("image_path"));
+                p.setWarrantyInfo(rs.getString("warranty_info"));
                 p.setDescription(rs.getString("description"));
                 p.setStoreUsername(rs.getString("store_username"));
                 p.setStoreId(rs.getInt("store_id"));
@@ -137,7 +141,7 @@ public class ProductDAO {
     }
 
     public void updateProduct(Product p) throws Exception {
-        String sql = "UPDATE products SET name=?, type=?, quantity=?, quantity_unit=?, price=?, image=?, description=? WHERE product_id=?";
+        String sql = "UPDATE products SET name=?, type=?, quantity=?, quantity_unit=?, price=?, image_path=?, warranty_info=?, description=? WHERE product_id=?";
         try (Connection con = DBConnection.getConnection();
                 PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, p.getName());
@@ -145,9 +149,10 @@ public class ProductDAO {
             ps.setDouble(3, p.getQuantity());
             ps.setString(4, p.getQuantityUnit());
             ps.setDouble(5, p.getPrice());
-            ps.setBytes(6, p.getImage());
-            ps.setString(7, p.getDescription());
-            ps.setInt(8, p.getProductId());
+            ps.setString(6, p.getImagePath());
+            ps.setString(7, p.getWarrantyInfo());
+            ps.setString(8, p.getDescription());
+            ps.setInt(9, p.getProductId());
             ps.executeUpdate();
         }
     }
@@ -231,7 +236,8 @@ public class ProductDAO {
                 p.setQuantity(rs.getInt("quantity"));
                 p.setQuantityUnit(rs.getString("quantity_unit"));
                 p.setPrice(rs.getDouble("price"));
-                p.setImage(rs.getBytes("image"));
+                p.setImagePath(rs.getString("image_path"));
+                p.setWarrantyInfo(rs.getString("warranty_info"));
                 p.setStoreUsername(rs.getString("store_username"));
                 p.setDescription(rs.getString("description"));
                 p.setStoreId(rs.getInt("resolved_store_id")); // Set store_id for location filtering
@@ -344,7 +350,8 @@ public class ProductDAO {
                 p.setQuantity(rs.getInt("quantity"));
                 p.setQuantityUnit(rs.getString("quantity_unit"));
                 p.setPrice(rs.getDouble("price"));
-                p.setImage(rs.getBytes("image"));
+                p.setImagePath(rs.getString("image_path"));
+                p.setWarrantyInfo(rs.getString("warranty_info"));
                 p.setStoreUsername(rs.getString("store_username"));
                 p.setDescription(rs.getString("description"));
                 p.setStoreId(rs.getInt("resolved_store_id"));
@@ -413,7 +420,8 @@ public class ProductDAO {
                 p.setQuantity(rs.getInt("quantity"));
                 p.setQuantityUnit(rs.getString("quantity_unit"));
                 p.setPrice(rs.getDouble("price"));
-                p.setImage(rs.getBytes("image"));
+                p.setImagePath(rs.getString("image_path"));
+                p.setWarrantyInfo(rs.getString("warranty_info"));
                 p.setStoreUsername(rs.getString("store_username"));
                 p.setDescription(rs.getString("description"));
                 p.setStoreId(rs.getInt("resolved_store_id"));

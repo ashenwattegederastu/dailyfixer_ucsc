@@ -78,20 +78,35 @@
                 <input type="text" name="name" value="<%=product.getName()%>" placeholder="Enter product name" required>
 
                 <label>Category</label>
-                <select name="type" required>
-                    <option value="Cutting Tools" <%=product.getType().equals("Cutting Tools")?"selected":""%>>Cutting Tools</option>
-                    <option value="Painting Tools" <%=product.getType().equals("Painting Tools")?"selected":""%>>Painting Tools</option>
-                    <option value="Tool Storage & Safety Gear" <%=product.getType().equals("Tool Storage & Safety Gear")?"selected":""%>>Tool Storage & Safety Gear</option>
-                    <option value="Electrical Tools & Accessories" <%=product.getType().equals("Electrical Tools & Accessories")?"selected":""%>>Electrical Tools & Accessories</option>
-                    <option value="Power Tools" <%=product.getType().equals("Power Tools")?"selected":""%>>Power Tools</option>
-                    <option value="Cleaning & Maintenance" <%=product.getType().equals("Cleaning & Maintenance")?"selected":""%>>Cleaning & Maintenance</option>
-                    <option value="Vehicle Parts & Accessories" <%=product.getType().equals("Vehicle Parts & Accessories")?"selected":""%>>Vehicle Parts & Accessories</option>
-                    <option value="Measuring & Marking Tools" <%=product.getType().equals("Measuring & Marking Tools")?"selected":""%>>Measuring & Marking Tools</option>
-                    <option value="Tapes" <%=product.getType().equals("Tapes")?"selected":""%>>Tapes</option>
-                    <option value="Fasteners & Fittings" <%=product.getType().equals("Fasteners & Fittings")?"selected":""%>>Fasteners & Fittings</option>
-                    <option value="Plumbing Tools & Supplies" <%=product.getType().equals("Plumbing Tools & Supplies")?"selected":""%>>Plumbing Tools & Supplies</option>
-                    <option value="Adhesives & Sealants" <%=product.getType().equals("Adhesives & Sealants")?"selected":""%>>Adhesives & Sealants</option>
+                <%
+                    String[] knownCategories = {"Cutting Tools","Painting Tools","Tool Storage & Safety Gear","Electrical Tools & Accessories","Power Tools","Cleaning & Maintenance","Vehicle Parts & Accessories","Measuring & Marking Tools","Tapes","Fasteners & Fittings","Plumbing Tools & Supplies","Adhesives & Sealants"};
+                    boolean isKnownCat = false;
+                    for (String cat : knownCategories) { if (cat.equals(product.getType())) { isKnownCat = true; break; } }
+                    String displayType = isKnownCat ? product.getType() : "Other";
+                    String customCatValue = isKnownCat ? "" : product.getType();
+                %>
+                <select name="type" id="categorySelect" required>
+                    <option value="Cutting Tools" <%=displayType.equals("Cutting Tools")?"selected":""%>>Cutting Tools</option>
+                    <option value="Painting Tools" <%=displayType.equals("Painting Tools")?"selected":""%>>Painting Tools</option>
+                    <option value="Tool Storage &amp; Safety Gear" <%=displayType.equals("Tool Storage & Safety Gear")?"selected":""%>>Tool Storage &amp; Safety Gear</option>
+                    <option value="Electrical Tools &amp; Accessories" <%=displayType.equals("Electrical Tools & Accessories")?"selected":""%>>Electrical Tools &amp; Accessories</option>
+                    <option value="Power Tools" <%=displayType.equals("Power Tools")?"selected":""%>>Power Tools</option>
+                    <option value="Cleaning &amp; Maintenance" <%=displayType.equals("Cleaning & Maintenance")?"selected":""%>>Cleaning &amp; Maintenance</option>
+                    <option value="Vehicle Parts &amp; Accessories" <%=displayType.equals("Vehicle Parts & Accessories")?"selected":""%>>Vehicle Parts &amp; Accessories</option>
+                    <option value="Measuring &amp; Marking Tools" <%=displayType.equals("Measuring & Marking Tools")?"selected":""%>>Measuring &amp; Marking Tools</option>
+                    <option value="Tapes" <%=displayType.equals("Tapes")?"selected":""%>>Tapes</option>
+                    <option value="Fasteners &amp; Fittings" <%=displayType.equals("Fasteners & Fittings")?"selected":""%>>Fasteners &amp; Fittings</option>
+                    <option value="Plumbing Tools &amp; Supplies" <%=displayType.equals("Plumbing Tools & Supplies")?"selected":""%>>Plumbing Tools &amp; Supplies</option>
+                    <option value="Adhesives &amp; Sealants" <%=displayType.equals("Adhesives & Sealants")?"selected":""%>>Adhesives &amp; Sealants</option>
+                    <option value="Other" <%=displayType.equals("Other")?"selected":""%>>Other</option>
                 </select>
+
+                <p id="categoryGuidance" class="category-guidance" style="display:none;"></p>
+
+                <div id="customCategoryWrap" class="custom-category-wrap" style="<%=!isKnownCat ? "" : "display:none;"%>">
+                    <label for="customCategory">Specify Category</label>
+                    <input type="text" id="customCategory" name="customCategory" value="<%=customCatValue%>" placeholder="Enter a specific category name" <%=!isKnownCat ? "required" : ""%>>
+                </div>
 
                 <label>Quantity <span id="quantityNote" class="form-help">(<%= (variants != null && !variants.isEmpty()) ? "Not required - variants have their own quantities" : "Required if no variants" %>)</span></label>
                 <input type="number" step="0.01" name="quantity" id="quantityInput" value="<%=product.getQuantity()%>" placeholder="Enter quantity" <%=(variants==null || variants.isEmpty()) ? "required" : "" %>>
@@ -110,8 +125,21 @@
                 <label>Description</label>
                 <textarea name="description" rows="4" placeholder="Enter product description" required><%=product.getDescription()%></textarea>
 
+                <label>Warranty Information <span class="form-help">(Optional)</span></label>
+                <textarea name="warrantyInfo" id="warrantyInfo" rows="2"
+                    placeholder="e.g. 1 year manufacturer warranty, 6 months for parts"><%=product.getWarrantyInfo() != null ? product.getWarrantyInfo() : ""%></textarea>
+
                 <label>Product Image</label>
-                <input type="file" name="image" accept="image/*">
+                <% String currentImg = product.getImagePath(); if (currentImg != null && !currentImg.isEmpty()) { %>
+                <div class="image-current-wrap">
+                    <img src="<%=request.getContextPath()%>/<%=currentImg%>" alt="Current image" class="image-current-preview">
+                    <p class="form-help">Current image shown. Upload a new file below to replace it.</p>
+                </div>
+                <% } %>
+                <input type="file" name="image" id="productImageInput" accept="image/*">
+                <div class="image-preview-wrap" id="imagePreviewWrap" style="display:none;">
+                    <img id="productImagePreview" src="" alt="New image preview" class="image-preview">
+                </div>
 
                 <!-- Product Variants Section -->
                 <div class="variants-section">
@@ -124,19 +152,19 @@
                             <div class="variant-row">
                                 <input type="hidden" name="variantId[]" value="<%=v.getVariantId()%>">
                                 <div class="variant-grid">
-                                    <div>
+                                    <div data-vfield="color">
                                         <label>Color</label>
-                                        <input type="text" name="variantColor[]" value="<%=v.getColor() != null ? v.getColor() : ""%>" placeholder="e.g. Red">
+                                        <input type="text" name="variantColor[]" value="<%=v.getColor() != null ? v.getColor() : ""%>" placeholder="Color">
                                     </div>
-                                    <div>
+                                    <div data-vfield="size">
                                         <label>Size</label>
-                                        <input type="text" name="variantSize[]" value="<%=v.getSize() != null ? v.getSize() : ""%>" placeholder="e.g. M">
+                                        <input type="text" name="variantSize[]" value="<%=v.getSize() != null ? v.getSize() : ""%>" placeholder="Size">
                                     </div>
                                 </div>
                                 <div class="variant-grid">
-                                    <div>
+                                    <div data-vfield="power">
                                         <label>Power</label>
-                                        <input type="text" name="variantPower[]" value="<%=v.getPower() != null ? v.getPower() : ""%>" placeholder="e.g. 500W">
+                                        <input type="text" name="variantPower[]" value="<%=v.getPower() != null ? v.getPower() : ""%>" placeholder="Power">
                                     </div>
                                     <div>
                                         <label>Variant Price (Rs.)</label>
@@ -147,6 +175,17 @@
                                     <label>Variant Stock</label>
                                     <input type="number" name="variantQuantity[]" value="<%=v.getQuantity()%>" placeholder="Stock quantity">
                                 </div>
+                                <div class="variant-image-wrap">
+                                    <label>Variant Image <span class="form-help">(Optional)</span></label>
+                                    <% if (v.getImagePath() != null && !v.getImagePath().isEmpty()) { %>
+                                    <div class="variant-current-image">
+                                        <img src="<%=request.getContextPath()%>/<%=v.getImagePath()%>" alt="Current variant image" class="variant-current-thumb">
+                                        <span class="form-help">Upload a new file to replace</span>
+                                    </div>
+                                    <% } %>
+                                    <input type="file" name="variantImage[]" accept="image/*" class="variant-image-input">
+                                    <img src="" alt="Variant preview" class="variant-image-preview" style="display:none;">
+                                </div>
                                 <button type="button" class="remove-variant-btn" onclick="removeVariantRow(this)">Remove</button>
                             </div>
                         <% } } else { %>
@@ -154,19 +193,19 @@
                             <div class="variant-row">
                                 <input type="hidden" name="variantId[]" value="">
                                 <div class="variant-grid">
-                                    <div>
+                                    <div data-vfield="color">
                                         <label>Color</label>
-                                        <input type="text" name="variantColor[]" placeholder="e.g. Red">
+                                        <input type="text" name="variantColor[]" placeholder="Color">
                                     </div>
-                                    <div>
+                                    <div data-vfield="size">
                                         <label>Size</label>
-                                        <input type="text" name="variantSize[]" placeholder="e.g. M">
+                                        <input type="text" name="variantSize[]" placeholder="Size">
                                     </div>
                                 </div>
                                 <div class="variant-grid">
-                                    <div>
+                                    <div data-vfield="power">
                                         <label>Power</label>
-                                        <input type="text" name="variantPower[]" placeholder="e.g. 500W">
+                                        <input type="text" name="variantPower[]" placeholder="Power">
                                     </div>
                                     <div>
                                         <label>Variant Price (Rs.)</label>
@@ -176,6 +215,11 @@
                                 <div>
                                     <label>Variant Stock</label>
                                     <input type="number" name="variantQuantity[]" placeholder="Stock quantity">
+                                </div>
+                                <div class="variant-image-wrap">
+                                    <label>Variant Image <span class="form-help">(Optional)</span></label>
+                                    <input type="file" name="variantImage[]" accept="image/*" class="variant-image-input">
+                                    <img src="" alt="Variant preview" class="variant-image-preview" style="display:none;">
                                 </div>
                                 <button type="button" class="remove-variant-btn" onclick="removeVariantRow(this)">Remove</button>
                             </div>
@@ -193,6 +237,7 @@
     </main>
 
     <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/storedash-product-category.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/storedash-product-variants.js"></script>
 </body>
 </html>

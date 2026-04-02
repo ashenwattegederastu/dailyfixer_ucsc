@@ -59,22 +59,30 @@
                             <label for="name">Product Name</label>
                             <input type="text" name="name" placeholder="Enter product name" required>
 
-                            <label for="type">Category</label>
-                            <select name="type" required>
+                            <label for="categorySelect">Category</label>
+                            <select name="type" id="categorySelect" required>
                                 <option value="">-- Select Category --</option>
                                 <option value="Cutting Tools">Cutting Tools</option>
                                 <option value="Painting Tools">Painting Tools</option>
-                                <option value="Tool Storage & Safety Gear">Tool Storage & Safety Gear</option>
-                                <option value="Electrical Tools & Accessories">Electrical Tools & Accessories</option>
+                                <option value="Tool Storage &amp; Safety Gear">Tool Storage &amp; Safety Gear</option>
+                                <option value="Electrical Tools &amp; Accessories">Electrical Tools &amp; Accessories</option>
                                 <option value="Power Tools">Power Tools</option>
-                                <option value="Cleaning & Maintenance">Cleaning & Maintenance</option>
-                                <option value="Vehicle Parts & Accessories">Vehicle Parts & Accessories</option>
-                                <option value="Measuring & Marking Tools">Measuring & Marking Tools</option>
+                                <option value="Cleaning &amp; Maintenance">Cleaning &amp; Maintenance</option>
+                                <option value="Vehicle Parts &amp; Accessories">Vehicle Parts &amp; Accessories</option>
+                                <option value="Measuring &amp; Marking Tools">Measuring &amp; Marking Tools</option>
                                 <option value="Tapes">Tapes</option>
-                                <option value="Fasteners & Fittings">Fasteners & Fittings</option>
-                                <option value="Plumbing Tools & Supplies">Plumbing Tools & Supplies</option>
-                                <option value="Adhesives & Sealants">Adhesives & Sealants</option>
+                                <option value="Fasteners &amp; Fittings">Fasteners &amp; Fittings</option>
+                                <option value="Plumbing Tools &amp; Supplies">Plumbing Tools &amp; Supplies</option>
+                                <option value="Adhesives &amp; Sealants">Adhesives &amp; Sealants</option>
+                                <option value="Other">Other</option>
                             </select>
+
+                            <p id="categoryGuidance" class="category-guidance" style="display:none;"></p>
+
+                            <div id="customCategoryWrap" class="custom-category-wrap" style="display:none;">
+                                <label for="customCategory">Specify Category</label>
+                                <input type="text" id="customCategory" name="customCategory" placeholder="Enter a specific category name">
+                            </div>
 
                             <label for="quantity">Quantity <span id="quantityNote"
                                     class="form-help">(Required if no
@@ -99,8 +107,15 @@
                                 placeholder="Enter product description" required></textarea>
 
 
-                            <label for="image">Product Image</label>
-                            <input type="file" name="image" accept="image/*" required>
+                            <label for="warrantyInfo">Warranty Information <span class="form-help">(Optional)</span></label>
+                            <textarea name="warrantyInfo" id="warrantyInfo" rows="2"
+                                placeholder="e.g. 1 year manufacturer warranty, 6 months for parts"></textarea>
+
+                            <label for="productImageInput">Product Image</label>
+                            <input type="file" name="image" id="productImageInput" accept="image/*" required>
+                            <div class="image-preview-wrap" id="imagePreviewWrap" style="display:none;">
+                                <img id="productImagePreview" src="" alt="Preview" class="image-preview">
+                            </div>
 
                             <!-- Product Variants Section -->
                             <div class="variants-section">
@@ -109,19 +124,19 @@
                                 <div id="variantsContainer">
                                     <div class="variant-row">
                                         <div class="variant-grid">
-                                            <div>
+                                            <div data-vfield="color">
                                                 <label>Color</label>
-                                                <input type="text" name="variantColor[]" placeholder="e.g. Red">
+                                                <input type="text" name="variantColor[]" placeholder="Color">
                                             </div>
-                                            <div>
+                                            <div data-vfield="size">
                                                 <label>Size</label>
-                                                <input type="text" name="variantSize[]" placeholder="e.g. M">
+                                                <input type="text" name="variantSize[]" placeholder="Size">
                                             </div>
                                         </div>
                                         <div class="variant-grid">
-                                            <div>
+                                            <div data-vfield="power">
                                                 <label>Power</label>
-                                                <input type="text" name="variantPower[]" placeholder="e.g. 500W">
+                                                <input type="text" name="variantPower[]" placeholder="Power">
                                             </div>
                                             <div>
                                                 <label>Variant Price (Rs.)</label>
@@ -131,6 +146,11 @@
                                         <div>
                                             <label>Variant Stock</label>
                                             <input type="number" name="variantQuantity[]" placeholder="Stock quantity">
+                                        </div>
+                                        <div class="variant-image-wrap">
+                                            <label>Variant Image <span class="form-help">(Optional)</span></label>
+                                            <input type="file" name="variantImage[]" accept="image/*" class="variant-image-input">
+                                            <img src="" alt="Variant preview" class="variant-image-preview" style="display:none;">
                                         </div>
                                         <button type="button" class="remove-variant-btn" onclick="removeVariantRow(this)">Remove</button>
                                     </div>
@@ -147,6 +167,7 @@
                 </main>
 
                 <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
+                <script src="${pageContext.request.contextPath}/assets/js/storedash-product-category.js"></script>
                 <script src="${pageContext.request.contextPath}/assets/js/storedash-product-variants.js"></script>
             </body>
 

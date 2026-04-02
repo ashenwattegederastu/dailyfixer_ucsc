@@ -3,11 +3,36 @@ function addVariantRow() {
     var firstRow = container.querySelector('.variant-row');
     var newRow = firstRow.cloneNode(true);
 
-    newRow.querySelectorAll('input').forEach(function(input) {
+    /* Clear all text/number inputs */
+    newRow.querySelectorAll('input[type="text"], input[type="number"]').forEach(function(input) {
         input.value = '';
     });
 
+    /* Replace file input with a fresh one (file inputs cannot be cleared by value) */
+    var oldFileInput = newRow.querySelector('input[type="file"].variant-image-input');
+    if (oldFileInput) {
+        var freshFile = document.createElement('input');
+        freshFile.type = 'file';
+        freshFile.name = 'variantImage[]';
+        freshFile.accept = 'image/*';
+        freshFile.className = 'variant-image-input';
+        oldFileInput.parentNode.replaceChild(freshFile, oldFileInput);
+    }
+
+    /* Hide stale image preview */
+    var preview = newRow.querySelector('.variant-image-preview');
+    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+
+    /* Hide any current-image thumbnail (only relevant in edit form) */
+    var currentThumb = newRow.querySelector('.variant-current-image');
+    if (currentThumb) currentThumb.style.display = 'none';
+
     container.appendChild(newRow);
+
+    /* Apply current category labels if category JS is loaded */
+    if (typeof applyCategoryLabelsToRow === 'function') {
+        applyCategoryLabelsToRow(newRow);
+    }
 }
 
 function removeVariantRow(btn) {

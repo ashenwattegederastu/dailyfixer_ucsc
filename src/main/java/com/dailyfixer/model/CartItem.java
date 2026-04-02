@@ -5,7 +5,7 @@ public class CartItem {
     private String name;
     private double price;
     private int quantity;
-    private String imageBase64;
+    private String imagePath;
     private Integer variantId;
     private String variantColor;
     private String variantSize;
@@ -17,24 +17,24 @@ public class CartItem {
     private int storeId; // Store that owns this product
     private String storeUsername; // Store username for order association
 
-    public CartItem(int productId, String name, double price, int quantity, String imageBase64) {
+    public CartItem(int productId, String name, double price, int quantity, String imagePath) {
         this.productId = productId;
         this.name = name;
         this.price = price;
         this.originalPrice = price;
         this.quantity = quantity;
-        this.imageBase64 = imageBase64;
+        this.imagePath = imagePath;
         this.discountAmount = 0;
     }
 
-    public CartItem(int productId, String name, double price, int quantity, String imageBase64,
+    public CartItem(int productId, String name, double price, int quantity, String imagePath,
                     Integer variantId, String variantColor, String variantSize, String variantPower) {
         this.productId = productId;
         this.name = name;
         this.price = price;
         this.originalPrice = price;
         this.quantity = quantity;
-        this.imageBase64 = imageBase64;
+        this.imagePath = imagePath;
         this.variantId = variantId;
         this.variantColor = variantColor;
         this.variantSize = variantSize;
@@ -42,7 +42,7 @@ public class CartItem {
         this.discountAmount = 0;
     }
 
-    public CartItem(int productId, String name, double price, double originalPrice, int quantity, String imageBase64,
+    public CartItem(int productId, String name, double price, double originalPrice, int quantity, String imagePath,
                     Integer variantId, String variantColor, String variantSize, String variantPower,
                     double discountAmount, String discountName, String discountType) {
         this.productId = productId;
@@ -50,7 +50,7 @@ public class CartItem {
         this.price = price;
         this.originalPrice = originalPrice;
         this.quantity = quantity;
-        this.imageBase64 = imageBase64;
+        this.imagePath = imagePath;
         this.variantId = variantId;
         this.variantColor = variantColor;
         this.variantSize = variantSize;
@@ -64,7 +64,10 @@ public class CartItem {
     public String getName() { return name; }
     public double getPrice() { return price; }
     public int getQuantity() { return quantity; }
-    public String getImageBase64() { return imageBase64; }
+    public String getImagePath() { return imagePath; }
+    /** @deprecated Use {@link #getImagePath()} instead. */
+    @Deprecated
+    public String getImageBase64() { return imagePath; }
     public Integer getVariantId() { return variantId; }
     public String getVariantColor() { return variantColor; }
     public String getVariantSize() { return variantSize; }

@@ -272,8 +272,8 @@
                                     <c:forEach var="item" items="${orderItemsMap[order.orderId]}">
                                         <div class="product-item">
                                             <c:choose>
-                                                <c:when test="${not empty productsMap[item.productId] and not empty productsMap[item.productId].imageBase64}">
-                                                    <img src="data:image/jpeg;base64,${productsMap[item.productId].imageBase64}"
+                                                <c:when test="${not empty productsMap[item.productId] and not empty productsMap[item.productId].imagePath}">
+                                                    <img src="${pageContext.request.contextPath}/${productsMap[item.productId].imagePath}"
                                                          alt="${item.productName}"
                                                          class="product-image">
                                                 </c:when>

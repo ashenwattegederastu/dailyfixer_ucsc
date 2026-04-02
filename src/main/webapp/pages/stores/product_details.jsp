@@ -121,7 +121,8 @@
         <!-- Left Image Section -->
         <div class="image-gallery">
             <div class="main-image">
-                <img src="data:image/jpeg;base64,<%=product.getImageBase64()%>"
+                <% String pdImg = product.getImagePath(); %>
+                <img src="<%=pdImg != null && !pdImg.isEmpty() ? request.getContextPath() + "/" + pdImg : request.getContextPath() + "/assets/images/tools.png"%>"
                      alt="<%=product.getName()%>">
             </div>
         </div>

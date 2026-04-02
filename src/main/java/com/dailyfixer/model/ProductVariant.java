@@ -11,6 +11,7 @@ public class ProductVariant {
     private String power;
     private BigDecimal price;
     private int quantity;
+    private String imagePath;
 
     public ProductVariant() {}
 
@@ -44,4 +45,7 @@ public class ProductVariant {
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public String getImagePath() { return imagePath; }
+    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 }

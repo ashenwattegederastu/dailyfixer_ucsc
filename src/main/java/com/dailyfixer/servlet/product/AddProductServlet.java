@@ -10,6 +10,7 @@ import com.dailyfixer.model.ProductVariant;
 import com.dailyfixer.dao.ProductDAO;
 import com.dailyfixer.dao.ProductVariantDAO;
 import com.dailyfixer.model.User;
+import com.dailyfixer.util.ProductImageUtil;
 
 @MultipartConfig(maxFileSize = 16177215) // 16 MB max
 public class AddProductServlet extends HttpServlet {
@@ -17,7 +18,7 @@ public class AddProductServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // 1. Get logged-in User object from session
-        HttpSession session = request.getSession(false); // do not create new session
+        HttpSession session = request.getSession(false);
         if (session == null) {
             response.sendRedirect("../../login.jsp");
             return;
@@ -25,41 +26,39 @@ public class AddProductServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("currentUser");
         if (user == null || !"store".equals(user.getRole())) {
-            response.sendRedirect("../../login.jsp"); // only store users can add products
+            response.sendRedirect("../../login.jsp");
             return;
         }
 
-        String storeUsername = user.getUsername(); // safe to use for DB
+        String storeUsername = user.getUsername();
+        String webAppPath = getServletContext().getRealPath("/");
 
         // 2. Get form parameters
-        String name = request.getParameter("name");
-        String type = request.getParameter("type");
+        String name        = request.getParameter("name");
+        String type        = request.getParameter("type");
+        // "Other" category: use custom text if selected
+        if ("Other".equals(type)) {
+            String custom = request.getParameter("customCategory");
+            if (custom != null && !custom.trim().isEmpty()) {
+                type = custom.trim();
+            }
+        }
         String quantityStr = request.getParameter("quantity");
         int quantity = 0;
         if (quantityStr != null && !quantityStr.trim().isEmpty()) {
-            try {
-                quantity = Integer.parseInt(quantityStr);
-            } catch (NumberFormatException e) {
-                quantity = 0;
-            }
+            try { quantity = Integer.parseInt(quantityStr); } catch (NumberFormatException ignored) {}
         }
-        String quantityUnit = request.getParameter("quantityUnit");
-        double price = 0.0;
-        String mainPriceStr = request.getParameter("price");
+        String quantityUnit  = request.getParameter("quantityUnit");
+        double price         = 0.0;
+        String mainPriceStr  = request.getParameter("price");
         if (mainPriceStr != null && !mainPriceStr.trim().isEmpty()) {
-            price = Double.parseDouble(mainPriceStr);
+            try { price = Double.parseDouble(mainPriceStr); } catch (NumberFormatException ignored) {}
         }
-        String description = request.getParameter("description");
-
-        // 3. Get uploaded image
-        InputStream inputStream = null;
-        Part filePart = request.getPart("image");
-        if (filePart != null && filePart.getSize() > 0) {
-            inputStream = filePart.getInputStream();
-        }
+        String description   = request.getParameter("description");
+        String warrantyInfo  = request.getParameter("warrantyInfo");
 
         try {
-            // 4. Create Product object
+            // 3. Create Product object (without image first — we need the ID to name the file)
             Product p = new Product();
             p.setName(name);
             p.setType(type);
@@ -68,80 +67,86 @@ public class AddProductServlet extends HttpServlet {
             p.setPrice(price);
             p.setStoreUsername(storeUsername);
             p.setDescription(description);
-            if (inputStream != null) p.setImage(inputStream.readAllBytes());
+            p.setWarrantyInfo((warrantyInfo != null && !warrantyInfo.isBlank()) ? warrantyInfo.trim() : null);
 
-            // 5. Save to database and get product ID
+            // 4. Save product to DB and get generated ID
             ProductDAO productDAO = new ProductDAO();
             int productId = productDAO.addProductAndReturnId(p);
 
-            // 6. Handle variants if provided
-            String[] variantColors = request.getParameterValues("variantColor[]");
-            String[] variantSizes = request.getParameterValues("variantSize[]");
-            String[] variantPowers = request.getParameterValues("variantPower[]");
-            String[] variantPrices = request.getParameterValues("variantPrice[]");
+            // 5. Save main image now that we have the productId
+            Part imagePart = request.getPart("image");
+            String imagePath = ProductImageUtil.saveProductMainImage(imagePart, productId, webAppPath);
+            if (imagePath != null) {
+                p.setImagePath(imagePath);
+                productDAO.updateProduct(p);
+            }
+
+            // 6. Handle variants
+            String[] variantColors     = request.getParameterValues("variantColor[]");
+            String[] variantSizes      = request.getParameterValues("variantSize[]");
+            String[] variantPowers     = request.getParameterValues("variantPower[]");
+            String[] variantPrices     = request.getParameterValues("variantPrice[]");
             String[] variantQuantities = request.getParameterValues("variantQuantity[]");
+            Part[]   variantImages     = null;
+            try {
+                java.util.Collection<Part> allParts = request.getParts();
+                java.util.List<Part> imgParts = new java.util.ArrayList<>();
+                for (Part part : allParts) {
+                    if ("variantImage[]".equals(part.getName())) imgParts.add(part);
+                }
+                variantImages = imgParts.toArray(new Part[0]);
+            } catch (Exception ignored) {}
 
             boolean hasVariants = false;
             if (variantColors != null && variantColors.length > 0) {
                 ProductVariantDAO variantDAO = new ProductVariantDAO();
                 for (int i = 0; i < variantColors.length; i++) {
-                    // Skip empty rows (all fields empty)
-                    String color = variantColors[i] != null ? variantColors[i].trim() : "";
-                    String size = (variantSizes != null && i < variantSizes.length) ? 
-                                  (variantSizes[i] != null ? variantSizes[i].trim() : "") : "";
-                    String power = (variantPowers != null && i < variantPowers.length) ? 
-                                   (variantPowers[i] != null ? variantPowers[i].trim() : "") : "";
-                    String priceStr = (variantPrices != null && i < variantPrices.length) ? 
-                                      variantPrices[i] : "";
-                    String qtyStr = (variantQuantities != null && i < variantQuantities.length) ? 
-                                    variantQuantities[i] : "";
+                    String color  = variantColors[i] != null ? variantColors[i].trim() : "";
+                    String size   = (variantSizes    != null && i < variantSizes.length)    ? variantSizes[i].trim()    : "";
+                    String power  = (variantPowers   != null && i < variantPowers.length)   ? variantPowers[i].trim()   : "";
+                    String pStr   = (variantPrices   != null && i < variantPrices.length)   ? variantPrices[i]          : "";
+                    String qStr   = (variantQuantities != null && i < variantQuantities.length) ? variantQuantities[i]  : "";
 
-                    // Skip if all fields are empty
-                    if (color.isEmpty() && size.isEmpty() && power.isEmpty() && 
-                        (priceStr == null || priceStr.trim().isEmpty()) && 
-                        (qtyStr == null || qtyStr.trim().isEmpty())) {
-                        continue;
-                    }
+                    if (color.isEmpty() && size.isEmpty() && power.isEmpty() &&
+                        (pStr == null || pStr.trim().isEmpty()) &&
+                        (qStr == null || qStr.trim().isEmpty())) continue;
 
-                    // Validate required fields
-                    if (priceStr == null || priceStr.trim().isEmpty() || 
-                        qtyStr == null || qtyStr.trim().isEmpty()) {
-                        continue; // Skip incomplete variants
-                    }
+                    if (pStr == null || pStr.trim().isEmpty() || qStr == null || qStr.trim().isEmpty()) continue;
 
                     try {
                         hasVariants = true;
                         ProductVariant variant = new ProductVariant();
                         variant.setProductId(productId);
                         variant.setColor(color.isEmpty() ? null : color);
-                        variant.setSize(size.isEmpty() ? null : size);
+                        variant.setSize(size.isEmpty()   ? null : size);
                         variant.setPower(power.isEmpty() ? null : power);
-                        variant.setPrice(new BigDecimal(priceStr));
-                        variant.setQuantity(Integer.parseInt(qtyStr));
-                        variantDAO.addVariant(variant);
+                        variant.setPrice(new BigDecimal(pStr.trim()));
+                        variant.setQuantity(Integer.parseInt(qStr.trim()));
+
+                        int variantId = variantDAO.addVariantAndReturnId(variant);
+
+                        // Save variant image if provided
+                        if (variantImages != null && i < variantImages.length) {
+                            String vImgPath = ProductImageUtil.saveVariantImage(variantImages[i], variantId, webAppPath);
+                            if (vImgPath != null) {
+                                variant.setVariantId(variantId);
+                                variant.setImagePath(vImgPath);
+                                variantDAO.updateVariant(variant);
+                            }
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        // Continue with other variants even if one fails
                     }
                 }
             }
-            
-            // If variants were added, set main product quantity to 0 (variants have their own quantities)
+
+            // If variants were added, set main product quantity to 0
             if (hasVariants) {
-                Product updateProduct = new Product();
-                updateProduct.setProductId(productId);
-                updateProduct.setName(p.getName());
-                updateProduct.setType(p.getType());
-                updateProduct.setQuantity(0);
-                updateProduct.setQuantityUnit(p.getQuantityUnit());
-                updateProduct.setPrice(p.getPrice());
-                updateProduct.setImage(p.getImage());
-                updateProduct.setDescription(p.getDescription());
-                productDAO.updateProduct(updateProduct);
+                p.setQuantity(0);
+                productDAO.updateProduct(p);
             }
 
-            // 7. Redirect to product list
-            response.sendRedirect("ListProductsServlet");
+            response.sendRedirect(request.getContextPath() + "/ListProductsServlet");
 
         } catch (Exception e) {
             e.printStackTrace();

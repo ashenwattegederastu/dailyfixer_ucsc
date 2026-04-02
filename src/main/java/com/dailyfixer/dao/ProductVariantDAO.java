@@ -29,6 +29,7 @@ public class ProductVariantDAO {
                 variant.setPower(rs.getString("power"));
                 variant.setPrice(rs.getBigDecimal("price"));
                 variant.setQuantity(rs.getInt("quantity"));
+                variant.setImagePath(rs.getString("image_path"));
                 variants.add(variant);
             }
 
@@ -54,6 +55,7 @@ public class ProductVariantDAO {
                 variant.setPower(rs.getString("power"));
                 variant.setPrice(rs.getBigDecimal("price"));
                 variant.setQuantity(rs.getInt("quantity"));
+                variant.setImagePath(rs.getString("image_path"));
                 return variant;
             }
         }
@@ -61,10 +63,10 @@ public class ProductVariantDAO {
     }
 
     // Add a new variant
-    public void addVariant(ProductVariant variant) throws Exception {
-        String sql = "INSERT INTO product_variants (product_id, color, size, power, price, quantity) VALUES (?, ?, ?, ?, ?, ?)";
+    public int addVariantAndReturnId(ProductVariant variant) throws Exception {
+        String sql = "INSERT INTO product_variants (product_id, color, size, power, price, quantity, image_path) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, variant.getProductId());
             stmt.setString(2, variant.getColor());
@@ -72,13 +74,23 @@ public class ProductVariantDAO {
             stmt.setString(4, variant.getPower());
             stmt.setBigDecimal(5, variant.getPrice());
             stmt.setInt(6, variant.getQuantity());
+            stmt.setString(7, variant.getImagePath());
             stmt.executeUpdate();
+
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) return keys.getInt(1);
+            }
         }
+        return -1;
+    }
+
+    public void addVariant(ProductVariant variant) throws Exception {
+        addVariantAndReturnId(variant);
     }
 
     // Update a variant
     public void updateVariant(ProductVariant variant) throws Exception {
-        String sql = "UPDATE product_variants SET color = ?, size = ?, power = ?, price = ?, quantity = ? WHERE variant_id = ?";
+        String sql = "UPDATE product_variants SET color = ?, size = ?, power = ?, price = ?, quantity = ?, image_path = ? WHERE variant_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -87,7 +99,8 @@ public class ProductVariantDAO {
             stmt.setString(3, variant.getPower());
             stmt.setBigDecimal(4, variant.getPrice());
             stmt.setInt(5, variant.getQuantity());
-            stmt.setInt(6, variant.getVariantId());
+            stmt.setString(6, variant.getImagePath());
+            stmt.setInt(7, variant.getVariantId());
             stmt.executeUpdate();
         }
     }

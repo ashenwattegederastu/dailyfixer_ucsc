@@ -1,7 +1,5 @@
 package com.dailyfixer.model;
 
-import java.util.Base64;
-
 public class Product {
     private int productId;
     private String name;
@@ -9,7 +7,8 @@ public class Product {
     private int quantity;
     private String quantityUnit;
     private double price;
-    private byte[] image;
+    private String imagePath;
+    private String warrantyInfo;
     private String storeUsername;
     private String description;
     private int storeId;
@@ -63,12 +62,20 @@ public class Product {
         this.price = price;
     }
 
-    public byte[] getImage() {
-        return image;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setImage(byte[] image) {
-        this.image = image;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public String getWarrantyInfo() {
+        return warrantyInfo;
+    }
+
+    public void setWarrantyInfo(String warrantyInfo) {
+        this.warrantyInfo = warrantyInfo;
     }
 
     public String getStoreUsername() {
@@ -79,17 +86,13 @@ public class Product {
         this.storeUsername = storeUsername;
     }
 
-    public String getImageBase64() {
-        if (image != null && image.length > 0) {
-            return Base64.getEncoder().encodeToString(image);
-        }
-        return "";
-    }
+    /** @deprecated Image is now stored as a file path. Use {@link #getImagePath()} instead. */
+    @Deprecated
+    public String getImageBase64() { return ""; }
 
-    // Alias for JSP EL ${product.base64Image}
-    public String getBase64Image() {
-        return getImageBase64();
-    }
+    /** @deprecated Use {@link #getImagePath()} instead. */
+    @Deprecated
+    public String getBase64Image() { return ""; }
 
     public String getDescription() {
         return description;

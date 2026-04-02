@@ -315,9 +315,9 @@
                 <h3>Most Selling Item</h3>
             </div>
             <% if (mostSellingProduct != null && topSales != null) { 
-                String imgBase64 = mostSellingProduct.getImageBase64();
-                String imgSrc = (imgBase64 != null && !imgBase64.isEmpty()) 
-                    ? "data:image/jpeg;base64," + imgBase64 
+                String imgPath = mostSellingProduct.getImagePath();
+                String imgSrc = (imgPath != null && !imgPath.isEmpty()) 
+                    ? request.getContextPath() + "/" + imgPath 
                     : request.getContextPath() + "/assets/images/power-drill.png";
             %>
                 <div class="most-selling-item">

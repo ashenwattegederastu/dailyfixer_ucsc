@@ -114,7 +114,7 @@ if (itemsToCheckout == null || itemsToCheckout.isEmpty()) {
                 discountedPrice,
                 originalPrice,
                 quantity,
-                product.getImageBase64(),
+                product.getImagePath(),
                 variantId,
                 variantColor,
                 variantSize,
@@ -519,7 +519,8 @@ if (checkoutDoorstepConsent != null) session.removeAttribute("checkout_doorstep_
                     total += itemOriginalSubtotal;
                 %>
                     <div class="checkout-item">
-                        <img src="data:image/jpeg;base64,<%=item.getImageBase64()%>" alt="<%=item.getName()%>" width="100">
+                        <% String ciImg = item.getImagePath(); %>
+                        <img src="<%=ciImg != null && !ciImg.isEmpty() ? request.getContextPath() + "/" + ciImg : request.getContextPath() + "/assets/images/tools.png"%>" alt="<%=item.getName()%>" width="100">
                         <div class="item-details">
                             <p><strong><%=item.getName()%></strong></p>
                             <% if (item.getVariantId() != null) { %>

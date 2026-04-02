@@ -36,7 +36,8 @@
                     <div class="cart-item" data-id="<%=ci.getProductId()%>"
                         data-unit-price="<%=ci.getPrice()%>"
                         data-cart-key="<%=ci.getVariantId() != null ? "V-" + ci.getVariantId() : "P-" + ci.getProductId()%>">
-                        <img src="data:image/jpeg;base64,<%=ci.getImageBase64()%>" alt="<%=ci.getName()%>">
+                        <% String ciImg = ci.getImagePath(); %>
+                        <img src="<%=ciImg != null && !ciImg.isEmpty() ? request.getContextPath() + "/" + ciImg : request.getContextPath() + "/assets/images/tools.png"%>" alt="<%=ci.getName()%>">
                         <div class="item-details">
                             <p class="item-name"><%=ci.getName()%></p>
                             <% if (ci.getVariantId() != null) { %>
