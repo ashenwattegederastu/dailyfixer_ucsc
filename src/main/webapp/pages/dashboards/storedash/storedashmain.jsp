@@ -101,9 +101,16 @@
                         pendingOrders.add(order);
                         break;
                 }
-                // Accumulate revenue across all active statuses
+                // Revenue for store should exclude delivery fee
                 if (order.getAmount() != null) {
-                    totalRevenue = totalRevenue.add(order.getAmount());
+                    BigDecimal netRevenue = order.getAmount();
+                    if (order.getDeliveryFee() != null) {
+                        netRevenue = netRevenue.subtract(order.getDeliveryFee());
+                    }
+                    if (netRevenue.compareTo(BigDecimal.ZERO) < 0) {
+                        netRevenue = BigDecimal.ZERO;
+                    }
+                    totalRevenue = totalRevenue.add(netRevenue);
                 }
             }
         }
@@ -152,7 +159,16 @@
             if (keyToIndex.containsKey(k)) {
                 int idx = keyToIndex.get(k);
                 orderCounts[idx]++;
-                if (o.getAmount() != null) revenueByDay[idx] += o.getAmount().doubleValue();
+                if (o.getAmount() != null) {
+                    BigDecimal netRevenue = o.getAmount();
+                    if (o.getDeliveryFee() != null) {
+                        netRevenue = netRevenue.subtract(o.getDeliveryFee());
+                    }
+                    if (netRevenue.compareTo(BigDecimal.ZERO) < 0) {
+                        netRevenue = BigDecimal.ZERO;
+                    }
+                    revenueByDay[idx] += netRevenue.doubleValue();
+                }
             }
         }
     }
@@ -240,10 +256,10 @@
     <div class="cards-grid">
         <div class="card">
             <div class="card-header">
-                <h3>Total Revenue</h3>
+                <h3>Store Revenue</h3>
             </div>
             <div class="number" style="font-size: 1.8em;">LKR <%= formattedRevenue %></div>
-            <div class="label">Total sales from all orders</div>
+            <div class="label">Order revenue excluding delivery fees</div>
         </div>
         
         <div class="card">
@@ -415,7 +431,7 @@
                 labels: dayLabels,
                 datasets: [
                     { label: 'Orders', data: orderCounts, backgroundColor: 'rgba(59,130,246,0.7)', borderColor: '#3b82f6', borderWidth: 1, yAxisID: 'y' },
-                    { label: 'Revenue (LKR)', data: revenueByDay, type: 'line', borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
+                    { label: 'Revenue Excl. Delivery (LKR)', data: revenueByDay, type: 'line', borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.3, yAxisID: 'y1' }
                 ]
             },
             options: {
