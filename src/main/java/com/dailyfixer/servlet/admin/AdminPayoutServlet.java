@@ -2,6 +2,7 @@ package com.dailyfixer.servlet.admin;
 
 import com.dailyfixer.dao.BankDetailDAO;
 import com.dailyfixer.dao.PayoutDAO;
+import com.dailyfixer.dao.StoreOrderDAO;
 import com.dailyfixer.model.BankDetail;
 import com.dailyfixer.model.Payout;
 import com.dailyfixer.model.User;
@@ -42,6 +43,7 @@ public class AdminPayoutServlet extends HttpServlet {
     private static final String RECEIPT_DIR = "assets/images/uploads/receipts";
     private final PayoutDAO payoutDAO = new PayoutDAO();
     private final BankDetailDAO bankDetailDAO = new BankDetailDAO();
+    private final StoreOrderDAO storeOrderDAO = new StoreOrderDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -122,10 +124,13 @@ public class AdminPayoutServlet extends HttpServlet {
         List<Payout> processing = payoutDAO.getPayoutsByStatus("PROCESSING");
         List<Payout> completed  = payoutDAO.getPayoutsByStatus("COMPLETED");
 
+        java.math.BigDecimal totalCommission = storeOrderDAO.getTotalCommissionCollected();
+
         StringBuilder json = new StringBuilder("{\"success\":true");
         json.append(",\"pending\":").append(payoutsToJson(pending));
         json.append(",\"processing\":").append(payoutsToJson(processing));
         json.append(",\"completed\":").append(payoutsToJson(completed));
+        json.append(",\"totalCommission\":").append(totalCommission);
         json.append("}");
         sendJson(resp, HttpServletResponse.SC_OK, json.toString());
     }

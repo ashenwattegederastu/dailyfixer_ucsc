@@ -62,6 +62,13 @@ public class PayoutDAO {
         "JOIN store_orders so ON so.order_id = o.order_id " +
         "WHERE so.store_id = ? AND UPPER(o.status) IN ('REFUND_PENDING','REFUNDED')";
 
+    /** Total commission deducted from a store across all DELIVERED orders */
+    private static final String STORE_COMMISSION =
+        "SELECT COALESCE(SUM(so.commission), 0) " +
+        "FROM store_orders so " +
+        "JOIN orders o ON so.order_id = o.order_id " +
+        "WHERE so.store_id = ? AND UPPER(o.status) = 'DELIVERED'";
+
     // ── Driver balance queries ──────────────────────────────────────────────
 
     private static final String DRIVER_LIFETIME =
@@ -188,14 +195,15 @@ public class PayoutDAO {
      * Returns {lifetime, pending, available, refunded} for a store.
      */
     public BigDecimal[] getStoreBalances(int storeId) {
-        BigDecimal lifetime  = querySingle(STORE_LIFETIME, storeId);
-        BigDecimal pending   = querySingle(STORE_PENDING, storeId);
-        BigDecimal mature    = querySingle(STORE_MATURE, storeId);
-        BigDecimal paidOut   = querySingle(STORE_PAID_OUT, storeId);
-        BigDecimal refunded  = querySingle(STORE_REFUND_TOTAL, storeId);
-        BigDecimal available = mature.subtract(paidOut);
+        BigDecimal lifetime   = querySingle(STORE_LIFETIME, storeId);
+        BigDecimal pending    = querySingle(STORE_PENDING, storeId);
+        BigDecimal mature     = querySingle(STORE_MATURE, storeId);
+        BigDecimal paidOut    = querySingle(STORE_PAID_OUT, storeId);
+        BigDecimal refunded   = querySingle(STORE_REFUND_TOTAL, storeId);
+        BigDecimal commission = querySingle(STORE_COMMISSION, storeId);
+        BigDecimal available  = mature.subtract(paidOut);
         if (available.compareTo(BigDecimal.ZERO) < 0) available = BigDecimal.ZERO;
-        return new BigDecimal[]{ lifetime, pending, available, refunded };
+        return new BigDecimal[]{ lifetime, pending, available, refunded, commission };
     }
 
     /**

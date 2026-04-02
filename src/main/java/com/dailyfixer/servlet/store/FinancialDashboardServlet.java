@@ -48,12 +48,14 @@ public class FinancialDashboardServlet extends HttpServlet {
             return;
         }
 
-        String refundedField = balances.length > 3 ? ",\"refunded\":" + balances[3] : "";
+        String refundedField    = balances.length > 3 ? ",\"refunded\":"    + balances[3] : "";
+        String commissionField  = balances.length > 4 ? ",\"commission\":" + balances[4] : "";
         sendJson(resp, 200, "{\"success\":true"
-            + ",\"lifetime\":" + balances[0]
-            + ",\"pending\":" + balances[1]
+            + ",\"lifetime\":"  + balances[0]
+            + ",\"pending\":"   + balances[1]
             + ",\"available\":" + balances[2]
             + refundedField
+            + commissionField
             + "}");
     }
 

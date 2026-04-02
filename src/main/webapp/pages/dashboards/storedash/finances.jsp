@@ -40,7 +40,7 @@
 /* KPI cards for finances */
 .finance-cards {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 20px;
     margin-bottom: 36px;
 }
@@ -67,6 +67,7 @@
 .kpi-card:nth-child(1)::before { background: linear-gradient(90deg, var(--primary), oklch(0.6 0.2 280)); }
 .kpi-card:nth-child(2)::before { background: linear-gradient(90deg, oklch(0.65 0.15 85), oklch(0.55 0.15 55)); }
 .kpi-card:nth-child(3)::before { background: linear-gradient(90deg, oklch(0.6 0.18 145), oklch(0.5 0.18 165)); }
+.kpi-card:nth-child(5)::before { background: linear-gradient(90deg, oklch(0.55 0.18 310), oklch(0.45 0.18 290)); }
 .kpi-card--refund::before { background: linear-gradient(90deg, oklch(0.6 0.2 25), oklch(0.5 0.2 10)) !important; }
 .kpi-card--refund .kpi-value { color: oklch(0.55 0.2 25); }
 .kpi-label { font-size: 0.88em; font-weight: 600; color: var(--muted-foreground); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.4px; }
@@ -186,6 +187,11 @@ tbody tr:hover { background: var(--muted); }
             <div class="kpi-value" id="kpi-refunded">-</div>
             <div class="kpi-sub">Orders refunded or pending refund</div>
         </div>
+        <div class="kpi-card">
+            <div class="kpi-label">Commission Deducted</div>
+            <div class="kpi-value" id="kpi-commission" style="color:oklch(0.45 0.18 310);">-</div>
+            <div class="kpi-sub">10% platform fee on delivered orders</div>
+        </div>
     </div>
 
     <!-- Bank Details – managed on My Store page -->
@@ -298,6 +304,9 @@ tbody tr:hover { background: var(--muted); }
                     document.getElementById('kpi-available').textContent = 'LKR ' + Number(data.available).toLocaleString('en-US', {minimumFractionDigits: 2});
                     if (data.refunded != null) {
                         document.getElementById('kpi-refunded').textContent = 'LKR ' + Number(data.refunded).toLocaleString('en-US', {minimumFractionDigits: 2});
+                    }
+                    if (data.commission != null) {
+                        document.getElementById('kpi-commission').textContent = 'LKR ' + Number(data.commission).toLocaleString('en-US', {minimumFractionDigits: 2});
                     }
                 }
             })

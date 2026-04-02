@@ -238,6 +238,10 @@ tbody tr:hover { background: var(--muted); }
             <div class="number" id="stat-completed">-</div>
             <div class="label">Completed</div>
         </div>
+        <div class="strip-card" style="border-top: 3px solid oklch(0.55 0.18 310);">
+            <div class="number" id="stat-commission" style="color:oklch(0.45 0.18 310);">-</div>
+            <div class="label">Total Commission Collected</div>
+        </div>
     </div>
 
     <div class="toolbar">
@@ -372,6 +376,10 @@ tbody tr:hover { background: var(--muted); }
                 document.getElementById('stat-pending').textContent = (data.pending || []).length;
                 document.getElementById('stat-processing').textContent = (data.processing || []).length;
                 document.getElementById('stat-completed').textContent = (data.completed || []).length;
+                if (data.totalCommission != null) {
+                    document.getElementById('stat-commission').textContent =
+                        'LKR ' + Number(data.totalCommission).toLocaleString('en-US', {minimumFractionDigits: 2});
+                }
             })
             .catch(err => showToast('Failed to load payouts: ' + err.message, 'error'));
     }

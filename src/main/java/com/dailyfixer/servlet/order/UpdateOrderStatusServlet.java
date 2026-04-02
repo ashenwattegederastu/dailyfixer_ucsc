@@ -2,6 +2,7 @@ package com.dailyfixer.servlet.order;
 
 import com.dailyfixer.dao.OrderDAO;
 import com.dailyfixer.dao.StoreDAO;
+import com.dailyfixer.dao.StoreOrderDAO;
 import com.dailyfixer.model.Order;
 import com.dailyfixer.model.Store;
 import com.dailyfixer.model.User;
@@ -29,11 +30,13 @@ import java.util.Map;
 public class UpdateOrderStatusServlet extends HttpServlet {
 
     private OrderDAO orderDAO;
+    private StoreOrderDAO storeOrderDAO;
 
     @Override
     public void init() throws ServletException {
         super.init();
         orderDAO = new OrderDAO();
+        storeOrderDAO = new StoreOrderDAO();
         System.out.println("UpdateOrderStatusServlet initialized");
     }
 
@@ -121,6 +124,11 @@ public class UpdateOrderStatusServlet extends HttpServlet {
             if (updated) {
                 System.out.println("Order status updated: " + orderId + " -> " + statusUpper
                         + " by " + currentUser.getUsername());
+
+                // Apply 10% commission when order is marked DELIVERED
+                if ("DELIVERED".equals(statusUpper)) {
+                    storeOrderDAO.updateCommission(orderId.trim());
+                }
 
                 // Restore stock only if a post-payment order is being cancelled
                 if ("CANCELLED".equals(statusUpper)) {

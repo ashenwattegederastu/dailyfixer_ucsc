@@ -666,7 +666,11 @@ public class OrderDAO {
             stmt = conn.prepareStatement(MARK_REFUNDED);
             stmt.setString(1, refundNumber);
             stmt.setString(2, orderId);
-            return stmt.executeUpdate() > 0;
+            boolean updated = stmt.executeUpdate() > 0;
+            if (updated) {
+                new StoreOrderDAO().clearCommission(orderId);
+            }
+            return updated;
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("OrderDAO.markRefunded: " + e.getMessage());
             e.printStackTrace();

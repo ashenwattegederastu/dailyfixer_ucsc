@@ -2,6 +2,7 @@ package com.dailyfixer.servlet.driver;
 
 import com.dailyfixer.dao.DeliveryAssignmentDAO;
 import com.dailyfixer.dao.OrderDAO;
+import com.dailyfixer.dao.StoreOrderDAO;
 import com.dailyfixer.model.DeliveryAssignment;
 import com.dailyfixer.model.User;
 
@@ -21,6 +22,7 @@ public class MarkDeliveredServlet extends HttpServlet {
 
     private final DeliveryAssignmentDAO assignmentDAO = new DeliveryAssignmentDAO();
     private final OrderDAO orderDAO = new OrderDAO();
+    private final StoreOrderDAO storeOrderDAO = new StoreOrderDAO();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -50,10 +52,11 @@ public class MarkDeliveredServlet extends HttpServlet {
             boolean ok = assignmentDAO.markDelivered(assignmentId, user.getUserId(), deliveryPin.trim());
 
             if (ok) {
-                // Also update the order status to DELIVERED
+                // Also update the order status to DELIVERED and apply commission
                 DeliveryAssignment da = assignmentDAO.getByAssignmentId(assignmentId);
                 if (da != null) {
                     orderDAO.updateStatus(da.getOrderId(), "DELIVERED");
+                    storeOrderDAO.updateCommission(da.getOrderId());
                 }
                 resp.getWriter().write("{\"success\":true}");
             } else {
