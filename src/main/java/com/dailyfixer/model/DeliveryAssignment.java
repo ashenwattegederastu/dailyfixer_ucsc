@@ -22,6 +22,7 @@ public class DeliveryAssignment {
     private Double deliveryLng;
     private String deliveryPin;         // 6-digit PIN for delivery confirmation
     private String status;              // PENDING | ACCEPTED | DELIVERED | CANCELLED
+    private String completionMethod;    // PIN | DOORSTEP_PHOTO
     private Timestamp assignedAt;
     private Timestamp completedAt;
     private Integer driverPayoutId;     // null until paid out
@@ -33,6 +34,7 @@ public class DeliveryAssignment {
     private double storeLng;
     private double distanceKm;          // haversine(store → driver home), set by DAO
     private String customerName;        // first_name + last_name from orders
+    private String buyerPhone;          // phone from orders for delivery contact
     private String driverName;          // for admin / store views
 
     // ── Getters & Setters ────────────────────────────────────────────────────
@@ -73,6 +75,9 @@ public class DeliveryAssignment {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public String getCompletionMethod() { return completionMethod; }
+    public void setCompletionMethod(String completionMethod) { this.completionMethod = completionMethod; }
+
     public Timestamp getAssignedAt() { return assignedAt; }
     public void setAssignedAt(Timestamp assignedAt) { this.assignedAt = assignedAt; }
 
@@ -100,6 +105,9 @@ public class DeliveryAssignment {
 
     public String getCustomerName() { return customerName; }
     public void setCustomerName(String customerName) { this.customerName = customerName; }
+
+    public String getBuyerPhone() { return buyerPhone; }
+    public void setBuyerPhone(String buyerPhone) { this.buyerPhone = buyerPhone; }
 
     public String getDriverName() { return driverName; }
     public void setDriverName(String driverName) { this.driverName = driverName; }

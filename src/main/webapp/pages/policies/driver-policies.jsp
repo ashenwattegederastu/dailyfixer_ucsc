@@ -35,6 +35,17 @@
             margin-bottom: 16px;
         }
 
+        .policy-list {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--foreground);
+        }
+
+        .policy-list li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
         .placeholder-notice {
             background: var(--muted);
             border: 1px dashed var(--border);
@@ -63,9 +74,18 @@
             <h1>Driver Policies & Terms of Service</h1>
             <p>By registering as a driver on Daily Fixer, you agree to abide by the following policies and guidelines.</p>
 
+            <ul class="policy-list">
+                <li>Daily Fixer currently uses a <strong>one-attempt delivery policy</strong>. Re-delivery scheduling is out of scope.</li>
+                <li>If the buyer is unavailable but answers the call, the package may be handed to a nearby neighbor or family member only after PIN verification.</li>
+                <li>If the buyer is unreachable, doorstep-drop completion is allowed only for orders where buyer consent exists.</li>
+                <li>For doorstep-drop completion, the driver must upload <strong>two proof photos</strong>: package close-up and package with door/house context.</li>
+                <li>Drivers must not mark an order delivered unless either PIN handover or required photo proof has been completed.</li>
+                <li>All delivery disputes are handled by support through the official website email channel.</li>
+            </ul>
+
             <div class="placeholder-notice">
-                <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">📄 Policies Coming Soon</p>
-                <p style="margin-bottom: 0;">The full driver policies document will be published here shortly. By proceeding with registration, you acknowledge that you will be bound by these policies once published.</p>
+                <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">Policy Scope</p>
+                <p style="margin-bottom: 0;">Advanced call logging, in-app calling, GPS tracking, and automated logistics rerouting are currently out of scope for this release.</p>
             </div>
 
             <a href="${pageContext.request.contextPath}/registerDriver.jsp" class="back-link">← Back to Registration</a>

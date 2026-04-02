@@ -209,6 +209,7 @@ tbody tr:hover { background-color: var(--muted); }
             <tr>
                 <th>Order ID</th>
                 <th>Customer</th>
+                <th>Phone</th>
                 <th>Pickup</th>
                 <th>Dropoff</th>
                 <th>Delivery Fee</th>
@@ -220,7 +221,7 @@ tbody tr:hover { background-color: var(--muted); }
         <tbody>
             <% if (activeOrders.isEmpty()) { %>
             <tr>
-                <td colspan="8" style="text-align:center; padding:40px; color: var(--muted-foreground);">
+                <td colspan="9" style="text-align:center; padding:40px; color: var(--muted-foreground);">
                     No active deliveries. Accept a delivery from the Delivery Requests page.
                 </td>
             </tr>
@@ -231,6 +232,7 @@ tbody tr:hover { background-color: var(--muted); }
                     String dropoff      = a.getDeliveryAddress() != null ? a.getDeliveryAddress() : "—";
                     String feeStr       = a.getDeliveryFeeEarned() != null
                                           ? String.format("LKR %.2f", a.getDeliveryFeeEarned()) : "LKR 0.00";
+                    String buyerPhone   = a.getBuyerPhone() != null && !a.getBuyerPhone().isBlank() ? a.getBuyerPhone() : "—";
                     String acceptedAt   = a.getAssignedAt() != null ? dtFmt.format(a.getAssignedAt()) : "—";
                     boolean isPickedUp  = "PICKED_UP".equalsIgnoreCase(a.getStatus());
 
@@ -247,6 +249,7 @@ tbody tr:hover { background-color: var(--muted); }
             <tr id="row-<%= a.getAssignmentId() %>">
                 <td><%= a.getOrderId() %></td>
                 <td><%= customerName %></td>
+                <td><%= buyerPhone %></td>
                 <td><%= pickup %></td>
                 <td style="max-width: 180px; word-break: break-word;"><%= dropoff %></td>
                 <td><strong><%= feeStr %></strong></td>
@@ -282,6 +285,10 @@ tbody tr:hover { background-color: var(--muted); }
                                 onclick="completeDelivery(<%= a.getAssignmentId() %>, this)">
                             Mark Delivered
                         </button>
+                        <button class="btn pin-cancel-btn"
+                                onclick="openDoorstepModal(<%= a.getAssignmentId() %>)">
+                            Buyer Unreachable Proof
+                        </button>
                     <% } %>
                 </td>
             </tr>
@@ -306,10 +313,35 @@ tbody tr:hover { background-color: var(--muted); }
     </div>
 </div>
 
+<!-- Doorstep Proof Modal -->
+<div id="doorstepModal" class="pin-modal-overlay">
+    <div class="pin-modal" style="max-width: 460px; text-align: left;">
+        <h3>Doorstep Proof Completion</h3>
+        <p>Upload two proof photos: package close-up and package with door/house context.</p>
+
+        <label style="display:block; font-size:0.85rem; margin-bottom:6px; color: var(--foreground);">Photo 1 - Package close-up</label>
+        <input type="file" id="proofPhotoPackage" accept="image/*" style="margin-bottom: 12px; width: 100%;">
+
+        <label style="display:block; font-size:0.85rem; margin-bottom:6px; color: var(--foreground);">Photo 2 - Package and door/house</label>
+        <input type="file" id="proofPhotoDoor" accept="image/*" style="margin-bottom: 12px; width: 100%;">
+
+        <label style="display:block; font-size:0.85rem; margin-bottom:6px; color: var(--foreground);">Optional note</label>
+        <textarea id="proofNote" rows="3" style="width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 8px; background: var(--input); color: var(--foreground);"></textarea>
+
+        <div id="proofError" class="pin-error" style="margin-top: 10px;"></div>
+
+        <div class="pin-modal-btns" style="margin-top: 12px;">
+            <button class="btn complete-btn" id="proofSubmitBtn" onclick="submitDoorstepProof()">Submit Proof & Complete</button>
+            <button class="btn pin-cancel-btn" onclick="closeDoorstepModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const CONTEXT_PATH = '<%= request.getContextPath() %>';
     let currentAssignmentId = null;
     let currentMarkBtn = null;
+    let currentDoorstepAssignmentId = null;
 
     function completeDelivery(assignmentId, btn) {
         currentAssignmentId = assignmentId;
@@ -328,9 +360,29 @@ tbody tr:hover { background-color: var(--muted); }
         currentMarkBtn = null;
     }
 
+    function openDoorstepModal(assignmentId) {
+        currentDoorstepAssignmentId = assignmentId;
+        document.getElementById('proofPhotoPackage').value = '';
+        document.getElementById('proofPhotoDoor').value = '';
+        document.getElementById('proofNote').value = '';
+        document.getElementById('proofError').textContent = '';
+        document.getElementById('proofSubmitBtn').disabled = false;
+        document.getElementById('proofSubmitBtn').textContent = 'Submit Proof & Complete';
+        document.getElementById('doorstepModal').classList.add('active');
+    }
+
+    function closeDoorstepModal() {
+        document.getElementById('doorstepModal').classList.remove('active');
+        currentDoorstepAssignmentId = null;
+    }
+
     // Close on overlay click
     document.getElementById('pinModal').addEventListener('click', function(e) {
         if (e.target.id === 'pinModal') closePinModal();
+    });
+
+    document.getElementById('doorstepModal').addEventListener('click', function(e) {
+        if (e.target.id === 'doorstepModal') closeDoorstepModal();
     });
 
     // Allow Enter key in PIN input
@@ -389,6 +441,55 @@ tbody tr:hover { background-color: var(--muted); }
             errorEl.textContent = 'Error: ' + err.message;
             confirmBtn.disabled = false;
             confirmBtn.textContent = 'Confirm';
+        });
+    }
+
+    function submitDoorstepProof() {
+        const photoPackage = document.getElementById('proofPhotoPackage').files[0];
+        const photoDoor = document.getElementById('proofPhotoDoor').files[0];
+        const note = document.getElementById('proofNote').value.trim();
+        const errorEl = document.getElementById('proofError');
+        const submitBtn = document.getElementById('proofSubmitBtn');
+
+        if (!photoPackage || !photoDoor) {
+            errorEl.textContent = 'Both proof photos are required.';
+            return;
+        }
+
+        errorEl.textContent = '';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        const formData = new FormData();
+        formData.append('assignmentId', String(currentDoorstepAssignmentId));
+        formData.append('photoPackage', photoPackage);
+        formData.append('photoDoorContext', photoDoor);
+        formData.append('note', note);
+
+        fetch(CONTEXT_PATH + '/driver/markDeliveredDoorstep', {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(data => {
+            if (data.success) {
+                const row = document.getElementById('row-' + currentDoorstepAssignmentId);
+                if (row) {
+                    row.style.opacity = '0.4';
+                    row.style.textDecoration = 'line-through';
+                    setTimeout(() => row.remove(), 1000);
+                }
+                closeDoorstepModal();
+            } else {
+                errorEl.textContent = data.message || 'Could not complete delivery with proof.';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Proof & Complete';
+            }
+        })
+        .catch(err => {
+            errorEl.textContent = 'Error: ' + err.message;
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Proof & Complete';
         });
     }
 </script>

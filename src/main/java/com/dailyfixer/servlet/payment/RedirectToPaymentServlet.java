@@ -92,6 +92,8 @@ public class RedirectToPaymentServlet extends HttpServlet {
             String district = request.getParameter("district");
             String latitude = request.getParameter("latitude");
             String longitude = request.getParameter("longitude");
+                boolean doorstepDropConsent = "on".equalsIgnoreCase(request.getParameter("doorstepDropConsent"))
+                    || "true".equalsIgnoreCase(request.getParameter("doorstepDropConsent"));
 
             // Parse customer delivery coordinates
             double customerLat = 0;
@@ -120,11 +122,18 @@ public class RedirectToPaymentServlet extends HttpServlet {
             session.setAttribute("checkout_city", city);
             session.setAttribute("checkout_province", province);
             session.setAttribute("checkout_district", district);
+            session.setAttribute("checkout_doorstep_consent", doorstepDropConsent);
 
             // Validate required fields
             if (isEmpty(name) || isEmpty(phone) || isEmpty(email) || isEmpty(address) || isEmpty(city)) {
                 System.err.println("Missing required fields");
                 response.sendRedirect(request.getContextPath() + "/pages/stores/checkout.jsp?error=missing_fields");
+                return;
+            }
+
+            if (!doorstepDropConsent) {
+                System.err.println("Doorstep drop consent was not accepted");
+                response.sendRedirect(request.getContextPath() + "/pages/stores/checkout.jsp?error=terms_not_accepted");
                 return;
             }
 
@@ -322,6 +331,7 @@ public class RedirectToPaymentServlet extends HttpServlet {
                 storeOrder.setStoreId(storeId);
                 storeOrder.setBuyerId(currentUser.getUserId());
                 storeOrder.setDeliveryFee(deliveryFee);
+                storeOrder.setDoorstepDropConsent(doorstepDropConsent);
                 if (customerLat != 0) storeOrder.setDeliveryLatitude(customerLat);
                 if (customerLng != 0) storeOrder.setDeliveryLongitude(customerLng);
 

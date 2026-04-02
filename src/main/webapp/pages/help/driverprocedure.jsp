@@ -426,15 +426,15 @@
         <aside class="notice-card">
           <h3>If the buyer is unreachable</h3>
           <ol>
-            <li>Call or message the buyer using the available contact method.</li>
-            <li>Wait at the location for a short grace period.</li>
-            <li>Try a second contact attempt and recheck the address or delivery notes.</li>
-            <li>Notify support or the assigned coordinator if there is still no response.</li>
-            <li>Do not leave the package unattended unless the order explicitly allows safe drop-off.</li>
-            <li>Record what happened before marking the order as failed, rescheduled, or returned.</li>
+            <li>Daily Fixer uses a one-attempt delivery policy.</li>
+            <li>If the buyer answers, they may authorize handover to a nearby neighbor or family member using the delivery PIN.</li>
+            <li>If the buyer does not answer, use the doorstep proof completion flow only when the order allows it.</li>
+            <li>Upload two clear proof photos: package close-up and package with door/house context.</li>
+            <li>Do not mark delivered until both photos are uploaded successfully.</li>
+            <li>If a buyer raises an issue later, support handles the dispute via email using the saved proof.</li>
           </ol>
           <div class="contact-box">
-            Placeholder policy: attempt contact twice, wait 5 to 10 minutes, then escalate.
+            Required proof: two photos are mandatory for buyer-unreachable doorstep completion.
           </div>
         </aside>
 

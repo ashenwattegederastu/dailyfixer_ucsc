@@ -144,16 +144,7 @@
             gap: 12px;
         }
 
-        .btn-outline {
-            padding: 8px 16px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--foreground);
-            border-radius: var(--radius-md);
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
+
 
         /* Status Badges */
         .status-badge {
@@ -311,25 +302,40 @@
                         
                         <div class="order-actions">
                             <c:if test="${not empty storeDetailsMap[order.orderId]}">
-                                <button type="button" class="btn-outline" 
+                                <button type="button" class="action-btn btn-view" 
                                         data-store-name="${fn:escapeXml(storeDetailsMap[order.orderId].storeName)}"
                                         data-store-phone="${fn:escapeXml(storeDetailsMap[order.orderId].phone)}"
                                         data-store-email="${fn:escapeXml(storeDetailsMap[order.orderId].email)}"
                                         data-store-address="${fn:escapeXml(storeDetailsMap[order.orderId].address)}"
                                         onclick="showStoreModal(this)">Store Details</button>
                             </c:if>
+                            <c:if test="${not empty driverDetailsMap[order.orderId]}">
+                                <button type="button" class="action-btn btn-view"
+                                        data-driver-name="${fn:escapeXml(driverDetailsMap[order.orderId].name)}"
+                                        data-driver-phone="${fn:escapeXml(driverDetailsMap[order.orderId].phone)}"
+                                        data-driver-picture="${fn:escapeXml(driverDetailsMap[order.orderId].picture)}"
+                                        data-completion-method="${fn:escapeXml(driverDetailsMap[order.orderId].completionMethod)}"
+                                        onclick="showDriverModal(this)">Driver Details</button>
+                            </c:if>
+                            <c:if test="${not empty deliveryProofMap[order.orderId]}">
+                                <button type="button" class="action-btn btn-view"
+                                        data-photo-package="${fn:escapeXml(deliveryProofMap[order.orderId].photoPackage)}"
+                                        data-photo-door="${fn:escapeXml(deliveryProofMap[order.orderId].photoDoor)}"
+                                        data-proof-note="${fn:escapeXml(deliveryProofMap[order.orderId].note)}"
+                                        onclick="showProofModal(this)">View Delivery Proof</button>
+                            </c:if>
                             <c:if test="${not empty deliveryPinMap[order.orderId]}">
-                                <button type="button" class="btn-outline" onclick="showPinModal('${deliveryPinMap[order.orderId]}')">View Delivery PIN</button>
+                                <button type="button" class="action-btn btn-view" onclick="showPinModal('${deliveryPinMap[order.orderId]}')">View Delivery PIN</button>
                             </c:if>
                             <c:if test="${order.status == 'DELIVERED'}">
                                 <c:forEach var="item" items="${orderItemsMap[order.orderId]}">
-                                    <button type="button" class="btn-outline" 
+                                    <button type="button" class="action-btn btn-resolve" 
                                             onclick="showReviewModal(${item.productId}, '${fn:escapeXml(item.productName)}')">
                                         Write Review
                                     </button>
                                 </c:forEach>
                             </c:if>
-                            <button type="button" class="btn-outline">Order Details</button>
+                            <button type="button" class="action-btn btn-view">Order Details</button>
                         </div>
                     </div>
                 </c:forEach>
@@ -353,7 +359,49 @@
         <div class="modal-title">Delivery PIN</div>
         <p style="color: var(--muted-foreground); font-size: 0.9em;">Share this PIN with the driver upon delivery</p>
         <div class="delivery-pin-code" id="pinDisplay"></div>
-        <button class="btn-outline" onclick="closePinModal()" style="width: 100%;">Close</button>
+        <button class="btn-secondary" onclick="closePinModal()" style="width: 100%;">Close</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="driverModal">
+    <div class="modal-content">
+        <div class="modal-title" id="driverModalTitle">Driver Details</div>
+        <p style="color: var(--muted-foreground); font-size: 0.9em; margin-bottom: 16px;">Contact your delivery driver if needed</p>
+
+        <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+            <img id="driverModalPicture" alt="Driver profile" style="width: 76px; height: 76px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--muted);" />
+        </div>
+
+        <div style="text-align: left; background: var(--muted); padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px;">
+            <div style="margin-bottom: 8px;"><strong>Name:</strong> <span id="driverModalName"></span></div>
+            <div style="margin-bottom: 8px;"><strong>Phone:</strong> <span id="driverModalPhone"></span></div>
+            <div><strong>Completion Method:</strong> <span id="driverModalMethod"></span></div>
+        </div>
+
+        <button class="btn-secondary" onclick="closeDriverModal()" style="width: 100%;">Close</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="proofModal">
+    <div class="modal-content" style="max-width: 700px; text-align: left;">
+        <div class="modal-title" style="margin-bottom: 16px;">Doorstep Delivery Proof</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <div>
+                <div style="font-size: 0.85em; color: var(--muted-foreground); margin-bottom: 6px;">Photo 1 - Package close-up</div>
+                <img id="proofModalPackage" alt="Package proof" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border); object-fit: cover;" />
+            </div>
+            <div>
+                <div style="font-size: 0.85em; color: var(--muted-foreground); margin-bottom: 6px;">Photo 2 - Package and door/house</div>
+                <img id="proofModalDoor" alt="Doorstep proof" style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border); object-fit: cover;" />
+            </div>
+        </div>
+
+        <div id="proofModalNoteBox" style="background: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px; margin-bottom: 16px; display: none;">
+            <strong>Driver note:</strong> <span id="proofModalNote"></span>
+        </div>
+
+        <button class="btn-secondary" onclick="closeProofModal()" style="width: 100%;">Close</button>
     </div>
 </div>
 
@@ -368,7 +416,7 @@
             <div><strong>Address:</strong> <span id="storeModalAddress"></span></div>
         </div>
 
-        <button class="btn-outline" onclick="closeStoreModal()" style="width: 100%;">Close</button>
+        <button class="btn-secondary" onclick="closeStoreModal()" style="width: 100%;">Close</button>
     </div>
 </div>
 
@@ -399,8 +447,8 @@
             <div id="reviewMessageModal" style="margin-top: 8px; font-size: 0.9em;"></div>
 
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
-                <button type="button" class="btn-outline" onclick="closeReviewModal()" style="padding: 10px 20px;">Cancel</button>
-                <button type="submit" class="btn-outline" style="padding: 10px 20px; background: var(--primary); color: var(--primary-foreground); border: none;">Submit Review</button>
+                <button type="button" class="btn-secondary" onclick="closeReviewModal()" style="padding: 10px 20px;">Cancel</button>
+                <button type="submit" class="btn-primary" style="padding: 10px 20px;">Submit Review</button>
             </div>
         </form>
     </div>
@@ -437,6 +485,56 @@
     }
     function closeStoreModal() {
         document.getElementById('storeModal').classList.remove('active');
+    }
+
+    function resolveImagePath(rawPath) {
+        if (!rawPath || rawPath.trim().length === 0) {
+            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='48' fill='%23e5e7eb'/%3E%3Ccircle cx='48' cy='36' r='16' fill='%239ca3af'/%3E%3Cpath d='M18 82c4-16 16-24 30-24s26 8 30 24' fill='%239ca3af'/%3E%3C/svg%3E";
+        }
+        if (rawPath.startsWith('http://') || rawPath.startsWith('https://') || rawPath.startsWith('data:')) {
+            return rawPath;
+        }
+        return contextPath + '/' + rawPath.replace(/^\/+/, '');
+    }
+
+    function showDriverModal(btn) {
+        const methodRaw = btn.getAttribute('data-completion-method') || '';
+        let methodText = 'PIN';
+        if (methodRaw === 'DOORSTEP_PHOTO') {
+            methodText = 'Doorstep Proof';
+        }
+
+        document.getElementById('driverModalTitle').innerText = 'Driver Details';
+        document.getElementById('driverModalName').innerText = btn.getAttribute('data-driver-name') || 'Delivery Driver';
+        document.getElementById('driverModalPhone').innerText = btn.getAttribute('data-driver-phone') || 'No phone';
+        document.getElementById('driverModalMethod').innerText = methodText;
+        document.getElementById('driverModalPicture').src = resolveImagePath(btn.getAttribute('data-driver-picture'));
+        document.getElementById('driverModal').classList.add('active');
+    }
+
+    function closeDriverModal() {
+        document.getElementById('driverModal').classList.remove('active');
+    }
+
+    function showProofModal(btn) {
+        document.getElementById('proofModalPackage').src = resolveImagePath(btn.getAttribute('data-photo-package'));
+        document.getElementById('proofModalDoor').src = resolveImagePath(btn.getAttribute('data-photo-door'));
+
+        const note = btn.getAttribute('data-proof-note') || '';
+        const noteBox = document.getElementById('proofModalNoteBox');
+        if (note.trim().length > 0) {
+            document.getElementById('proofModalNote').innerText = note;
+            noteBox.style.display = 'block';
+        } else {
+            document.getElementById('proofModalNote').innerText = '';
+            noteBox.style.display = 'none';
+        }
+
+        document.getElementById('proofModal').classList.add('active');
+    }
+
+    function closeProofModal() {
+        document.getElementById('proofModal').classList.remove('active');
     }
 
     function showReviewModal(productId, productName) {

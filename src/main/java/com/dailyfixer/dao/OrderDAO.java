@@ -18,9 +18,9 @@ public class OrderDAO {
     // SQL Statements
     private static final String INSERT_ORDER = "INSERT INTO orders (order_id, customer_name, first_name, last_name, email, phone, address, city, "
             +
-            "total_amount, delivery_fee, currency, status, store_username, store_id, product_name, buyer_id, delivery_latitude, delivery_longitude) "
+            "total_amount, delivery_fee, currency, status, store_username, store_id, product_name, buyer_id, delivery_latitude, delivery_longitude, doorstep_drop_consent) "
             +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SELECT_ORDER_BY_ID = "SELECT * FROM orders WHERE order_id = ?";
 
@@ -138,6 +138,7 @@ public class OrderDAO {
             } else {
                 stmt.setNull(18, Types.DECIMAL);
             }
+            stmt.setBoolean(19, order.isDoorstepDropConsent());
 
             int rowsAffected = stmt.executeUpdate();
             System.out.println("Order created: " + order.getOrderId() + " | Rows affected: " + rowsAffected);
@@ -518,6 +519,7 @@ public class OrderDAO {
         order.setRefundReason(rs.getString("refund_reason"));
         order.setRefundNumber(rs.getString("refund_number"));
         order.setRefundedAt(rs.getTimestamp("refunded_at"));
+        order.setDoorstepDropConsent(rs.getBoolean("doorstep_drop_consent"));
         return order;
     }
 

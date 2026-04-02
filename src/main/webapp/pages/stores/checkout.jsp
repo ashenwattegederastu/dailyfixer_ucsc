@@ -202,6 +202,7 @@ String checkoutAddress = (String) session.getAttribute("checkout_address");
 String checkoutCity = (String) session.getAttribute("checkout_city");
 String checkoutProvince = (String) session.getAttribute("checkout_province");
 String checkoutDistrict = (String) session.getAttribute("checkout_district");
+Boolean checkoutDoorstepConsent = (Boolean) session.getAttribute("checkout_doorstep_consent");
 
 // Clear session attributes after retrieving (so they don't persist)
 if (checkoutName != null) session.removeAttribute("checkout_name");
@@ -211,6 +212,7 @@ if (checkoutAddress != null) session.removeAttribute("checkout_address");
 if (checkoutCity != null) session.removeAttribute("checkout_city");
 if (checkoutProvince != null) session.removeAttribute("checkout_province");
 if (checkoutDistrict != null) session.removeAttribute("checkout_district");
+if (checkoutDoorstepConsent != null) session.removeAttribute("checkout_doorstep_consent");
 %>
 
 <!DOCTYPE html>
@@ -382,6 +384,8 @@ if (checkoutDistrict != null) session.removeAttribute("checkout_district");
                             Server error occurred. Please try again.
                         <% } else if ("invalid_email".equals(error)) { %>
                             Please enter a valid email address.
+                        <% } else if ("terms_not_accepted".equals(error)) { %>
+                            You must accept the one-attempt delivery policy to place this order.
                         <% } else if ("item_price_limit_exceeded".equals(error)) { %>
                             One or more items exceed the Rs 10,000 purchase limit.
                         <% } else if ("order_price_limit_exceeded".equals(error)) { %>
@@ -484,6 +488,19 @@ if (checkoutDistrict != null) session.removeAttribute("checkout_district");
                         <label>City</label>
                         <input type="text" name="city" value="<%= checkoutCity != null ? checkoutCity : "" %>" required>
                     </div>
+                </div>
+
+                <div style="margin-top: 16px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--muted);">
+                    <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 0.9em; color: var(--foreground); line-height: 1.45;">
+                        <input type="checkbox" name="doorstepDropConsent" required
+                               <%= (checkoutDoorstepConsent != null && checkoutDoorstepConsent) ? "checked" : "" %>
+                               style="margin-top: 3px;">
+                        <span>
+                            I understand this order has <strong>one delivery attempt only</strong>. If I am unreachable,
+                            the driver may complete delivery by leaving the package at my door with two proof photos.
+                            After completion, responsibility transfers to me.
+                        </span>
+                    </label>
                 </div>
             </div>
 

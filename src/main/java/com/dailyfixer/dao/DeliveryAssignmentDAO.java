@@ -72,8 +72,13 @@ public class DeliveryAssignmentDAO {
 
     private static final String MARK_DELIVERED =
         "UPDATE delivery_assignments " +
-        "SET status='DELIVERED', completed_at=NOW() " +
+        "SET status='DELIVERED', completed_at=NOW(), completion_method='PIN' " +
         "WHERE assignment_id=? AND driver_id=? AND status='PICKED_UP' AND delivery_pin=?";
+
+    private static final String MARK_DELIVERED_DOORSTEP =
+        "UPDATE delivery_assignments " +
+        "SET status='DELIVERED', completed_at=NOW(), completion_method='DOORSTEP_PHOTO' " +
+        "WHERE assignment_id=? AND driver_id=? AND status='PICKED_UP'";
 
     private static final String CANCEL =
         "UPDATE delivery_assignments SET status='CANCELLED' " +
@@ -129,7 +134,7 @@ public class DeliveryAssignmentDAO {
 
     private static final String SELECT_BY_DRIVER =
         "SELECT da.*, s.store_name, s.latitude AS store_lat, s.longitude AS store_lng, " +
-        "       o.first_name, o.last_name " +
+        "       o.first_name, o.last_name, o.phone AS buyer_phone " +
         "FROM delivery_assignments da " +
         "JOIN stores s ON da.store_id = s.store_id " +
         "JOIN orders o ON da.order_id = o.order_id " +
@@ -353,6 +358,25 @@ public class DeliveryAssignmentDAO {
     }
 
     /**
+     * Marks a picked-up assignment as DELIVERED using doorstep-photo proof.
+     * PIN is not required for this exception path.
+     */
+    public boolean markDeliveredDoorstep(int assignmentId, int driverId) {
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(MARK_DELIVERED_DOORSTEP)) {
+
+            stmt.setInt(1, assignmentId);
+            stmt.setInt(2, driverId);
+            return stmt.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            System.err.println("DeliveryAssignmentDAO.markDeliveredDoorstep: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
      * Cancels a PENDING or ACCEPTED assignment (e.g. store cancels order).
      */
     public boolean cancelAssignment(int assignmentId) {
@@ -514,6 +538,7 @@ public class DeliveryAssignmentDAO {
                     String fn = rs.getString("first_name");
                     String ln = rs.getString("last_name");
                     if (fn != null) da.setCustomerName(fn + (ln != null ? " " + ln : ""));
+                    da.setBuyerPhone(rs.getString("buyer_phone"));
                     list.add(da);
                 }
             }
@@ -735,6 +760,7 @@ public class DeliveryAssignmentDAO {
         da.setDeliveryLng(rs.wasNull() ? null : lng);
 
         da.setStatus(rs.getString("status"));
+        da.setCompletionMethod(rs.getString("completion_method"));
         da.setAssignedAt(rs.getTimestamp("assigned_at"));
         da.setCompletedAt(rs.getTimestamp("completed_at"));
 

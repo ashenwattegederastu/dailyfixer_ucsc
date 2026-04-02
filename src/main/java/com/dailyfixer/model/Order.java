@@ -31,6 +31,7 @@ public class Order {
     private String refundReason;
     private String refundNumber;
     private Timestamp refundedAt;
+    private boolean doorstepDropConsent;
 
     // Default constructor
     public Order() {
@@ -175,6 +176,14 @@ public class Order {
 
     public Timestamp getRefundedAt() { return refundedAt; }
     public void setRefundedAt(Timestamp refundedAt) { this.refundedAt = refundedAt; }
+
+    public boolean isDoorstepDropConsent() {
+        return doorstepDropConsent;
+    }
+
+    public void setDoorstepDropConsent(boolean doorstepDropConsent) {
+        this.doorstepDropConsent = doorstepDropConsent;
+    }
 
     public String getStoreUsername() {
         return storeUsername;

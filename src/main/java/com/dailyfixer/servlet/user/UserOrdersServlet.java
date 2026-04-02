@@ -1,9 +1,11 @@
 package com.dailyfixer.servlet.user;
 
 import com.dailyfixer.dao.DeliveryAssignmentDAO;
+import com.dailyfixer.dao.DeliveryDropProofDAO;
 import com.dailyfixer.dao.OrderDAO;
 import com.dailyfixer.dao.ProductDAO;
 import com.dailyfixer.model.DeliveryAssignment;
+import com.dailyfixer.model.DeliveryDropProof;
 import com.dailyfixer.model.Order;
 import com.dailyfixer.model.OrderItem;
 import com.dailyfixer.model.Product;
@@ -37,6 +39,7 @@ public class UserOrdersServlet extends HttpServlet {
     private OrderDAO orderDAO;
     private ProductDAO productDAO;
     private DeliveryAssignmentDAO assignmentDAO;
+    private DeliveryDropProofDAO dropProofDAO;
     private StoreDAO storeDAO;
     private UserDAO userDAO;
 
@@ -46,6 +49,7 @@ public class UserOrdersServlet extends HttpServlet {
         orderDAO = new OrderDAO();
         productDAO = new ProductDAO();
         assignmentDAO = new DeliveryAssignmentDAO();
+        dropProofDAO = new DeliveryDropProofDAO();
         storeDAO = new StoreDAO();
         userDAO = new UserDAO();
         System.out.println("UserOrdersServlet initialized");
@@ -103,6 +107,8 @@ public class UserOrdersServlet extends HttpServlet {
             // Build a map of orderId → delivery PIN for active delivery orders
             Map<String, String> deliveryPinMap = new HashMap<>();
             Map<String, Map<String, String>> storeDetailsMap = new HashMap<>();
+            Map<String, Map<String, String>> driverDetailsMap = new HashMap<>();
+            Map<String, Map<String, String>> deliveryProofMap = new HashMap<>();
             
             for (Order order : orders) {
                 String status = order.getStatus() != null ? order.getStatus().trim().toUpperCase() : "";
@@ -110,6 +116,33 @@ public class UserOrdersServlet extends HttpServlet {
                     DeliveryAssignment da = assignmentDAO.getByOrderId(order.getOrderId());
                     if (da != null && da.getDeliveryPin() != null) {
                         deliveryPinMap.put(order.getOrderId(), da.getDeliveryPin());
+                    }
+                }
+
+                DeliveryAssignment assignment = assignmentDAO.getByOrderId(order.getOrderId());
+                if (assignment != null) {
+                    if (assignment.getDriverId() != null) {
+                        User driver = userDAO.getUserById(assignment.getDriverId());
+                        if (driver != null) {
+                            Map<String, String> driverDetails = new HashMap<>();
+                            String driverName = (driver.getFirstName() != null ? driver.getFirstName() : "")
+                                    + (driver.getLastName() != null && !driver.getLastName().isBlank()
+                                    ? " " + driver.getLastName() : "");
+                            driverDetails.put("name", driverName.isBlank() ? "Delivery Driver" : driverName.trim());
+                            driverDetails.put("phone", driver.getPhoneNumber() != null ? driver.getPhoneNumber() : "No phone");
+                            driverDetails.put("picture", driver.getProfilePicturePath() != null ? driver.getProfilePicturePath() : "");
+                            driverDetails.put("completionMethod", assignment.getCompletionMethod() != null ? assignment.getCompletionMethod() : "");
+                            driverDetailsMap.put(order.getOrderId(), driverDetails);
+                        }
+                    }
+
+                    DeliveryDropProof proof = dropProofDAO.getByOrderId(order.getOrderId());
+                    if (proof != null) {
+                        Map<String, String> proofDetails = new HashMap<>();
+                        proofDetails.put("photoPackage", proof.getPhotoPackagePath() != null ? proof.getPhotoPackagePath() : "");
+                        proofDetails.put("photoDoor", proof.getPhotoDoorContextPath() != null ? proof.getPhotoDoorContextPath() : "");
+                        proofDetails.put("note", proof.getNote() != null ? proof.getNote() : "");
+                        deliveryProofMap.put(order.getOrderId(), proofDetails);
                     }
                 }
 
@@ -137,6 +170,8 @@ public class UserOrdersServlet extends HttpServlet {
             request.setAttribute("productsMap", productsMap);
             request.setAttribute("deliveryPinMap", deliveryPinMap);
             request.setAttribute("storeDetailsMap", storeDetailsMap);
+            request.setAttribute("driverDetailsMap", driverDetailsMap);
+            request.setAttribute("deliveryProofMap", deliveryProofMap);
 
             // Forward to myPurchases.jsp
             request.getRequestDispatcher("/pages/dashboards/userdash/myPurchases.jsp").forward(request, response);

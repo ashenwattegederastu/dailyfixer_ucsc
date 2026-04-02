@@ -253,6 +253,7 @@ CREATE TABLE `delivery_assignments` (
   `delivery_lng` decimal(11,7) DEFAULT NULL,
   `delivery_pin` char(6) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'PENDING',
+  `completion_method` varchar(24) DEFAULT NULL,
   `assigned_at` timestamp NULL DEFAULT NULL,
   `picked_up_at` timestamp NULL DEFAULT NULL,
   `completed_at` timestamp NULL DEFAULT NULL,
@@ -267,6 +268,32 @@ CREATE TABLE `delivery_assignments` (
   CONSTRAINT `fk_da_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_da_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `delivery_drop_proofs`
+--
+
+DROP TABLE IF EXISTS `delivery_drop_proofs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `delivery_drop_proofs` (
+  `proof_id` int NOT NULL AUTO_INCREMENT,
+  `assignment_id` int NOT NULL,
+  `order_id` varchar(50) NOT NULL,
+  `driver_id` int NOT NULL,
+  `photo_package_path` varchar(255) NOT NULL,
+  `photo_door_context_path` varchar(255) NOT NULL,
+  `note` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`proof_id`),
+  UNIQUE KEY `uq_ddp_assignment` (`assignment_id`),
+  KEY `idx_ddp_order` (`order_id`),
+  KEY `idx_ddp_driver` (`driver_id`),
+  CONSTRAINT `fk_ddp_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `delivery_assignments` (`assignment_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ddp_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ddp_driver` FOREIGN KEY (`driver_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -768,6 +795,7 @@ CREATE TABLE `orders` (
   `refunded_at` timestamp NULL DEFAULT NULL,
   `delivery_latitude` decimal(10,7) DEFAULT NULL,
   `delivery_longitude` decimal(11,7) DEFAULT NULL,
+  `doorstep_drop_consent` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_id` (`order_id`),
   KEY `fk_orders_store` (`store_id`),
