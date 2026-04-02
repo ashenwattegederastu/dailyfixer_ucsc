@@ -22,7 +22,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Lora:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
           rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/framework.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <style>
         .main-content {
             flex: 1;
@@ -99,9 +98,25 @@
             border-radius: var(--radius-lg);
             padding: 24px;
             box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
         }
         .chart-box h3 { margin-bottom: 14px; font-size: 1.05rem; color: var(--foreground); }
-        .chart-box canvas { max-height: 280px; width: 100% !important; }
+        .chart-box::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, .08), transparent 34%);
+            pointer-events: none;
+        }
+        .chart-box canvas {
+            position: relative;
+            display: block;
+            width: 100% !important;
+            height: 280px !important;
+            max-height: 280px;
+            z-index: 1;
+        }
 
         /* ── Date-range picker bar ── */
         .range-bar {
@@ -350,89 +365,37 @@
 
     </main>
 
-    <%-- ══════ Build JS arrays from server maps ══════ --%>
+    <%-- ══════ Build JS data payload for local chart renderer ══════ --%>
     <script>
-    (function() {
-        // --- helper: Java Map → JS arrays via JSTL ---
-        const ordersLabels  = [<c:forEach var="e" items="${ordersPerDay}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>];
-        const ordersData    = [<c:forEach var="e" items="${ordersPerDay}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>];
-
-        const revLabels     = [<c:forEach var="e" items="${revenuePerDay}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>];
-        const revData       = [<c:forEach var="e" items="${revenuePerDay}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>];
-
-        const userLabels    = [<c:forEach var="e" items="${newUsersPerDay}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>];
-        const userData      = [<c:forEach var="e" items="${newUsersPerDay}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>];
-
-        const bookLabels    = [<c:forEach var="e" items="${bookingsPerDay}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>];
-        const bookData      = [<c:forEach var="e" items="${bookingsPerDay}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>];
-
-        const roleLabels    = [<c:forEach var="e" items="${usersByRole}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>];
-        const roleData      = [<c:forEach var="e" items="${usersByRole}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>];
-
-        const statusLabels  = [<c:forEach var="e" items="${ordersByStatus}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>];
-        const statusData    = [<c:forEach var="e" items="${ordersByStatus}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>];
-
-        // Resolve CSS custom-property colours at runtime
-        const cs = getComputedStyle(document.documentElement);
-        const c1 = cs.getPropertyValue('--chart-1').trim() || '#4ade80';
-        const c2 = cs.getPropertyValue('--chart-2').trim() || '#7c3aed';
-        const c3 = cs.getPropertyValue('--chart-3').trim() || '#f59e0b';
-        const c4 = cs.getPropertyValue('--chart-4').trim() || '#3b82f6';
-        const c5 = cs.getPropertyValue('--chart-5').trim() || '#6b7280';
-        const palette = [c1,c2,c3,c4,c5,'#ec4899','#14b8a6','#f97316','#8b5cf6','#06b6d4'];
-
-        const gridColor = cs.getPropertyValue('--border').trim() || '#e5e7eb';
-        const textColor = cs.getPropertyValue('--muted-foreground').trim() || '#6b7280';
-
-        const commonScales = {
-            x: { ticks:{color:textColor,maxRotation:45,autoSkip:true}, grid:{color:gridColor} },
-            y: { beginAtZero:true, ticks:{color:textColor}, grid:{color:gridColor} }
-        };
-
-        // ── Line: Orders ──
-        new Chart(document.getElementById('ordersChart'), {
-            type:'line',
-            data:{ labels:ordersLabels, datasets:[{label:'Orders',data:ordersData,borderColor:c2,backgroundColor:c2+'33',fill:true,tension:.35}] },
-            options:{ responsive:true, plugins:{legend:{display:false}}, scales:commonScales }
-        });
-
-        // ── Line: Revenue ──
-        new Chart(document.getElementById('revenueChart'), {
-            type:'bar',
-            data:{ labels:revLabels, datasets:[{label:'Revenue (LKR)',data:revData,backgroundColor:c1+'99',borderColor:c1,borderWidth:1}] },
-            options:{ responsive:true, plugins:{legend:{display:false}}, scales:commonScales }
-        });
-
-        // ── Bar: New Users ──
-        new Chart(document.getElementById('usersChart'), {
-            type:'bar',
-            data:{ labels:userLabels, datasets:[{label:'New Users',data:userData,backgroundColor:c3+'99',borderColor:c3,borderWidth:1}] },
-            options:{ responsive:true, plugins:{legend:{display:false}}, scales:commonScales }
-        });
-
-        // ── Line: Bookings ──
-        new Chart(document.getElementById('bookingsChart'), {
-            type:'line',
-            data:{ labels:bookLabels, datasets:[{label:'Bookings',data:bookData,borderColor:c4,backgroundColor:c4+'33',fill:true,tension:.35}] },
-            options:{ responsive:true, plugins:{legend:{display:false}}, scales:commonScales }
-        });
-
-        // ── Doughnut: Users by Role ──
-        new Chart(document.getElementById('roleChart'), {
-            type:'doughnut',
-            data:{ labels:roleLabels, datasets:[{data:roleData,backgroundColor:palette.slice(0,roleLabels.length)}] },
-            options:{ responsive:true, plugins:{legend:{position:'bottom',labels:{color:textColor}}} }
-        });
-
-        // ── Doughnut: Orders by Status ──
-        new Chart(document.getElementById('statusChart'), {
-            type:'doughnut',
-            data:{ labels:statusLabels, datasets:[{data:statusData,backgroundColor:palette.slice(0,statusLabels.length)}] },
-            options:{ responsive:true, plugins:{legend:{position:'bottom',labels:{color:textColor}}} }
-        });
-    })();
+    window.adminDashboardData = {
+        ordersTrend: {
+            labels: [<c:forEach var="e" items="${ordersPerDay}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>],
+            values: [<c:forEach var="e" items="${ordersPerDay}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>]
+        },
+        revenueTrend: {
+            labels: [<c:forEach var="e" items="${revenuePerDay}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>],
+            values: [<c:forEach var="e" items="${revenuePerDay}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>]
+        },
+        registrationsTrend: {
+            labels: [<c:forEach var="e" items="${newUsersPerDay}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>],
+            values: [<c:forEach var="e" items="${newUsersPerDay}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>]
+        },
+        bookingsTrend: {
+            labels: [<c:forEach var="e" items="${bookingsPerDay}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>],
+            values: [<c:forEach var="e" items="${bookingsPerDay}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>]
+        },
+        usersByRole: {
+            labels: [<c:forEach var="e" items="${usersByRole}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>],
+            values: [<c:forEach var="e" items="${usersByRole}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>]
+        },
+        ordersByStatus: {
+            labels: [<c:forEach var="e" items="${ordersByStatus}" varStatus="s">'${e.key}'<c:if test="${!s.last}">,</c:if></c:forEach>],
+            values: [<c:forEach var="e" items="${ordersByStatus}" varStatus="s">${e.value}<c:if test="${!s.last}">,</c:if></c:forEach>]
+        }
+    };
     </script>
 
     <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/admin-dashboard-charts.js"></script>
 </body>
 </html>
