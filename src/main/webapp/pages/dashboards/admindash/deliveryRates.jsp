@@ -187,6 +187,7 @@
                 <th>Base Fee (Rs)</th>
                 <th>Cost / km (Rs)</th>
                 <th>Distribution Weight (%)</th>
+                <th>Max Orders</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -198,6 +199,7 @@
                 <td>Rs <%= String.format("%.2f", r.getBaseFee()) %></td>
                 <td>Rs <%= String.format("%.2f", r.getCostPerKm()) %></td>
                 <td><%= r.getDistributionWeight().stripTrailingZeros().toPlainString() %>%</td>
+                <td><%= r.getMaxSimultaneousOrders() %></td>
                 <td>
                     <% if (r.isActive()) { %>
                         <span class="badge-active">Active</span>
@@ -207,7 +209,7 @@
                 </td>
                 <td>
                     <div class="action-btns">
-                        <button class="btn-edit" onclick="openEditModal(<%= r.getRateId() %>, '<%= r.getVehicleType().replace("'", "\\'") %>', '<%= r.getBaseFee() %>', '<%= r.getCostPerKm() %>', '<%= r.getDistributionWeight() %>', <%= r.isActive() %>)">Edit</button>
+                        <button class="btn-edit" onclick="openEditModal(<%= r.getRateId() %>, '<%= r.getVehicleType().replace("'", "\\'") %>', '<%= r.getBaseFee() %>', '<%= r.getCostPerKm() %>', '<%= r.getDistributionWeight() %>', <%= r.isActive() %>, <%= r.getMaxSimultaneousOrders() %>)">Edit</button>
                         <form method="post" action="${pageContext.request.contextPath}/admin/deliveryRates" style="margin:0;"
                               onsubmit="return confirm('Delete <%= r.getVehicleType().replace("'", "\\'") %>?');">
                             <input type="hidden" name="action" value="delete">
@@ -219,7 +221,7 @@
             </tr>
             <% } } %>
             <% if (rates == null || rates.isEmpty()) { %>
-            <tr><td colspan="6" style="text-align:center; color: var(--muted-foreground); padding: 30px;">No delivery rates configured yet.</td></tr>
+            <tr><td colspan="7" style="text-align:center; color: var(--muted-foreground); padding: 30px;">No delivery rates configured yet.</td></tr>
             <% } %>
         </tbody>
     </table>
@@ -251,6 +253,11 @@
                 <small style="color: var(--muted-foreground); font-size: 0.78rem;">All active weights should sum to 100%.</small>
             </div>
             <div class="form-group">
+                <label>Max Simultaneous Orders</label>
+                <input type="number" name="maxSimultaneousOrders" id="form-maxSimultaneousOrders" placeholder="e.g. 3" min="1" step="1" required>
+                <small style="color: var(--muted-foreground); font-size: 0.78rem;">How many ACCEPTED + PICKED_UP orders a driver of this type can hold at once.</small>
+            </div>
+            <div class="form-group">
                 <div class="checkbox-row">
                     <input type="checkbox" name="isActive" id="form-isActive" value="on" checked>
                     <label for="form-isActive" style="margin:0;">Active (used in checkout calculations)</label>
@@ -272,12 +279,13 @@
         document.getElementById('form-baseFee').value = '';
         document.getElementById('form-costPerKm').value = '';
         document.getElementById('form-distributionWeight').value = '';
+        document.getElementById('form-maxSimultaneousOrders').value = '';
         document.getElementById('form-isActive').checked = true;
         document.getElementById('modal-submit-btn').textContent = 'Add Rate';
         document.getElementById('rateModal').classList.add('open');
     }
 
-    function openEditModal(rateId, vehicleType, baseFee, costPerKm, distributionWeight, isActive) {
+    function openEditModal(rateId, vehicleType, baseFee, costPerKm, distributionWeight, isActive, maxOrders) {
         document.getElementById('modal-title').textContent = 'Edit Vehicle Type';
         document.getElementById('form-action').value = 'edit';
         document.getElementById('form-rateId').value = rateId;
@@ -285,6 +293,7 @@
         document.getElementById('form-baseFee').value = baseFee;
         document.getElementById('form-costPerKm').value = costPerKm;
         document.getElementById('form-distributionWeight').value = distributionWeight;
+        document.getElementById('form-maxSimultaneousOrders').value = maxOrders;
         document.getElementById('form-isActive').checked = isActive;
         document.getElementById('modal-submit-btn').textContent = 'Save Changes';
         document.getElementById('rateModal').classList.add('open');

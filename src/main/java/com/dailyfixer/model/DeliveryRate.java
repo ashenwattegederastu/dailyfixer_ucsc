@@ -9,6 +9,7 @@ public class DeliveryRate {
     private BigDecimal costPerKm;
     private BigDecimal baseFee;
     private BigDecimal distributionWeight; // percentage, e.g. 50.00 = 50%
+    private int maxSimultaneousOrders = 3; // max concurrent ACCEPTED+PICKED_UP orders
     private boolean active;
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -27,6 +28,9 @@ public class DeliveryRate {
 
     public BigDecimal getDistributionWeight() { return distributionWeight; }
     public void setDistributionWeight(BigDecimal distributionWeight) { this.distributionWeight = distributionWeight; }
+
+    public int getMaxSimultaneousOrders() { return maxSimultaneousOrders; }
+    public void setMaxSimultaneousOrders(int maxSimultaneousOrders) { this.maxSimultaneousOrders = maxSimultaneousOrders; }
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }

@@ -309,6 +309,7 @@ CREATE TABLE `delivery_rates` (
   `cost_per_km` decimal(10,2) NOT NULL,
   `base_fee` decimal(10,2) NOT NULL DEFAULT '100.00',
   `distribution_weight` decimal(5,2) NOT NULL DEFAULT '33.33' COMMENT 'Percentage weight used in weighted-average customer price (weights should sum to 100)',
+  `max_simultaneous_orders` int NOT NULL DEFAULT '3' COMMENT 'Max concurrent ACCEPTED+PICKED_UP orders a driver of this vehicle type can hold',
   `is_active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

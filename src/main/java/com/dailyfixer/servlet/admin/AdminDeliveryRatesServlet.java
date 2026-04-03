@@ -57,6 +57,13 @@ public class AdminDeliveryRatesServlet extends HttpServlet {
         rate.setBaseFee(new BigDecimal(req.getParameter("baseFee")));
         rate.setDistributionWeight(new BigDecimal(req.getParameter("distributionWeight")));
         rate.setActive("on".equals(req.getParameter("isActive")) || "true".equals(req.getParameter("isActive")));
+        String maxStr = req.getParameter("maxSimultaneousOrders");
+        int maxOrders = 3; // safe default
+        try {
+            if (maxStr != null && !maxStr.isBlank()) maxOrders = Integer.parseInt(maxStr);
+            if (maxOrders < 1) maxOrders = 1;
+        } catch (NumberFormatException ignored) {}
+        rate.setMaxSimultaneousOrders(maxOrders);
         return rate;
     }
 

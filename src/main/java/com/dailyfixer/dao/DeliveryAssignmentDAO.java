@@ -22,9 +22,22 @@ import java.util.List;
 public class DeliveryAssignmentDAO {
 
     /** Result of an acceptAssignment() call. */
-    public enum AcceptResult { SUCCESS, ALREADY_TAKEN, ERROR }
+    public enum AcceptResult { SUCCESS, ALREADY_TAKEN, LIMIT_REACHED, ERROR }
 
     // ── SQL constants ─────────────────────────────────────────────────────────
+
+    /** Count this driver's currently active (non-completed) assignments. */
+    private static final String COUNT_DRIVER_ACTIVE =
+        "SELECT COUNT(*) FROM delivery_assignments " +
+        "WHERE driver_id = ? AND status IN ('ACCEPTED','PICKED_UP')";
+
+    /** Get the max simultaneous order limit for this driver's registered vehicle category. */
+    private static final String GET_DRIVER_ORDER_LIMIT =
+        "SELECT dr.max_simultaneous_orders " +
+        "FROM delivery_rates dr " +
+        "JOIN vehicles v ON v.vehicle_category = dr.vehicle_type " +
+        "WHERE v.driver_id = ? AND dr.is_active = 1 " +
+        "LIMIT 1";
 
     private static final String INSERT =
         "INSERT INTO delivery_assignments " +
@@ -310,22 +323,53 @@ public class DeliveryAssignmentDAO {
 
     /**
      * Atomically claims a PENDING assignment for the given driver.
-     * Uses a single UPDATE with WHERE status='PENDING' as the guard.
-     * MySQL's row-level locking ensures at most one concurrent caller
-     * receives rowsAffected=1 for the same assignment_id.
+     * First checks whether the driver has reached the simultaneous order limit
+     * for their vehicle category (from delivery_rates.max_simultaneous_orders).
+     * Then uses a single UPDATE with WHERE status='PENDING' as the race guard.
      *
      * @return SUCCESS       – driver now owns this assignment
      *         ALREADY_TAKEN – another driver accepted first (rowsAffected=0)
+     *         LIMIT_REACHED – driver already at max concurrent orders for their vehicle type
      *         ERROR         – unexpected exception
      */
     public AcceptResult acceptAssignment(int assignmentId, int driverId) {
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(ACCEPT)) {
+        try (Connection conn = DBConnection.getConnection()) {
 
-            stmt.setInt(1, driverId);
-            stmt.setInt(2, assignmentId);
-            int rows = stmt.executeUpdate();
-            return rows > 0 ? AcceptResult.SUCCESS : AcceptResult.ALREADY_TAKEN;
+            // 1. Get this driver's limit from their vehicle category
+            int limit = 1; // safe minimum if lookup fails
+            try (PreparedStatement ps = conn.prepareStatement(GET_DRIVER_ORDER_LIMIT)) {
+                ps.setInt(1, driverId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        limit = rs.getInt(1);
+                    } else {
+                        // No registered vehicle → cannot accept deliveries
+                        return AcceptResult.ERROR;
+                    }
+                }
+            }
+
+            // 2. Count current active orders for this driver
+            int activeCount;
+            try (PreparedStatement ps = conn.prepareStatement(COUNT_DRIVER_ACTIVE)) {
+                ps.setInt(1, driverId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    activeCount = rs.getInt(1);
+                }
+            }
+
+            if (activeCount >= limit) {
+                return AcceptResult.LIMIT_REACHED;
+            }
+
+            // 3. Atomic claim — existing race guard unchanged
+            try (PreparedStatement ps = conn.prepareStatement(ACCEPT)) {
+                ps.setInt(1, driverId);
+                ps.setInt(2, assignmentId);
+                int rows = ps.executeUpdate();
+                return rows > 0 ? AcceptResult.SUCCESS : AcceptResult.ALREADY_TAKEN;
+            }
 
         } catch (Exception e) {
             System.err.println("DeliveryAssignmentDAO.acceptAssignment: " + e.getMessage());

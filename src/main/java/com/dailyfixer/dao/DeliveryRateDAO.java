@@ -16,9 +16,9 @@ public class DeliveryRateDAO {
     private static final String SELECT_BY_ID =
         "SELECT * FROM delivery_rates WHERE rate_id = ?";
     private static final String INSERT =
-        "INSERT INTO delivery_rates (vehicle_type, cost_per_km, base_fee, distribution_weight, is_active) VALUES (?, ?, ?, ?, ?)";
+        "INSERT INTO delivery_rates (vehicle_type, cost_per_km, base_fee, distribution_weight, is_active, max_simultaneous_orders) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String UPDATE =
-        "UPDATE delivery_rates SET vehicle_type=?, cost_per_km=?, base_fee=?, distribution_weight=?, is_active=? WHERE rate_id=?";
+        "UPDATE delivery_rates SET vehicle_type=?, cost_per_km=?, base_fee=?, distribution_weight=?, is_active=?, max_simultaneous_orders=? WHERE rate_id=?";
     private static final String DELETE =
         "DELETE FROM delivery_rates WHERE rate_id=?";
     private static final String SELECT_VEHICLE_TYPES =
@@ -53,6 +53,7 @@ public class DeliveryRateDAO {
             stmt.setBigDecimal(3, rate.getBaseFee());
             stmt.setBigDecimal(4, rate.getDistributionWeight());
             stmt.setBoolean(5, rate.isActive());
+            stmt.setInt(6, rate.getMaxSimultaneousOrders());
             return stmt.executeUpdate() > 0;
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("DeliveryRateDAO.addRate: " + e.getMessage());
@@ -68,7 +69,8 @@ public class DeliveryRateDAO {
             stmt.setBigDecimal(3, rate.getBaseFee());
             stmt.setBigDecimal(4, rate.getDistributionWeight());
             stmt.setBoolean(5, rate.isActive());
-            stmt.setInt(6, rate.getRateId());
+            stmt.setInt(6, rate.getMaxSimultaneousOrders());
+            stmt.setInt(7, rate.getRateId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("DeliveryRateDAO.updateRate: " + e.getMessage());
@@ -120,6 +122,7 @@ public class DeliveryRateDAO {
         r.setBaseFee(rs.getBigDecimal("base_fee"));
         r.setDistributionWeight(rs.getBigDecimal("distribution_weight"));
         r.setActive(rs.getBoolean("is_active"));
+        r.setMaxSimultaneousOrders(rs.getInt("max_simultaneous_orders"));
         r.setCreatedAt(rs.getTimestamp("created_at"));
         r.setUpdatedAt(rs.getTimestamp("updated_at"));
         return r;

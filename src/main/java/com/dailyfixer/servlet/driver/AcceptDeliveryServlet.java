@@ -55,6 +55,9 @@ public class AcceptDeliveryServlet extends HttpServlet {
                 case ALREADY_TAKEN:
                     resp.getWriter().write("{\"success\":false,\"message\":\"This delivery has already been taken by another driver.\"}");
                     break;
+                case LIMIT_REACHED:
+                    resp.getWriter().write("{\"success\":false,\"message\":\"You have reached your maximum simultaneous order limit for your vehicle type.\"}");
+                    break;
                 default:
                     resp.getWriter().write("{\"success\":false,\"message\":\"Database error. Please try again.\"}");
             }
