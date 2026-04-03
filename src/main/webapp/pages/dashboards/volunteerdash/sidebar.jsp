@@ -136,7 +136,7 @@
                         document.getElementById('nav-all-guides')?.classList.add('active');
                     } else if (currentPath.includes('/guideComments.jsp')) {
                         document.getElementById('nav-guide-comments')?.classList.add('active');
-                    } else if (currentPath.includes('/notifications.jsp')) {
+                    } else if (currentPath.includes('#')) {
                         document.getElementById('nav-notifications')?.classList.add('active');
                     } else if (currentPath.includes('/diagnostic-trees.jsp') || currentPath.includes('/diagnostic-tree-builder.jsp')) {
                         document.getElementById('nav-diagnostic-trees')?.classList.add('active');
