@@ -19,7 +19,7 @@
             redirectUrl += "?" + request.getQueryString();
         }
         session.setAttribute("redirectAfterLogin", redirectUrl);
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
     

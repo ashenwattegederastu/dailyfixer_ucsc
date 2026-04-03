@@ -51,7 +51,7 @@ public class RegisterTechnicianServlet extends HttpServlet {
 
         if (errorMsg != null) {
             request.setAttribute("errorMsg", errorMsg);
-            request.getRequestDispatcher("/registerTechnician.jsp").forward(request, response);
+            request.getRequestDispatcher("/pages/authentication/register/registerTechnician.jsp").forward(request, response);
             return;
         }
 
@@ -79,18 +79,18 @@ public class RegisterTechnicianServlet extends HttpServlet {
                 int rows = stmt.executeUpdate();
                 if (rows > 0) {
                     // Success: redirect to login page
-                    response.sendRedirect(request.getContextPath() + "/login.jsp");
+                    response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
                 } else {
                     errorMsg = "Registration failed. Please try again.";
                     request.setAttribute("errorMsg", errorMsg);
-                    request.getRequestDispatcher("/registerTechnician.jsp").forward(request, response);
+                    request.getRequestDispatcher("/pages/authentication/register/registerTechnician.jsp").forward(request, response);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             errorMsg = "Error: " + e.getMessage();
             request.setAttribute("errorMsg", errorMsg);
-            request.getRequestDispatcher("/registerTechnician.jsp").forward(request, response);
+            request.getRequestDispatcher("/pages/authentication/register/registerTechnician.jsp").forward(request, response);
         }
     }
 }

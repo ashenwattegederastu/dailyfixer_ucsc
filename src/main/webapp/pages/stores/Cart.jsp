@@ -374,7 +374,7 @@
             <% if (!isLoggedIn) { %>
                 alert("Please login before purchasing products");
                 const currentPath = window.location.pathname + window.location.search;
-                window.location.href = "<%=request.getContextPath()%>/login.jsp?redirect=" + encodeURIComponent(currentPath);
+                window.location.href = "<%=request.getContextPath()%>/pages/authentication/login.jsp?redirect=" + encodeURIComponent(currentPath);
                 return;
             <% } %>
             window.location.href = "checkout.jsp";

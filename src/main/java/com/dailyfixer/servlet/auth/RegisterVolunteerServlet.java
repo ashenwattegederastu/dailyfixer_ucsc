@@ -46,26 +46,26 @@ public class RegisterVolunteerServlet extends HttpServlet {
                     email == null || email.trim().isEmpty() ||
                     password == null || password.trim().isEmpty()) {
                 req.setAttribute("errorMsg", "Please fill in all required fields.");
-                req.getRequestDispatcher("registerVolunteer.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerVolunteer.jsp").forward(req, resp);
                 return;
             }
 
             if (!password.equals(confirmPassword)) {
                 req.setAttribute("errorMsg", "Passwords do not match.");
-                req.getRequestDispatcher("registerVolunteer.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerVolunteer.jsp").forward(req, resp);
                 return;
             }
 
             // Check for duplicate username/email
             if (requestDAO.usernameExists(username.trim())) {
                 req.setAttribute("errorMsg", "Username already exists or is pending review.");
-                req.getRequestDispatcher("registerVolunteer.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerVolunteer.jsp").forward(req, resp);
                 return;
             }
 
             if (requestDAO.emailExists(email.trim())) {
                 req.setAttribute("errorMsg", "Email already exists or is pending review.");
-                req.getRequestDispatcher("registerVolunteer.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerVolunteer.jsp").forward(req, resp);
                 return;
             }
 
@@ -146,16 +146,16 @@ public class RegisterVolunteerServlet extends HttpServlet {
             int requestId = requestDAO.submitRequest(request);
 
             if (requestId > 0) {
-                resp.sendRedirect(req.getContextPath() + "/volunteerRegistrationSuccess.jsp");
+                resp.sendRedirect(req.getContextPath() + "/pages/authentication/register/volunteerRegistrationSuccess.jsp");
             } else {
                 req.setAttribute("errorMsg", "Registration failed. Please try again.");
-                req.getRequestDispatcher("registerVolunteer.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerVolunteer.jsp").forward(req, resp);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("error", "An error occurred: " + e.getMessage());
-            req.getRequestDispatcher("registerVolunteer.jsp").forward(req, resp);
+            req.getRequestDispatcher("pages/authentication/register/registerVolunteer.jsp").forward(req, resp);
         }
     }
 }

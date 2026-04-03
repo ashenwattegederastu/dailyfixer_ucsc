@@ -4,7 +4,7 @@
 
             <% User user=(User) session.getAttribute("currentUser"); if (user==null || user.getRole()==null ||
                 !"admin".equalsIgnoreCase(user.getRole().trim())) { response.sendRedirect(request.getContextPath()
-                + "/login.jsp" ); return; } String treeId=request.getParameter("id"); boolean isEditMode=treeId !=null
+                + "/pages/authentication/login.jsp" ); return; } String treeId=request.getParameter("id"); boolean isEditMode=treeId !=null
                 && !treeId.isEmpty(); %>
 
                 <!DOCTYPE html>

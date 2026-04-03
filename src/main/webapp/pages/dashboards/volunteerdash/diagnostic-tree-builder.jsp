@@ -3,7 +3,7 @@
         <%@ page import="com.dailyfixer.model.User" %>
             <% User user=(User) session.getAttribute("currentUser"); if (user==null ||
                 !"volunteer".equalsIgnoreCase(user.getRole())) { response.sendRedirect(request.getContextPath()
-                + "/login.jsp" ); return; } String treeId=request.getParameter("id"); boolean isEditMode=treeId !=null
+                + "/pages/authentication/login.jsp" ); return; } String treeId=request.getParameter("id"); boolean isEditMode=treeId !=null
                 && !treeId.isEmpty(); %>
 
 

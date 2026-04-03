@@ -71,7 +71,7 @@ public class AdminDeliveryRatesServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         User user = session != null ? (User) session.getAttribute("currentUser") : null;
         if (user == null || !"admin".equalsIgnoreCase(user.getRole())) {
-            resp.sendRedirect(req.getContextPath() + "/pages/shared/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/pages/authentication/login.jsp");
             return false;
         }
         return true;

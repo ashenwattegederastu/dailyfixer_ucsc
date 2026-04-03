@@ -3,7 +3,7 @@
 <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 <%@ page import="com.dailyfixer.model.User" %>
 <% User user=(User) session.getAttribute("currentUser"); if (user==null || user.getRole()==null || !"technician".equalsIgnoreCase(user.getRole().trim())) {
-    response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp" ); return;
+    response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp" ); return;
 } %>
                     <!DOCTYPE html>
                     <html lang="en">

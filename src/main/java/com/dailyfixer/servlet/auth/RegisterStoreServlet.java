@@ -29,7 +29,7 @@ public class RegisterStoreServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        req.getRequestDispatcher("registerStore.jsp").forward(req, resp);
+        req.getRequestDispatcher("pages/authentication/register/registerStore.jsp").forward(req, resp);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class RegisterStoreServlet extends HttpServlet {
 
             if (errors.length() > 0) {
                 req.setAttribute("errorMsg", errors.toString());
-                req.getRequestDispatcher("registerStore.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerStore.jsp").forward(req, resp);
                 return;
             }
 
@@ -98,7 +98,7 @@ public class RegisterStoreServlet extends HttpServlet {
             int userId = userDAO.saveUser(user);
             if (userId <= 0) {
                 req.setAttribute("errorMsg", "Failed to create user account.");
-                req.getRequestDispatcher("registerStore.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerStore.jsp").forward(req, resp);
                 return;
             }
 
@@ -121,19 +121,19 @@ public class RegisterStoreServlet extends HttpServlet {
                     ps.executeUpdate();
                 } catch (Exception ignored) {}
                 req.setAttribute("errorMsg", "Failed to create store record. Please try again.");
-                req.getRequestDispatcher("registerStore.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerStore.jsp").forward(req, resp);
                 return;
             }
 
             // --- Success ---
             HttpSession session = req.getSession();
             session.setAttribute("successMsg", "Store registration successful. Please log in.");
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect("pages/authentication/login.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("errorMsg", "Server error: " + e.getMessage());
-            req.getRequestDispatcher("registerStore.jsp").forward(req, resp);
+            req.getRequestDispatcher("pages/authentication/register/registerStore.jsp").forward(req, resp);
         }
     }
 }

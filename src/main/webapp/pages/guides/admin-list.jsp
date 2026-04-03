@@ -7,7 +7,7 @@
 
                         <% User user=(User) session.getAttribute("currentUser"); if (user==null ||
                             !"admin".equals(user.getRole())) { response.sendRedirect(request.getContextPath()
-                            + "/login.jsp" ); return; } GuideDAO guideDAO=new GuideDAO(); String
+                            + "/pages/authentication/login.jsp" ); return; } GuideDAO guideDAO=new GuideDAO(); String
                             filter=request.getParameter("filter"); List<Guide> guides;
 
                             if ("mine".equals(filter)) {

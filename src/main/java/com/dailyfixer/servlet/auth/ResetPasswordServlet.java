@@ -20,7 +20,7 @@ public class ResetPasswordServlet extends HttpServlet {
         User currentUser = (User) session.getAttribute("currentUser");
 
         if (currentUser == null) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 
@@ -32,13 +32,13 @@ public class ResetPasswordServlet extends HttpServlet {
         if (currentPassword == null || newPassword == null || confirmPassword == null ||
                 currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
             req.setAttribute("errorMsg", "All fields are required.");
-            req.getRequestDispatcher("/resetPassword.jsp").forward(req, resp);
+            req.getRequestDispatcher("/pages/authentication/resetPassword.jsp").forward(req, resp);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
             req.setAttribute("errorMsg", "New passwords do not match.");
-            req.getRequestDispatcher("/resetPassword.jsp").forward(req, resp);
+            req.getRequestDispatcher("/pages/authentication/resetPassword.jsp").forward(req, resp);
             return;
         }
 
@@ -50,7 +50,7 @@ public class ResetPasswordServlet extends HttpServlet {
             User dbUser = userDAO.getUserById(currentUser.getUserId());
             if (dbUser == null || !dbUser.getPassword().equals(hashedCurrent)) {
                 req.setAttribute("errorMsg", "Current password is incorrect.");
-                req.getRequestDispatcher("/resetPassword.jsp").forward(req, resp);
+                req.getRequestDispatcher("/pages/authentication/resetPassword.jsp").forward(req, resp);
                 return;
             }
 
@@ -67,12 +67,12 @@ public class ResetPasswordServlet extends HttpServlet {
                 req.setAttribute("errorMsg", "Failed to update password. Try again later.");
             }
 
-            req.getRequestDispatcher("/resetPassword.jsp").forward(req, resp);
+            req.getRequestDispatcher("/pages/authentication/resetPassword.jsp").forward(req, resp);
 
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("errorMsg", "Server error: " + e.getMessage());
-            req.getRequestDispatcher("/resetPassword.jsp").forward(req, resp);
+            req.getRequestDispatcher("/pages/authentication/resetPassword.jsp").forward(req, resp);
         }
     }
 }

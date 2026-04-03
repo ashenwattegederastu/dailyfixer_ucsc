@@ -49,39 +49,39 @@ public class RegisterDriverServlet extends HttpServlet {
             if (fullName.isEmpty() || username == null || username.trim().isEmpty()
                     || email == null || email.trim().isEmpty()
                     || password == null || password.trim().isEmpty()) {
-                response.sendRedirect("registerDriver.jsp?error=Please+fill+in+all+required+fields");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Please+fill+in+all+required+fields");
                 return;
             }
 
             if (!password.equals(confirmPw)) {
-                response.sendRedirect("registerDriver.jsp?error=Passwords+do+not+match");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Passwords+do+not+match");
                 return;
             }
 
             if (password.length() < 6) {
-                response.sendRedirect("registerDriver.jsp?error=Password+must+be+at+least+6+characters");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Password+must+be+at+least+6+characters");
                 return;
             }
 
             // NIC validation: 9 digits + V/X or 12 digits
             if (nicNumber == null || nicNumber.trim().isEmpty()
                     || !nicNumber.trim().matches("^\\d{9}[VvXx]$|^\\d{12}$")) {
-                response.sendRedirect("registerDriver.jsp?error=Invalid+NIC+number+format");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Invalid+NIC+number+format");
                 return;
             }
 
             if (!"on".equals(policyParam) && !"true".equals(policyParam)) {
-                response.sendRedirect("registerDriver.jsp?error=You+must+accept+the+driver+policies");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=You+must+accept+the+driver+policies");
                 return;
             }
 
             // Duplicate checks
             if (requestDAO.usernameExists(username.trim())) {
-                response.sendRedirect("registerDriver.jsp?error=Username+already+exists+or+is+pending+review");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Username+already+exists+or+is+pending+review");
                 return;
             }
             if (requestDAO.emailExists(email.trim())) {
-                response.sendRedirect("registerDriver.jsp?error=Email+already+exists+or+is+pending+review");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Email+already+exists+or+is+pending+review");
                 return;
             }
 
@@ -97,7 +97,7 @@ public class RegisterDriverServlet extends HttpServlet {
                     || nicBackPart == null || nicBackPart.getSize() == 0
                     || profilePicPart == null || profilePicPart.getSize() == 0
                     || licenseFrontPart == null || licenseFrontPart.getSize() == 0) {
-                response.sendRedirect("registerDriver.jsp?error=Please+upload+all+required+documents");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Please+upload+all+required+documents");
                 return;
             }
 
@@ -105,13 +105,13 @@ public class RegisterDriverServlet extends HttpServlet {
             Part[] requiredParts = {nicFrontPart, nicBackPart, profilePicPart, licenseFrontPart};
             for (Part p : requiredParts) {
                 if (p.getContentType() == null || !p.getContentType().startsWith("image/")) {
-                    response.sendRedirect("registerDriver.jsp?error=Only+image+files+are+accepted+for+uploads");
+                    response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Only+image+files+are+accepted+for+uploads");
                     return;
                 }
             }
             if (licenseBackPart != null && licenseBackPart.getSize() > 0
                     && (licenseBackPart.getContentType() == null || !licenseBackPart.getContentType().startsWith("image/"))) {
-                response.sendRedirect("registerDriver.jsp?error=Only+image+files+are+accepted+for+uploads");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Only+image+files+are+accepted+for+uploads");
                 return;
             }
 
@@ -147,14 +147,14 @@ public class RegisterDriverServlet extends HttpServlet {
             int requestId = requestDAO.submitRequest(driverRequest);
 
             if (requestId > 0) {
-                response.sendRedirect("login.jsp?msg=Driver+registration+submitted+successfully.+Your+application+is+pending+admin+verification.");
+                response.sendRedirect("pages/authentication/login.jsp?msg=Driver+registration+submitted+successfully.+Your+application+is+pending+admin+verification.");
             } else {
-                response.sendRedirect("registerDriver.jsp?error=Registration+failed.+Please+try+again.");
+                response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=Registration+failed.+Please+try+again.");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("registerDriver.jsp?error=An+unexpected+error+occurred.+Please+try+again.");
+            response.sendRedirect("pages/authentication/register/registerDriver.jsp?error=An+unexpected+error+occurred.+Please+try+again.");
         }
     }
 }

@@ -540,7 +540,7 @@
                                         document.getElementById('ratingThanks').style.display = 'block';
                                     } else if (data.error && data.error.includes('Login')) {
                                         alert('Please log in to rate this guide');
-                                        window.location.href = contextPath + '/login.jsp';
+                                        window.location.href = contextPath + '/pages/authentication/login.jsp';
                                     } else {
                                         alert('Failed to submit rating: ' + (data.error || 'Unknown error'));
                                     }

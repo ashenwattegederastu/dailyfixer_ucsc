@@ -5,7 +5,7 @@
 <%
   User user = (User) session.getAttribute("currentUser");
   if (user == null || user.getRole() == null || !"driver".equalsIgnoreCase(user.getRole().trim())) {
-    response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp");
+    response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
     return;
   }
   Double savedLat = user.getLatitude();
@@ -244,10 +244,10 @@
             </table>
 
             <div class="profile-buttons">
-                <form action="${pageContext.request.contextPath}/resetPassword.jsp" method="get">
+                <form action="${pageContext.request.contextPath}/pages/authentication/resetPassword.jsp" method="get">
                     <button type="submit" class="btn reset">Reset Password</button>
                 </form>
-                <form action="${pageContext.request.contextPath}/editProfile.jsp" method="get">
+                <form action="${pageContext.request.contextPath}/pages/authentication/editProfile.jsp" method="get">
                     <button type="submit" class="btn edit">Edit Account Info</button>
                 </form>
             </div>

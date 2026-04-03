@@ -3,7 +3,7 @@
 
         <% User currentUser=(User) session.getAttribute("currentUser"); if (currentUser==null ||
             !"volunteer".equalsIgnoreCase(currentUser.getRole())) { response.sendRedirect(request.getContextPath()
-            + "/pages/shared/login.jsp" ); return; } %>
+            + "/pages/authentication/login.jsp" ); return; } %>
 
             <!DOCTYPE html>
             <html lang="en">

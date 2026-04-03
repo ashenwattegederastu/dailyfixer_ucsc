@@ -64,14 +64,14 @@ public class UserOrdersServlet extends HttpServlet {
 
         // Check if user is logged in
         if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 
         // Check if the user has the correct role
         String role = currentUser.getRole();
         if (role == null || !"user".equalsIgnoreCase(role.trim())) {
-            response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 

@@ -7,7 +7,7 @@
 <%
     User user = (User) session.getAttribute("currentUser");
     if (user == null || !"admin".equalsIgnoreCase(user.getRole())) {
-        response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
     List<DriverIncident> incidentsSummary = (List<DriverIncident>) request.getAttribute("incidentsSummary");

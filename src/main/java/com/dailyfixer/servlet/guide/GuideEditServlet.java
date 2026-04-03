@@ -35,13 +35,13 @@ public class GuideEditServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 
@@ -86,13 +86,13 @@ public class GuideEditServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 

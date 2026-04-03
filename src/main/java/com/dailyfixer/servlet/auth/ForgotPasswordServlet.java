@@ -40,7 +40,7 @@ public class ForgotPasswordServlet extends HttpServlet {
                 if ((scheme.equals("http") && serverPort != 80) || (scheme.equals("https") && serverPort != 443)) {
                     resetLink += ":" + serverPort;
                 }
-                resetLink += contextPath + "/reset_password.jsp?token=" + token;
+                resetLink += contextPath + "/pages/authentication/forgot_password/reset_password.jsp?token=" + token;
                 
                 String htmlContent = "<h3>DailyFixer Password Reset</h3>" +
                         "<p>Click the link below to reset your password:</p>" +
@@ -50,7 +50,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             }
 
             request.setAttribute("message", "If an account exists for " + email + ", an email has been sent.");
-            request.getRequestDispatcher("forgot_password.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/authentication/forgot_password/forgot_password.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();

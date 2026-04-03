@@ -7,7 +7,7 @@
                     <% User currentUser=(User) session.getAttribute("currentUser"); if (currentUser==null ||
                         (!"volunteer".equalsIgnoreCase(currentUser.getRole()) &&
                         !"technician".equalsIgnoreCase(currentUser.getRole()))) {
-                        response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp" ); return; } int
+                        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp" ); return; } int
                         userId=currentUser.getUserId(); GuideCommentDAO dao=new GuideCommentDAO(); List<GuideComment>
                         myComments = dao.getCommentsByGuideOwner(userId);
                         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm");

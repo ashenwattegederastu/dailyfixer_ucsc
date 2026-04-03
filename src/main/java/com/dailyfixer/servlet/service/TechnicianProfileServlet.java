@@ -17,7 +17,7 @@ public class TechnicianProfileServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("currentUser") == null) {
-            response.sendRedirect(request.getContextPath() + "/pages/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 

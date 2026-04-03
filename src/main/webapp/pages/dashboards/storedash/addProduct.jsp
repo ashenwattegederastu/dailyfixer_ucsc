@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
     <%@ page import="com.dailyfixer.model.User" %>
         <% User user=(User) session.getAttribute("currentUser"); if (user==null || !"store".equals(user.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp" ); return; } %>
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp" ); return; } %>
             <!DOCTYPE html>
             <html lang="en">
 

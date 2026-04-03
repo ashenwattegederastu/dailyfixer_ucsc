@@ -42,7 +42,7 @@
                                     Diagnosing</a>
                             </c:when>
                             <c:otherwise>
-                                <a href="${pageContext.request.contextPath}/preliminarySignup.jsp" class="hero-cta">Get
+                                <a href="${pageContext.request.contextPath}/pages/authentication/register/preliminarySignup.jsp" class="hero-cta">Get
                                     Started</a>
                             </c:otherwise>
                         </c:choose>

@@ -27,7 +27,7 @@ public class AdminRefundsServlet extends HttpServlet {
 
         User user = (User) req.getSession().getAttribute("currentUser");
         if (!isAdmin(user)) {
-            resp.sendRedirect(req.getContextPath() + "/pages/shared/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 

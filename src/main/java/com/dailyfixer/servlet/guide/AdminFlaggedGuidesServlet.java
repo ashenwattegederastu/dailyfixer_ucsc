@@ -31,13 +31,13 @@ public class AdminFlaggedGuidesServlet extends HttpServlet {
         // Admin auth check
         HttpSession session = request.getSession(false);
         if (session == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 
         User currentUser = (User) session.getAttribute("currentUser");
         if (currentUser == null || !"admin".equals(currentUser.getRole())) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 

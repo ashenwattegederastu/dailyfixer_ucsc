@@ -6,7 +6,7 @@
    if (user == null || (!"admin".equals(user.getRole()) &&
        !"volunteer".equals(user.getRole()) &&
        !"technician".equals(user.getRole()))) {
-       response.sendRedirect(request.getContextPath() + "/login.jsp");
+       response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
        return;
    }
 %>

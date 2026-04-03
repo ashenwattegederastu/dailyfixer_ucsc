@@ -6,7 +6,7 @@
 
             <% User user=(User) session.getAttribute("currentUser"); if (user==null ||
                 !"volunteer".equalsIgnoreCase(user.getRole())) { response.sendRedirect(request.getContextPath()
-                + "/login.jsp" ); return; } VolunteerStatsDAO statsDAO=new VolunteerStatsDAO(); VolunteerStats
+                + "/pages/authentication/login.jsp" ); return; } VolunteerStatsDAO statsDAO=new VolunteerStatsDAO(); VolunteerStats
                 stats=statsDAO.getStats(user.getUserId()); double currentScore=stats.getReputationScore(); boolean
                 hasAccess=ReputationUtils.isDiagnosticContributor(currentScore); double requiredScore=150.0; double
                 progressPercent=Math.min(100, (currentScore / requiredScore) * 100); %>

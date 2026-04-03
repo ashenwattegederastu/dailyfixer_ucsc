@@ -26,7 +26,7 @@ public class AddServiceServlet extends HttpServlet {
             User currentUser = (User) session.getAttribute("currentUser");
 
             if (currentUser == null || !"technician".equalsIgnoreCase(currentUser.getRole())) {
-                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
                 return;
             }
 
@@ -51,7 +51,7 @@ public class AddServiceServlet extends HttpServlet {
             User currentUser = (User) session.getAttribute("currentUser");
 
             if (currentUser == null || !"technician".equalsIgnoreCase(currentUser.getRole())) {
-                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
                 return;
             }
 

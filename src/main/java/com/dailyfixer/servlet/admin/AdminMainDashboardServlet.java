@@ -29,7 +29,7 @@ public class AdminMainDashboardServlet extends HttpServlet {
         User user = session != null ? (User) session.getAttribute("currentUser") : null;
         if (user == null || user.getRole() == null
                 || !"admin".equalsIgnoreCase(user.getRole().trim())) {
-            resp.sendRedirect(req.getContextPath() + "/pages/shared/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 

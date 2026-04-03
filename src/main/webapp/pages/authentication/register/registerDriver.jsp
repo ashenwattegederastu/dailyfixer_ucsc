@@ -189,7 +189,7 @@
 
             <div id="error" class="error-text" style="margin-bottom: 15px; text-align: center;"></div>
 
-            <form action="RegisterDriverServlet" method="post" enctype="multipart/form-data" id="registerForm">
+            <form action="${pageContext.request.contextPath}/RegisterDriverServlet" method="post" enctype="multipart/form-data" id="registerForm">
 
                 <!-- Personal Information -->
                 <div class="section-title">Personal Information</div>
@@ -318,7 +318,7 @@
                     Submit Driver Application
                 </button>
             </form>
-            <p class="login-link">Already have an account? <a href="login.jsp">Login here</a></p>
+            <p class="login-link">Already have an account? <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp">Login here</a></p>
         </div>
     </div>
 

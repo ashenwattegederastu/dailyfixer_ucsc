@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="com.dailyfixer.model.Vehicle" %>
 <%@ page import="com.dailyfixer.dao.VehicleDAO" %>
 <%@ page import="com.dailyfixer.model.User" %>
@@ -6,7 +6,7 @@
 <%
     User user = (User) session.getAttribute("currentUser");
     if (user == null || !"driver".equals(user.getRole())) {
-        response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
 

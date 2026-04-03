@@ -88,7 +88,7 @@
                 <p style="margin-bottom: 0;">Advanced call logging, in-app calling, GPS tracking, and automated logistics rerouting are currently out of scope for this release.</p>
             </div>
 
-            <a href="${pageContext.request.contextPath}/registerDriver.jsp" class="back-link">← Back to Registration</a>
+            <a href="${pageContext.request.contextPath}/pages/authentication/register/registerDriver.jsp" class="back-link">← Back to Registration</a>
         </div>
     </div>
 </body>

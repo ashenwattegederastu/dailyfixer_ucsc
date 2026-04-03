@@ -12,19 +12,19 @@
 <%
     User user = (User) session.getAttribute("currentUser");
     if (user == null || user.getRole() == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
     String role = user.getRole().trim().toLowerCase();
     if (!("admin".equals(role) || "store".equals(role))) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
 
     StoreDAO storeDAO = new StoreDAO();
     Store store = storeDAO.getStoreByUserId(user.getUserId());
     if (store == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
 

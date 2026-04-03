@@ -48,7 +48,7 @@ public class SendResetEmailServlet extends HttpServlet {
                         request.getServerName() + ":" +
                         request.getServerPort() +
                         request.getContextPath() +
-                        "/reset_password.jsp?token=" + token;
+                        "/pages/authentication/forgot_password/reset_password.jsp?token=" + token;
 
                 // Email content (HTML)
                 String htmlMessage = "<html><body>"
@@ -68,12 +68,12 @@ public class SendResetEmailServlet extends HttpServlet {
 
             // Security: always show the same message
             request.setAttribute("message", "If the email exists, a password reset link has been sent.");
-            request.getRequestDispatcher("forgot_password.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/authentication/forgot_password/forgot_password.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("message", "Server error: " + e.getMessage());
-            request.getRequestDispatcher("forgot_password.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/authentication/forgot_password/forgot_password.jsp").forward(request, response);
         }
     }
 }

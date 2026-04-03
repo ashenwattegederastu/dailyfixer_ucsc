@@ -3,7 +3,7 @@
         <%@ page import="com.dailyfixer.model.User" %>
 
             <% User user=(User) session.getAttribute("currentUser"); if (user==null) {
-                response.sendRedirect(request.getContextPath() + "/login.jsp" ); return; } %>
+                response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp" ); return; } %>
 
                 <!DOCTYPE html>
                 <html lang="en">

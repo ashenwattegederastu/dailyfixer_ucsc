@@ -118,7 +118,7 @@
                     </ul>
                 </div>
 
-                <a href="${pageContext.request.contextPath}/login.jsp" class="btn-primary"
+                <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp" class="btn-primary"
                     style="width:100%;text-align:center;">Go to Login</a>
             </div>
         </div>

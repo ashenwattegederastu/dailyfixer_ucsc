@@ -4,7 +4,7 @@
 
             <% User user=(User) session.getAttribute("currentUser"); if (user==null || user.getRole()==null ||
                 !"admin".equalsIgnoreCase(user.getRole().trim())) { response.sendRedirect(request.getContextPath()
-                + "/pages/shared/login.jsp" ); return; } %>
+                + "/pages/authentication/login.jsp" ); return; } %>
 
                 <!DOCTYPE html>
                 <html lang="en">

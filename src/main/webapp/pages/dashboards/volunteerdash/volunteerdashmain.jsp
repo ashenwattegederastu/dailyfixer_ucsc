@@ -6,7 +6,7 @@
             <%@ page trimDirectiveWhitespaces="true" %>
 
                 <% User user=(User) session.getAttribute("currentUser"); if (user==null ||
-                    !"volunteer".equals(user.getRole())) { response.sendRedirect(request.getContextPath() + "/login.jsp"
+                    !"volunteer".equals(user.getRole())) { response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp"
                     ); return; } VolunteerStatsDAO statsDAO=new VolunteerStatsDAO(); VolunteerStats
                     stats=statsDAO.getStats(user.getUserId()); List<Guide> topGuides =
                     statsDAO.getTopRatedGuides(user.getUserId(), 3);

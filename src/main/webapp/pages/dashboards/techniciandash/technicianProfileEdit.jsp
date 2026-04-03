@@ -4,7 +4,7 @@
 
             <% User user=(User) session.getAttribute("currentUser"); if (user==null || user.getRole()==null ||
                 !"technician".equalsIgnoreCase(user.getRole())) { response.sendRedirect(request.getContextPath()
-                + "/login.jsp" ); return; } String profilePath=request.getContextPath() + "/technician/profile" ; %>
+                + "/pages/authentication/login.jsp" ); return; } String profilePath=request.getContextPath() + "/technician/profile" ; %>
 
                 <!DOCTYPE html>
                 <html lang="en">

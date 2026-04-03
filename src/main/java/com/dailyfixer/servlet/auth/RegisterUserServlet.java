@@ -40,7 +40,7 @@ public class RegisterUserServlet extends HttpServlet {
 
             if (errors.length() > 0) {
                 req.setAttribute("errorMsg", errors.toString());
-                req.getRequestDispatcher("registerUser.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/register/registerUser.jsp").forward(req, resp);
                 return;
             }
 
@@ -57,12 +57,12 @@ public class RegisterUserServlet extends HttpServlet {
 
             HttpSession session = req.getSession();
             session.setAttribute("successMsg", "Registration successful. Please log in.");
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect("pages/authentication/login.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("errorMsg", "Server error: " + e.getMessage());
-            req.getRequestDispatcher("registerUser.jsp").forward(req, resp);
+            req.getRequestDispatcher("pages/authentication/register/registerUser.jsp").forward(req, resp);
         }
     }
 }

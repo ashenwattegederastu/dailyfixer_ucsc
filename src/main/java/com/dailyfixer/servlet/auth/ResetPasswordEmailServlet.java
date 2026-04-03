@@ -22,19 +22,19 @@ public class ResetPasswordEmailServlet extends HttpServlet {
         // Validate inputs
         if (token == null || token.isEmpty()) {
             request.setAttribute("error", "Invalid reset link. Please request a new password reset.");
-            request.getRequestDispatcher("reset_password.jsp").forward(request, response);
+            request.getRequestDispatcher("pages/authentication/forgot_password/reset_password.jsp").forward(request, response);
             return;
         }
 
         if (newPassword == null || newPassword.isEmpty() || confirmPassword == null || confirmPassword.isEmpty()) {
             request.setAttribute("error", "All fields are required.");
-            request.getRequestDispatcher("reset_password.jsp?token=" + token).forward(request, response);
+            request.getRequestDispatcher("pages/authentication/forgot_password/reset_password.jsp?token=" + token).forward(request, response);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
             request.setAttribute("error", "Passwords do not match.");
-            request.getRequestDispatcher("reset_password.jsp?token=" + token).forward(request, response);
+            request.getRequestDispatcher("pages/authentication/forgot_password/reset_password.jsp?token=" + token).forward(request, response);
             return;
         }
 
@@ -44,19 +44,19 @@ public class ResetPasswordEmailServlet extends HttpServlet {
 
             if (prt == null) {
                 request.setAttribute("error", "Invalid reset link. Please request a new password reset.");
-                request.getRequestDispatcher("reset_password.jsp?token=" + token).forward(request, response);
+                request.getRequestDispatcher("pages/authentication/forgot_password/reset_password.jsp?token=" + token).forward(request, response);
                 return;
             }
 
             if (prt.isUsed()) {
                 request.setAttribute("error", "This reset link has already been used. Please request a new password reset.");
-                request.getRequestDispatcher("reset_password.jsp?token=" + token).forward(request, response);
+                request.getRequestDispatcher("pages/authentication/forgot_password/reset_password.jsp?token=" + token).forward(request, response);
                 return;
             }
 
             if (prt.getExpiry().before(new Timestamp(System.currentTimeMillis()))) {
                 request.setAttribute("error", "This reset link has expired. Please request a new password reset.");
-                request.getRequestDispatcher("reset_password.jsp?token=" + token).forward(request, response);
+                request.getRequestDispatcher("pages/authentication/forgot_password/reset_password.jsp?token=" + token).forward(request, response);
                 return;
             }
 
@@ -65,12 +65,12 @@ public class ResetPasswordEmailServlet extends HttpServlet {
             userDAO.resetPasswordByUserId(prt.getUserId(), newPassword);
             prDAO.markTokenAsUsed(token);
 
-            response.sendRedirect(request.getContextPath() + "/login.jsp?msg=PasswordUpdated");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp?msg=PasswordUpdated");
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "An error occurred while resetting your password. Please try again.");
-            request.getRequestDispatcher("reset_password.jsp?token=" + (token != null ? token : "")).forward(request, response);
+            request.getRequestDispatcher("pages/authentication/forgot_password/reset_password.jsp?token=" + (token != null ? token : "")).forward(request, response);
         }
     }
 }

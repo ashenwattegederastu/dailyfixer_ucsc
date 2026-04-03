@@ -20,12 +20,12 @@ public class AdminDriverReviewServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
-            resp.sendRedirect(req.getContextPath() + "/pages/shared/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
         User user = (User) session.getAttribute("currentUser");
         if (user == null || !"admin".equalsIgnoreCase(user.getRole())) {
-            resp.sendRedirect(req.getContextPath() + "/pages/shared/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 
@@ -64,12 +64,12 @@ public class AdminDriverReviewServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
         if (session == null) {
-            resp.sendRedirect(req.getContextPath() + "/pages/shared/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
         User user = (User) session.getAttribute("currentUser");
         if (user == null || !"admin".equalsIgnoreCase(user.getRole())) {
-            resp.sendRedirect(req.getContextPath() + "/pages/shared/login.jsp");
+            resp.sendRedirect(req.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 

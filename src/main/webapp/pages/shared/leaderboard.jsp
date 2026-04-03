@@ -92,7 +92,7 @@
                         <a href="${pageContext.request.contextPath}/pages/dashboards/volunteerdash/volunteerdashmain.jsp" class="btn-primary">Return to Dashboard</a>
                     </c:if>
                     <c:if test="${sessionScope.currentUser == null}">
-                        <a href="${pageContext.request.contextPath}/login.jsp"
+                        <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp"
                             class="btn-primary">Login</a>
                     </c:if>
                 </div>

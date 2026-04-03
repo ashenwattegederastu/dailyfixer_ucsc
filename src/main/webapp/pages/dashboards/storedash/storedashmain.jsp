@@ -23,14 +23,14 @@
 
     // If user is not logged in, redirect to login
     if (user == null || user.getRole() == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
 
     // Check if role is admin or store; otherwise redirect
     String role = user.getRole().trim().toLowerCase();
     if (!("admin".equals(role) || "store".equals(role))) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
 

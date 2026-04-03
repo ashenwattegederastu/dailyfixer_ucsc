@@ -134,7 +134,7 @@ public class ProductDetailsServlet extends HttpServlet {
             if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
                 currentPageUrl += "?" + request.getQueryString();
             }
-            String loginUrl = request.getContextPath() + "/login.jsp?redirect=" +
+            String loginUrl = request.getContextPath() + "/pages/authentication/login.jsp?redirect=" +
                     URLEncoder.encode(currentPageUrl, StandardCharsets.UTF_8);
 
             StoreDAO storeDAO = new StoreDAO();

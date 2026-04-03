@@ -6,7 +6,7 @@
 
                     <% User user=(User) session.getAttribute("currentUser"); if (user==null || user.getRole()==null ||
                         !"technician".equalsIgnoreCase(user.getRole())) { response.sendRedirect(request.getContextPath()
-                        + "/login.jsp" ); return; } ServiceDAO dao=new ServiceDAO(); List<Service> services =
+                        + "/pages/authentication/login.jsp" ); return; } ServiceDAO dao=new ServiceDAO(); List<Service> services =
                         dao.getServicesByTechnician(user.getUserId());
                         %>
 

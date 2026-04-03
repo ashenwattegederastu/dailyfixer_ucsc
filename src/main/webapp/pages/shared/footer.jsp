@@ -10,7 +10,7 @@
         <li><a href="${pageContext.request.contextPath}/index.jsp">Home</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#services">Services</a></li>
-        <li><a href="${pageContext.request.contextPath}/pages/shared/login.jsp">Log in</a></li>
+        <li><a href="${pageContext.request.contextPath}/pages/authentication/login.jsp">Log in</a></li>
       </ul>
     </div>
     <div class="footer-contact">

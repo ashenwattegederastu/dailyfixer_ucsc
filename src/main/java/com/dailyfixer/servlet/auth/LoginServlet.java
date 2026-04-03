@@ -65,7 +65,7 @@ public class LoginServlet extends HttpServlet {
                     if ("PENDING".equalsIgnoreCase(status)) {
                         req.setAttribute("loginError",
                                 "Your driver registration is under review. Please wait for admin verification before logging in.");
-                        req.getRequestDispatcher("login.jsp").forward(req, resp);
+                        req.getRequestDispatcher("pages/authentication/login.jsp").forward(req, resp);
                         return;
                     } else if ("REJECTED".equalsIgnoreCase(status)) {
                         String reason = driverReq.getRejectionReason();
@@ -74,18 +74,18 @@ public class LoginServlet extends HttpServlet {
                             msg += " Reason: " + reason;
                         }
                         req.setAttribute("loginError", msg);
-                        req.getRequestDispatcher("login.jsp").forward(req, resp);
+                        req.getRequestDispatcher("pages/authentication/login.jsp").forward(req, resp);
                         return;
                     }
                 }
 
                 req.setAttribute("loginError", "Invalid username or password");
-                req.getRequestDispatcher("login.jsp").forward(req, resp);
+                req.getRequestDispatcher("pages/authentication/login.jsp").forward(req, resp);
             }
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("loginError", "Server error: " + e.getMessage());
-            req.getRequestDispatcher("login.jsp").forward(req, resp);
+            req.getRequestDispatcher("pages/authentication/login.jsp").forward(req, resp);
         }
     }
 }

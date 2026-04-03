@@ -113,7 +113,7 @@
 
                     <div id="errorMsg" class="server-error" style="display: none;"></div>
 
-                    <form method="post" action="registerTechnician" id="registerForm">
+                    <form method="post" action="${pageContext.request.contextPath}/registerTechnician" id="registerForm">
                         <div class="section-title">Personal Details</div>
 
                         <div class="form-cols">
@@ -176,7 +176,7 @@
                         <button type="submit" class="btn-primary" style="width: 100%; margin-top: 24px;">Register
                             Technician</button>
                     </form>
-                    <p class="login-link">Already have an account? <a href="login.jsp">Login here</a></p>
+                    <p class="login-link">Already have an account? <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp">Login here</a></p>
                 </div>
             </div>
 

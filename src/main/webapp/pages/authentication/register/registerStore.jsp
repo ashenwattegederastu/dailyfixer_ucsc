@@ -128,7 +128,7 @@
                             <div class="error">${errorMsg}</div>
                         </c:if>
 
-                        <form id="registerForm" method="post" action="registerStore"
+                        <form id="registerForm" method="post" action="${pageContext.request.contextPath}/registerStore"
                             onsubmit="return submitForm(event);">
                             <!-- Hidden fields for coordinates -->
                             <input type="hidden" name="latitude" id="latitude">
@@ -252,8 +252,8 @@
 
                         <hr style="margin-top:20px;">
 
-                        <p>Already have an account? <a href="login.jsp">Log in</a></p>
-                        <p>Or go back <a href="index.jsp">Home</a></p>
+                        <p>Already have an account? <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp">Log in</a></p>
+                        <p>Or go back <a href="${pageContext.request.contextPath}/index.jsp">Home</a></p>
 
                         <p style="font-size:12px;color:#888;margin-top:12px;">By registering you agree to our terms and
                             that information you provide is accurate.</p>

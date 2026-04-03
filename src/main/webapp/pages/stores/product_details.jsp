@@ -80,7 +80,7 @@
     if (baseDiscountJson == null || baseDiscountJson.isEmpty()) baseDiscountJson = "null";
 
     if (loginUrl == null) {
-        loginUrl = request.getContextPath() + "/login.jsp";
+        loginUrl = request.getContextPath() + "/pages/authentication/login.jsp";
     }
 
     if (product == null) {

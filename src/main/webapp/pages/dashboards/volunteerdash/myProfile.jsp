@@ -4,7 +4,7 @@
 
             <% User user=(User) session.getAttribute("currentUser"); if (user==null || user.getRole()==null ||
                 !"volunteer".equalsIgnoreCase(user.getRole().trim())) { response.sendRedirect(request.getContextPath()
-                + "/pages/shared/login.jsp" ); return; } %>
+                + "/pages/authentication/login.jsp" ); return; } %>
 
                 <!DOCTYPE html>
                 <html lang="en">
@@ -204,11 +204,11 @@
 
                             <div class="profile-actions">
                                 <!-- Note: Linking to existing pages, maintaining original functionality -->
-                                <form action="${pageContext.request.contextPath}/resetPassword.jsp" method="get"
+                                <form action="${pageContext.request.contextPath}/pages/authentication/resetPassword.jsp" method="get"
                                     style="display: inline;">
                                     <button type="submit" class="btn-secondary">Reset Password</button>
                                 </form>
-                                <form action="${pageContext.request.contextPath}/editProfile.jsp" method="get"
+                                <form action="${pageContext.request.contextPath}/pages/authentication/editProfile.jsp" method="get"
                                     style="display: inline;">
                                     <button type="submit" class="btn-primary">Edit Account Info</button>
                                 </form>

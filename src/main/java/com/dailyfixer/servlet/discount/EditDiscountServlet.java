@@ -27,13 +27,13 @@ public class EditDiscountServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null) {
-            response.sendRedirect("../../login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 
         User user = (User) session.getAttribute("currentUser");
         if (user == null || !"store".equals(user.getRole())) {
-            response.sendRedirect("../../login.jsp");
+            response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
             return;
         }
 

@@ -179,7 +179,7 @@
                 </div>
 
                 <div class="bottom-actions">
-                    <a href="${pageContext.request.contextPath}/login.jsp" class="action-link">
+                    <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp" class="action-link">
                         Already have an account? <strong>Log In</strong>
                     </a>
                     <a href="${pageContext.request.contextPath}/index.jsp" class="action-link">

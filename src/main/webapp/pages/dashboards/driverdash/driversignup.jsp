@@ -215,7 +215,7 @@ body {
       </div>
       <button type="submit" class="login-btn">Sign Up</button>
     </form>
-    <a href="../../pages/shared/login.jsp" class="back-link">← Back to Login</a>
+    <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp" class="back-link">← Back to Login</a>
     <c:if test="${not empty error}">
       <div class="error">${error}</div>
     </c:if>

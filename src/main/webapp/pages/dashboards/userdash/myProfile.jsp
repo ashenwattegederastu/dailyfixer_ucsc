@@ -5,7 +5,7 @@
 <% 
     User user=(User) session.getAttribute("currentUser"); 
     if (user==null || user.getRole()==null || !"user".equalsIgnoreCase(user.getRole().trim())) { 
-        response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp" ); 
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp" ); 
         return; 
     } 
 %>
@@ -171,10 +171,10 @@
                 </div>
 
                 <div class="profile-actions">
-                    <form action="${pageContext.request.contextPath}/resetPassword.jsp" method="get" style="display: inline;">
+                    <form action="${pageContext.request.contextPath}/pages/authentication/resetPassword.jsp" method="get" style="display: inline;">
                         <button type="submit" class="btn-danger">Reset Password</button>
                     </form>
-                    <form action="${pageContext.request.contextPath}/editProfile.jsp" method="get" style="display: inline;">
+                    <form action="${pageContext.request.contextPath}/pages/authentication/editProfile.jsp" method="get" style="display: inline;">
                         <button type="submit" class="btn-primary">Edit Profile</button>
                     </form>
                 </div>

@@ -7,13 +7,13 @@
     User user = (User) session.getAttribute("currentUser");
 
     if (user == null || user.getRole() == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
 
     String role = user.getRole().trim().toLowerCase();
     if (!("admin".equals(role) || "store".equals(role))) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/pages/authentication/login.jsp");
         return;
     }
 %>
@@ -104,10 +104,10 @@
         </div>
 
         <div class="profile-buttons">
-            <form action="${pageContext.request.contextPath}/resetPassword.jsp" method="get">
+            <form action="${pageContext.request.contextPath}/pages/authentication/resetPassword.jsp" method="get">
                 <button type="submit" class="btn reset-btn">Reset Password</button>
             </form>
-            <form action="${pageContext.request.contextPath}/editProfile.jsp" method="get">
+            <form action="${pageContext.request.contextPath}/pages/authentication/editProfile.jsp" method="get">
                 <button type="submit" class="btn edit-btn">Edit Account Info</button>
             </form>
         </div>

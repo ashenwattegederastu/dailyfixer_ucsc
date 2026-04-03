@@ -59,7 +59,7 @@
                         </c:when>
                         <c:otherwise>
                             <!-- Guest -->
-                            <a href="${pageContext.request.contextPath}/login.jsp" class="btn-login">Login</a>
+                            <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp" class="btn-login">Login</a>
                         </c:otherwise>
                     </c:choose>
                 </div>

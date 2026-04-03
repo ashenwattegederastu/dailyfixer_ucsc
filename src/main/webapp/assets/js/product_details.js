@@ -338,7 +338,7 @@
 
     function redirectToLogin() {
         const currentPath = window.location.pathname + window.location.search;
-        const loginBase = (DATA.loginUrl && DATA.loginUrl.split("?")[0]) || (contextPath + "/login.jsp");
+        const loginBase = (DATA.loginUrl && DATA.loginUrl.split("?")[0]) || (contextPath + "/pages/authentication/login.jsp");
         window.location.href = loginBase + "?redirect=" + encodeURIComponent(currentPath);
     }
 

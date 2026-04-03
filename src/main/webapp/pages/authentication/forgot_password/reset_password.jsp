@@ -57,7 +57,7 @@
 
         <div class="login-footer">
             <p class="footer-text">
-                <a href="${pageContext.request.contextPath}/login.jsp" class="footer-link">Back to Login</a>
+                <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp" class="footer-link">Back to Login</a>
             </p>
             <p class="footer-text">
                 <a href="${pageContext.request.contextPath}/index.jsp" class="footer-link-secondary">← Back to Home</a>

@@ -30,7 +30,7 @@
         <div class="alert alert-error"><%= loginError %></div>
         <% } %>
 
-        <form method="post" action="login" class="login-form">
+        <form method="post" action="${pageContext.request.contextPath}/login" class="login-form">
             <div class="form-group">
                 <label for="username" class="form-label">Username</label>
                 <input
@@ -61,10 +61,10 @@
         <div class="login-footer">
             <p class="footer-text">
                 Don't have an account?
-                <a href="${pageContext.request.contextPath}/preliminarySignup.jsp" class="footer-link">Create one</a>
+                <a href="${pageContext.request.contextPath}/pages/authentication/register/preliminarySignup.jsp" class="footer-link">Create one</a>
             </p>
             <p class="footer-text">
-                <a href="${pageContext.request.contextPath}/forgot_password.jsp" class="footer-link">Forgot your password?</a>
+                <a href="${pageContext.request.contextPath}/pages/authentication/forgot_password/forgot_password.jsp" class="footer-link">Forgot your password?</a>
             </p>
             <p class="footer-text">
                 <a href="${pageContext.request.contextPath}/index.jsp" class="footer-link-secondary">← Back to Home</a>

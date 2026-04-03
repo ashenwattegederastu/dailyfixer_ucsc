@@ -8,7 +8,7 @@
                         <% User user=(User) session.getAttribute("currentUser"); if (user==null ||
                             (!"admin".equals(user.getRole()) && !"volunteer".equals(user.getRole()) &&
                             !"technician".equals(user.getRole()))) { response.sendRedirect(request.getContextPath()
-                            + "/login.jsp" ); return; } GuideDAO guideDAO=new GuideDAO(); List<Guide> guides =
+                            + "/pages/authentication/login.jsp" ); return; } GuideDAO guideDAO=new GuideDAO(); List<Guide> guides =
                             guideDAO.getGuidesByCreator(user.getUserId());
                             request.setAttribute("guides", guides);
                             %>

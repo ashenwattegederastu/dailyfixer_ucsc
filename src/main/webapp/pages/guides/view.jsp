@@ -583,7 +583,7 @@
                     </c:if>
                     <c:if test="${empty sessionScope.currentUser}">
                         <p style="margin-bottom: 20px; color: var(--muted-foreground);">
-                            <a href="${pageContext.request.contextPath}/login.jsp">Login</a> to leave a comment.
+                            <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp">Login</a> to leave a comment.
                         </p>
                     </c:if>
 
