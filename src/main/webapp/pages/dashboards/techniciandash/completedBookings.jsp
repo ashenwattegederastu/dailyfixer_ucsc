@@ -1,11 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-    <%@ taglib uri="jakarta.tags.core" prefix="c" %>
-        <%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
-            <%@ page import="com.dailyfixer.model.User" %>
-
-                <% User user=(User) session.getAttribute("currentUser"); if (user==null || user.getRole()==null ||
-                    !"technician".equalsIgnoreCase(user.getRole().trim())) {
-                    response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp" ); return; } %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<%@ page import="com.dailyfixer.model.User" %>
+<% User user=(User) session.getAttribute("currentUser"); if (user==null || user.getRole()==null || !"technician".equalsIgnoreCase(user.getRole().trim())) {
+    response.sendRedirect(request.getContextPath() + "/pages/shared/login.jsp" ); return;
+} %>
                     <!DOCTYPE html>
                     <html lang="en">
 
@@ -162,7 +161,5 @@
                                 });
                             }
                         </script>
-                        <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
                     </body>
-
                     </html>

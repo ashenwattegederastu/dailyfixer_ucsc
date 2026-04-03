@@ -111,10 +111,6 @@
                     </div>
                 </div>
             </aside>
-
-            <!-- Note: Since dar-mode.js is included in the individual pages usually, we don't strictly need it here if it's already in the main jsp. But keeping script helps isolation. -->
-            <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
-
             <script>
                 // Highlight active navigation item based on current URL
                 document.addEventListener('DOMContentLoaded', function () {

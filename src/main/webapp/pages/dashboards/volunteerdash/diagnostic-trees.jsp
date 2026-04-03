@@ -332,8 +332,6 @@
                                 </div>
                                 <% } %>
                     </main>
-
-                    <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
                     <% if (hasAccess) { %>
                         <script>
                             const contextPath = '${pageContext.request.contextPath}';

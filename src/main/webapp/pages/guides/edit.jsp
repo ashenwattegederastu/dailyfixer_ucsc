@@ -373,8 +373,6 @@
                             </div>
                         </form>
                     </div>
-
-                    <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
                     <script>
                         const subCategories = {
                             'Home Repair': ['Plumbing', 'Electrical', 'Masonry', 'Painting & Finishing', 'Carpentry', 'Roofing',

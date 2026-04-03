@@ -375,8 +375,6 @@
                             </div>
                         </form>
                     </div>
-
-                    <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
                     <script>
                         // Dynamic category data loaded from server
                         let categoriesData = [];

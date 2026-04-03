@@ -418,7 +418,5 @@ tbody tr:hover { background: var(--muted); }
         setTimeout(() => { t.style.display = 'none'; }, 3500);
     }
 </script>
-
-<script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
 </body>
 </html>

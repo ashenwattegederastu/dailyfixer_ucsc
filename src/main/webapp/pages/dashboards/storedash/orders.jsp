@@ -706,7 +706,5 @@ document.getElementById('vehicleModal').addEventListener('click', e => {
     }
 });
 </script>
-
-<script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
 </body>
 </html>

@@ -265,7 +265,6 @@
         <div class="nav-container">
             <a href="<%=request.getContextPath()%>/index.jsp" class="logo">Daily Fixer</a>
             <div class="nav-buttons">
-                <button id="theme-toggle-btn" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙 Dark</button>
                 <% if (isLoggedIn) { %>
                     <form action="<%=request.getContextPath()%>/logout" method="post" style="margin: 0; display: inline;">
                         <button type="submit" class="btn-logout">Logout</button>
@@ -668,7 +667,6 @@
             }, 250);
         }
     </script>
-    <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
 </body>
 
 </html>

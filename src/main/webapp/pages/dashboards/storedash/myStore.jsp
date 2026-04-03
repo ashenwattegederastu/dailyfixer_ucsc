@@ -226,7 +226,6 @@
     <div class="logo">Daily Fixer</div>
     <div class="panel-name">Store Panel</div>
     <div style="display:flex;align-items:center;gap:10px;">
-        <button id="theme-toggle-btn" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙 Dark</button>
         <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Log Out</a>
     </div>
 </header>
@@ -636,6 +635,5 @@
 <% if (hasCoords) { %>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8zSes6UGbYKIHNzCp3tny5RgccFruILI&callback=initStoreMap" async defer onerror="handleStoreMapLoadError()"></script>
 <% } %>
-<script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
 </body>
 </html>

@@ -59,7 +59,6 @@
     <div class="logo">Daily Fixer</div>
     <div class="panel-name">Store Panel</div>
     <div style="display: flex; align-items: center; gap: 10px;">
-        <button id="theme-toggle-btn" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙 Dark</button>
         <a href="${pageContext.request.contextPath}/logout" class="logout-btn">Log Out</a>
     </div>
 </header>
@@ -147,7 +146,5 @@
         </tbody>
     </table>
 </main>
-
-<script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
 </body>
 </html>

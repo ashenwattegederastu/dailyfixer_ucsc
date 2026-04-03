@@ -138,8 +138,6 @@
                     </div>
 
                     <div class="sidebar-actions">
-                        <button id="theme-toggle-btn" class="action-btn theme-toggle" onclick="toggleTheme()"
-                            aria-label="Toggle dark mode">🌙 Theme Setup</button>
                         <a href="${pageContext.request.contextPath}/logout" class="action-btn logout-btn">
                             <i class="ph ph-sign-out"></i>
                             Log Out
@@ -147,9 +145,6 @@
                     </div>
                 </div>
             </aside>
-
-            <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
-
             <script>
                 // Highlight active navigation item based on current URL
                 document.addEventListener('DOMContentLoaded', function () {

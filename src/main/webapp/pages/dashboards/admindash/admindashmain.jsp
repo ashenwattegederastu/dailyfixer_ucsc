@@ -394,8 +394,6 @@
         }
     };
     </script>
-
-    <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/admin-dashboard-charts.js"></script>
 </body>
 </html>

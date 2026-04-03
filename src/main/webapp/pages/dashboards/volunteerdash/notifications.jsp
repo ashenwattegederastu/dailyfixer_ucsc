@@ -99,7 +99,5 @@
                         <p>The notifications system is currently being built. Check back later!</p>
                     </div>
                 </main>
-                <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
             </body>
-
             </html>

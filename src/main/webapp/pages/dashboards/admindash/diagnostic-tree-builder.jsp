@@ -448,8 +448,6 @@
                             <button onclick="confirmDeleteNode()" class="btn-danger">Delete</button>
                         </div>
                     </dialog>
-
-                    <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
                     <script>
                         const contextPath = '${pageContext.request.contextPath}';
                         let currentTreeId = <%= treeId != null ? treeId : "null" %>;
@@ -903,7 +901,5 @@
                             return div.innerHTML;
                         }
                     </script>
-
                 </body>
-
                 </html>

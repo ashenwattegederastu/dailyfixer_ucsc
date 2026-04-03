@@ -211,8 +211,6 @@
             </div>
         </div>
     </main>
-
-    <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
     <script>
         // Auto-scroll to bottom of messages
         const container = document.getElementById('messagesContainer');

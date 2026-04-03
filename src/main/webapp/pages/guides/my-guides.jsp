@@ -329,8 +329,5 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </main>
-
-                                <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
                             </body>
-
                             </html>

@@ -263,8 +263,6 @@
         </form>
     </div>
 </div>
-
-<script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
 <script>
     function openAddModal() {
         document.getElementById('modal-title').textContent = 'Add Vehicle Type';

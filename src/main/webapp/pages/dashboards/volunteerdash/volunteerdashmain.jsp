@@ -423,11 +423,8 @@
                                 </div>
                             </div>
                         </main>
-
-                        <script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
                         <script
                             src="${pageContext.request.contextPath}/assets/js/volunteer-dashboard-charts.js"></script>
-
                         <script>
                             // Initialize Dashboard Animations with data from JSP
                             document.addEventListener("DOMContentLoaded", function () {
@@ -449,5 +446,4 @@
                             });
                         </script>
                     </body>
-
                     </html>

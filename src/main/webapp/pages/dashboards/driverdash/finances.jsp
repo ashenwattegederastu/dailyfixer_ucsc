@@ -329,6 +329,5 @@ tbody tr:hover { background: var(--muted); }
         if (link) link.classList.add('active');
     });
 </script>
-<script src="${pageContext.request.contextPath}/assets/js/dark-mode.js"></script>
 </body>
 </html>
