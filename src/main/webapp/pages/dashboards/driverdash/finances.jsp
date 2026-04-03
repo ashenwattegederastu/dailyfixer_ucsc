@@ -69,46 +69,6 @@
     margin-bottom: 16px;
 }
 
-/* Bank details form */
-.bank-form {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 28px;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 36px;
-}
-.bank-form .field-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-.bank-form .form-group { display: flex; flex-direction: column; }
-.bank-form label { font-weight: 600; font-size: 0.85rem; color: var(--foreground); margin-bottom: 6px; }
-.bank-form input {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
-    background: var(--background);
-    color: var(--foreground);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    transition: border-color 0.2s;
-}
-.bank-form input:focus { outline: none; border-color: var(--primary); }
-.bank-form .btn-save {
-    margin-top: 18px;
-    padding: 10px 28px;
-    background: linear-gradient(135deg, var(--primary), oklch(0.6 0.2 280));
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.bank-form .btn-save:hover { opacity: 0.9; transform: translateY(-1px); }
-
 /* Table */
 table {
     width: 100%;
@@ -186,32 +146,6 @@ tbody tr:hover { background: var(--muted); }
         </div>
     </div>
 
-    <!-- Bank Details -->
-    <h3 class="section-title">Bank Details</h3>
-    <div class="bank-form">
-        <form id="bankForm">
-            <div class="field-grid">
-                <div class="form-group">
-                    <label for="bankName">Bank Name *</label>
-                    <input type="text" id="bankName" name="bankName" required placeholder="e.g. Bank of Ceylon">
-                </div>
-                <div class="form-group">
-                    <label for="branch">Branch</label>
-                    <input type="text" id="branch" name="branch" placeholder="e.g. Colombo Fort">
-                </div>
-                <div class="form-group">
-                    <label for="accountNumber">Account Number *</label>
-                    <input type="text" id="accountNumber" name="accountNumber" required placeholder="e.g. 0012345678">
-                </div>
-                <div class="form-group">
-                    <label for="accountHolderName">Account Holder Name *</label>
-                    <input type="text" id="accountHolderName" name="accountHolderName" required placeholder="As it appears on the account">
-                </div>
-            </div>
-            <button type="submit" class="btn-save">Save Bank Details</button>
-        </form>
-    </div>
-
     <!-- Payout History -->
     <h3 class="section-title">Payout History</h3>
     <table>
@@ -247,39 +181,6 @@ tbody tr:hover { background: var(--muted); }
             })
             .catch(err => console.error('Balance load error:', err));
     }
-
-    function loadBankDetails() {
-        fetch(CTX + '/bank-details')
-            .then(r => r.json())
-            .then(data => {
-                if (data.success && data.bank) {
-                    document.getElementById('bankName').value = data.bank.bankName || '';
-                    document.getElementById('branch').value = data.bank.branch || '';
-                    document.getElementById('accountNumber').value = data.bank.accountNumber || '';
-                    document.getElementById('accountHolderName').value = data.bank.accountHolderName || '';
-                }
-            })
-            .catch(err => console.error('Bank detail load error:', err));
-    }
-
-    document.getElementById('bankForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const params = new URLSearchParams(new FormData(this));
-        fetch(CTX + '/bank-details', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params.toString()
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                showToast('Bank details saved.', 'success');
-            } else {
-                showToast(data.message || 'Failed to save.', 'error');
-            }
-        })
-        .catch(err => showToast('Error: ' + err.message, 'error'));
-    });
 
     function loadPayouts() {
         fetch(CTX + '/payout-history')
@@ -322,7 +223,6 @@ tbody tr:hover { background: var(--muted); }
 
     document.addEventListener('DOMContentLoaded', function() {
         loadBalances();
-        loadBankDetails();
         loadPayouts();
         // Highlight sidebar
         const link = document.getElementById('nav-finances');

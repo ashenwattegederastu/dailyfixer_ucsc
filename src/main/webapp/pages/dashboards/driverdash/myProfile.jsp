@@ -215,6 +215,83 @@
     color: #c0392b;
     font-weight: 600;
 }
+
+.section-title {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 28px 0 16px;
+}
+
+/* Bank status card */
+.bank-status-card {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.bank-icon, .bank-icon-none {
+    width: 50px; height: 50px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.bank-icon      { background: oklch(0.9 0.12 145); color: oklch(0.35 0.15 145); }
+.bank-icon-none { background: var(--muted); color: var(--muted-foreground); }
+.bank-name   { font-size: 1em; font-weight: 700; color: var(--foreground); margin-bottom: 4px; }
+.bank-detail { font-size: 0.87em; color: var(--muted-foreground); font-family: 'IBM Plex Mono', monospace; }
+.bank-empty  { color: var(--muted-foreground); font-size: 0.95em; }
+
+/* Modal */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 1000; display: flex; align-items: center; justify-content: center;
+}
+.modal-box {
+    background: var(--card); border-radius: var(--radius-lg);
+    border: 1px solid var(--border); box-shadow: var(--shadow-xl);
+    padding: 32px; width: 520px; max-width: 95vw;
+    max-height: 90vh; overflow-y: auto;
+}
+.modal-box h3 { font-size: 1.1em; font-weight: 700; color: var(--foreground); margin: 0 0 22px; }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.form-group { display: flex; flex-direction: column; }
+.form-group label { font-weight: 600; font-size: 0.84rem; color: var(--foreground); margin-bottom: 6px; }
+.form-group input {
+    padding: 10px 14px; border: 1px solid var(--border);
+    border-radius: var(--radius-md); font-size: 0.9rem;
+    background: var(--background); color: var(--foreground);
+    font-family: 'Plus Jakarta Sans', sans-serif; transition: border-color 0.2s;
+}
+.form-group input:focus { outline: none; border-color: var(--primary); }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+.btn-primary {
+    padding: 9px 22px;
+    background: linear-gradient(135deg, var(--primary), oklch(0.6 0.2 280));
+    color: #fff; border: none; border-radius: var(--radius-md);
+    font-weight: 600; font-size: 0.88em; cursor: pointer; transition: all 0.2s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-outline {
+    padding: 9px 22px; background: transparent; color: var(--foreground);
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    font-weight: 600; font-size: 0.88em; cursor: pointer; transition: all 0.2s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--muted); }
+
+/* Toast */
+#toast {
+    position: fixed; bottom: 24px; right: 24px;
+    padding: 14px 22px; border-radius: var(--radius-md);
+    font-weight: 600; font-size: 0.95em; z-index: 9999;
+    display: none; box-shadow: var(--shadow-lg);
+}
+#toast.success { background: #28a745; color: #fff; }
+#toast.error   { background: #dc3545; color: #fff; }
 </style>
 </head>
 <body>
@@ -285,7 +362,53 @@
             <p id="locationStatus"></p>
         </div>
     </div>
+
+    <!-- Bank Details -->
+    <h3 class="section-title">Bank Details</h3>
+    <div id="bankStatusContainer">
+        <div class="bank-status-card">
+            <div class="bank-icon-none">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>
+                </svg>
+            </div>
+            <div class="bank-empty">Loading...</div>
+        </div>
+    </div>
 </main>
+
+<!-- Bank Details Modal -->
+<div id="bankModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+        <h3 id="bankModalTitle">Add Bank Details</h3>
+        <form id="bankForm" onsubmit="saveBank(event)">
+            <div class="field-grid">
+                <div class="form-group">
+                    <label for="bankName">Bank Name *</label>
+                    <input type="text" id="bankName" name="bankName" required placeholder="e.g. Bank of Ceylon">
+                </div>
+                <div class="form-group">
+                    <label for="branch">Branch</label>
+                    <input type="text" id="branch" name="branch" placeholder="e.g. Colombo Fort">
+                </div>
+                <div class="form-group">
+                    <label for="accountNumber">Account Number *</label>
+                    <input type="text" id="accountNumber" name="accountNumber" required placeholder="e.g. 0012345678">
+                </div>
+                <div class="form-group">
+                    <label for="accountHolderName">Account Holder Name *</label>
+                    <input type="text" id="accountHolderName" name="accountHolderName" required placeholder="As it appears on the account">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" onclick="closeBankModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Save Details</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast"></div>
 
 <script>
     const CONTEXT_PATH = '<%= request.getContextPath() %>';
@@ -377,6 +500,99 @@
             btn.disabled = false;
         });
     }
+
+    // ── Bank Details ─────────────────────────────────────────
+    function loadBankDetails() {
+        fetch(CONTEXT_PATH + '/bank-details')
+            .then(r => r.json())
+            .then(data => renderBankStatus(data.success ? data.bank : null))
+            .catch(() => renderBankStatus(null));
+    }
+
+    function renderBankStatus(bank) {
+        const c = document.getElementById('bankStatusContainer');
+        const cardIcon = '<svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">'
+            + '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>'
+            + '</svg>';
+        if (bank) {
+            const accountNumber = (bank.accountNumber || '').toString();
+            const masked = accountNumber.length > 4
+                ? '\u2022\u2022\u2022\u2022 ' + accountNumber.slice(-4)
+                : accountNumber;
+            c.innerHTML =
+                '<div class="bank-status-card">'
+                + '<div class="bank-icon">' + cardIcon + '</div>'
+                + '<div style="flex:1">'
+                + '<div class="bank-name">' + htmlEsc(bank.bankName) + (bank.branch ? ' \u2014 ' + htmlEsc(bank.branch) : '') + '</div>'
+                + '<div class="bank-detail">Account: ' + htmlEsc(masked) + ' &nbsp;|&nbsp; ' + htmlEsc(bank.accountHolderName) + '</div>'
+                + '</div>'
+                + '<button class="btn-outline" id="editBankBtn">Edit</button>'
+                + '</div>';
+            document.getElementById('editBankBtn').addEventListener('click', function() {
+                openBankModal(bank);
+            });
+        } else {
+            c.innerHTML =
+                '<div class="bank-status-card">'
+                + '<div class="bank-icon-none">' + cardIcon + '</div>'
+                + '<div class="bank-empty" style="flex:1">No bank account linked yet.</div>'
+                + '<button class="btn-primary" onclick="openBankModal(null)">Add Bank Details</button>'
+                + '</div>';
+        }
+    }
+
+    function openBankModal(bank) {
+        document.getElementById('bankModalTitle').textContent = bank ? 'Edit Bank Details' : 'Add Bank Details';
+        document.getElementById('bankName').value          = bank ? (bank.bankName || '')         : '';
+        document.getElementById('branch').value            = bank ? (bank.branch || '')            : '';
+        document.getElementById('accountNumber').value     = bank ? (bank.accountNumber || '')     : '';
+        document.getElementById('accountHolderName').value = bank ? (bank.accountHolderName || '') : '';
+        document.getElementById('bankModal').style.display = 'flex';
+    }
+
+    function closeBankModal() {
+        document.getElementById('bankModal').style.display = 'none';
+    }
+
+    function saveBank(e) {
+        e.preventDefault();
+        fetch(CONTEXT_PATH + '/bank-details', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(new FormData(document.getElementById('bankForm')))
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                closeBankModal();
+                loadBankDetails();
+                showToast('Bank details saved.', 'success');
+            } else {
+                showToast(data.message || 'Failed to save.', 'error');
+            }
+        })
+        .catch(err => showToast('Error: ' + err.message, 'error'));
+    }
+
+    document.getElementById('bankModal').addEventListener('click', function(e) {
+        if (e.target === this) closeBankModal();
+    });
+
+    function htmlEsc(str) {
+        const d = document.createElement('div');
+        d.textContent = str || '';
+        return d.innerHTML;
+    }
+
+    function showToast(msg, type) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.className = type; t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadBankDetails();
+    });
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8zSes6UGbYKIHNzCp3tny5RgccFruILI&callback=initDriverProfileMap" async defer></script>
 
