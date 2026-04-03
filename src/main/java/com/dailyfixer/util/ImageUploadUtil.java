@@ -115,6 +115,37 @@ public class ImageUploadUtil {
 
     private static final String DRIVER_UPLOAD_DIR = "assets/images/uploads/drivers";
 
+    private static final String VEHICLE_UPLOAD_DIR = "assets/images/uploads/vehicles";
+
+    /**
+     * Saves a vehicle-related upload (photos and documents).
+     *
+     * @param filePart   The uploaded file part
+     * @param prefix     A prefix like "v_front_123" or "v_doc_reg_123"
+     * @param webAppPath The absolute path to the webapp directory
+     * @return The relative path to the saved file (for storing in DB), or null if no file
+     */
+    public static String saveVehicleUpload(Part filePart, String prefix, String webAppPath) throws IOException {
+        if (filePart == null || filePart.getSize() == 0) {
+            return null;
+        }
+
+        String fileName = prefix + "_" + System.currentTimeMillis() + getExtension(filePart);
+        String relativePath = VEHICLE_UPLOAD_DIR + "/" + fileName;
+
+        Path uploadPath = Paths.get(webAppPath, VEHICLE_UPLOAD_DIR);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        Path filePath = Paths.get(webAppPath, relativePath);
+        try (InputStream input = filePart.getInputStream()) {
+            Files.copy(input, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return relativePath;
+    }
+
     /**
      * Saves a driver registration upload (NIC photos, profile picture, license photos).
      *
