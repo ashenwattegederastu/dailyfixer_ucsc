@@ -207,7 +207,7 @@ CREATE TABLE `chat_messages` (
   KEY `idx_created_at` (`created_at`),
   CONSTRAINT `fk_message_chat` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`chat_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_message_sender` FOREIGN KEY (`sender_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -267,54 +267,7 @@ CREATE TABLE `delivery_assignments` (
   CONSTRAINT `fk_da_driver` FOREIGN KEY (`driver_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
   CONSTRAINT `fk_da_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_da_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `delivery_drop_proofs`
---
-
-DROP TABLE IF EXISTS `delivery_drop_proofs`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `delivery_drop_proofs` (
-  `proof_id` int NOT NULL AUTO_INCREMENT,
-  `assignment_id` int NOT NULL,
-  `order_id` varchar(50) NOT NULL,
-  `driver_id` int NOT NULL,
-  `photo_package_path` varchar(255) NOT NULL,
-  `photo_door_context_path` varchar(255) NOT NULL,
-  `note` varchar(500) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`proof_id`),
-  UNIQUE KEY `uq_ddp_assignment` (`assignment_id`),
-  KEY `idx_ddp_order` (`order_id`),
-  KEY `idx_ddp_driver` (`driver_id`),
-  CONSTRAINT `fk_ddp_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `delivery_assignments` (`assignment_id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_ddp_driver` FOREIGN KEY (`driver_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_ddp_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `delivery_rates`
---
-
-DROP TABLE IF EXISTS `delivery_rates`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `delivery_rates` (
-  `rate_id` int NOT NULL AUTO_INCREMENT,
-  `vehicle_type` varchar(50) NOT NULL,
-  `cost_per_km` decimal(10,2) NOT NULL,
-  `base_fee` decimal(10,2) NOT NULL DEFAULT '100.00',
-  `distribution_weight` decimal(5,2) NOT NULL DEFAULT '33.33' COMMENT 'Percentage weight used in weighted-average customer price (weights should sum to 100)',
-  `is_active` tinyint(1) NOT NULL DEFAULT '1',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`rate_id`),
-  UNIQUE KEY `uq_vehicle_type` (`vehicle_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -338,7 +291,54 @@ CREATE TABLE `delivery_requeue_events` (
   KEY `idx_dre_created_at` (`created_at`),
   CONSTRAINT `fk_dre_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `delivery_assignments` (`assignment_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_dre_driver` FOREIGN KEY (`actor_driver_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `delivery_drop_proofs`
+--
+
+DROP TABLE IF EXISTS `delivery_drop_proofs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `delivery_drop_proofs` (
+  `proof_id` int NOT NULL AUTO_INCREMENT,
+  `assignment_id` int NOT NULL,
+  `order_id` varchar(50) NOT NULL,
+  `driver_id` int NOT NULL,
+  `photo_package_path` varchar(255) NOT NULL,
+  `photo_door_context_path` varchar(255) NOT NULL,
+  `note` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`proof_id`),
+  UNIQUE KEY `uq_ddp_assignment` (`assignment_id`),
+  KEY `idx_ddp_order` (`order_id`),
+  KEY `idx_ddp_driver` (`driver_id`),
+  CONSTRAINT `fk_ddp_assignment` FOREIGN KEY (`assignment_id`) REFERENCES `delivery_assignments` (`assignment_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ddp_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ddp_driver` FOREIGN KEY (`driver_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `delivery_rates`
+--
+
+DROP TABLE IF EXISTS `delivery_rates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `delivery_rates` (
+  `rate_id` int NOT NULL AUTO_INCREMENT,
+  `vehicle_type` varchar(50) NOT NULL,
+  `cost_per_km` decimal(10,2) NOT NULL,
+  `base_fee` decimal(10,2) NOT NULL DEFAULT '100.00',
+  `distribution_weight` decimal(5,2) NOT NULL DEFAULT '33.33' COMMENT 'Percentage weight used in weighted-average customer price (weights should sum to 100)',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`rate_id`),
+  UNIQUE KEY `uq_vehicle_type` (`vehicle_type`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -783,7 +783,7 @@ CREATE TABLE `order_items` (
   CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE,
   CONSTRAINT `order_items_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE SET NULL,
   CONSTRAINT `order_items_ibfk_4` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`variant_id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -824,7 +824,7 @@ CREATE TABLE `orders` (
   UNIQUE KEY `order_id` (`order_id`),
   KEY `fk_orders_store` (`store_id`),
   CONSTRAINT `fk_orders_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -914,7 +914,7 @@ CREATE TABLE `product_reviews` (
   CONSTRAINT `product_reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE,
   CONSTRAINT `product_reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   CONSTRAINT `product_reviews_chk_1` CHECK (((`rating` >= 1) and (`rating` <= 5)))
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -932,11 +932,10 @@ CREATE TABLE `product_variants` (
   `power` varchar(50) DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
   `quantity` int NOT NULL,
-  `image_path` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`variant_id`),
   KEY `product_id` (`product_id`),
   CONSTRAINT `product_variants_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -953,15 +952,14 @@ CREATE TABLE `products` (
   `quantity` int NOT NULL,
   `quantity_unit` enum('No of items','Litres','Kg','Metres') NOT NULL,
   `price` decimal(10,2) NOT NULL,
+  `image` longblob,
   `description` text,
-  `image_path` varchar(255) DEFAULT NULL,
-  `warranty_info` varchar(500) DEFAULT NULL,
   `store_username` varchar(50) NOT NULL,
   `store_id` int DEFAULT NULL,
   PRIMARY KEY (`product_id`),
   KEY `fk_products_store` (`store_id`),
   CONSTRAINT `fk_products_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1062,7 +1060,7 @@ CREATE TABLE `store_orders` (
   KEY `fk_store_orders_store` (`store_id`),
   CONSTRAINT `fk_store_orders_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_store_orders_store` FOREIGN KEY (`store_id`) REFERENCES `stores` (`store_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1152,23 +1150,6 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `vehicle_makes`
---
-
-DROP TABLE IF EXISTS `vehicle_makes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `vehicle_makes` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `category` varchar(50) NOT NULL,
-  `make_name` varchar(100) NOT NULL,
-  `is_custom` tinyint(1) NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_make` (`category`,`make_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `vehicles`
 --
 
@@ -1182,20 +1163,13 @@ CREATE TABLE `vehicles` (
   `brand` varchar(50) NOT NULL,
   `model` varchar(50) NOT NULL,
   `plate_number` varchar(20) NOT NULL,
-  `img_front` varchar(500) DEFAULT NULL,
-  `img_left` varchar(500) DEFAULT NULL,
-  `img_right` varchar(500) DEFAULT NULL,
-  `img_back` varchar(500) DEFAULT NULL,
-  `doc_registration` varchar(500) DEFAULT NULL,
-  `doc_insurance` varchar(500) DEFAULT NULL,
-  `doc_revenue` varchar(500) DEFAULT NULL,
   `vehicle_category` varchar(50) NOT NULL DEFAULT 'Bike',
+  `picture` longblob,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_driver_vehicle` (`driver_id`),
   KEY `driver_id` (`driver_id`),
   CONSTRAINT `vehicles_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1305,4 +1279,4 @@ CREATE TABLE `volunteers` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-03 10:50:59
+-- Dump completed on 2026-04-01 21:47:47
