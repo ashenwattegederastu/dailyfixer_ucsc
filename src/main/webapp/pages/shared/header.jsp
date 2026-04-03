@@ -39,7 +39,7 @@
                             Tool</a></li>
                     <li><a href="${pageContext.request.contextPath}/guides">View Repair Guides</a></li>
                     <li><a href="${pageContext.request.contextPath}/services">Book a Technician</a></li>
-                    <li><a href="${pageContext.request.contextPath}/pages/stores/store_main.jsp">Store</a></li>
+                    <li><a href="${pageContext.request.contextPath}/pages/stores/store_main.jsp">Marketplace</a></li>
                 </ul>
 
                 <!-- Dynamic Login/Logout -->

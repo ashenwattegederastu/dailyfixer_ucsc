@@ -1,265 +1,312 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-    <%@ page import="java.util.*" %>
-        <!DOCTYPE html>
-        <html>
+<%@ page import="java.util.*" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
 
-        <head>
-            <meta charset="UTF-8">
-            <title>Register Store - DailyFixer</title>
-            <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-            <style>
-                .signup-wrapper {
-                    display: flex;
-                    justify-content: center;
-                    padding: 60px 20px;
-                }
+<head>
+    <meta charset="UTF-8">
+    <title>Register Store - DailyFixer</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/framework.css">
+    <style>
+        body {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--background);
+            padding: 40px 20px;
+        }
 
-                .card {
-                    width: 1100px;
-                    max-width: 1200px;
-                    display: flex;
-                    gap: 30px;
-                }
+        .register-wrapper {
+            width: 100%;
+            max-width: 1200px;
+        }
 
-                .left,
-                .right {
-                    background: #fff;
-                    padding: 30px;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-                }
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-                .left {
-                    flex: 1;
-                }
+        .page-header h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
 
-                .right {
-                    width: 450px;
-                }
+        .page-header p {
+            color: var(--muted-foreground);
+        }
 
-                .section-title {
-                    font-size: 18px;
-                    margin-bottom: 12px;
-                    font-weight: 600;
-                }
+        .register-card {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
 
-                .input-row {
-                    display: flex;
-                    gap: 12px;
-                }
+        /* Override form-container centering for side-by-side layout */
+        .register-card .form-container {
+            max-width: none;
+            margin: 0;
+        }
 
-                .input-row>div {
-                    flex: 1;
-                }
+        .register-left {
+            flex: 1;
+        }
 
-                .small {
-                    width: 100%;
-                    box-sizing: border-box;
-                    padding: 10px;
-                    border-radius: 8px;
-                    border: 1px solid #ccc;
-                }
+        .register-right {
+            width: 420px;
+            flex-shrink: 0;
+        }
 
-                .error {
-                    color: #b00020;
-                    margin-bottom: 12px;
-                }
+        .form-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
 
-                /* Map styles */
-                #store-map {
-                    width: 100%;
-                    height: 280px;
-                    border-radius: 10px;
-                    margin-top: 12px;
-                    border: 2px solid #e0e0e0;
-                }
+        /* Extend framework form-group to cover additional input types */
+        .form-group input[type="email"],
+        .form-group input[type="password"],
+        .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            background-color: var(--input);
+            color: var(--foreground);
+            transition: border-color 0.2s, background-color 0.3s ease, color 0.3s ease;
+            font-family: var(--font-sans), serif;
+        }
 
-                .location-info {
-                    background: #f5f5f5;
-                    padding: 10px 14px;
-                    border-radius: 8px;
-                    margin-top: 10px;
-                    font-size: 13px;
-                }
+        .form-group input[type="email"]:focus,
+        .form-group input[type="password"]:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--ring);
+        }
 
-                .location-info.success {
-                    background: #e8f5e9;
-                    color: #2e7d32;
-                }
+        .section-label {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--foreground);
+            margin: 20px 0 14px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border);
+        }
 
-                .location-info.error {
-                    background: #ffebee;
-                    color: #c62828;
-                }
+        .section-label:first-of-type {
+            margin-top: 4px;
+        }
 
-                .location-coords {
-                    font-weight: 600;
-                }
+        /* Map panel */
+        #store-map {
+            width: 100%;
+            height: 280px;
+            border-radius: var(--radius-md);
+            margin-top: 12px;
+            border: 2px solid var(--border);
+        }
 
-                .map-instructions {
-                    font-size: 12px;
-                    color: #666;
-                    margin-top: 8px;
-                    padding: 8px;
-                    background: #fff3e0;
-                    border-radius: 6px;
-                }
+        .location-info {
+            background: var(--muted);
+            color: var(--muted-foreground);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
 
-                .search-box-container {
-                    margin-top: 12px;
-                }
+        .location-info.success {
+            background: oklch(0.92 0.05 156);
+            color: oklch(0.35 0.12 156);
+        }
 
-                .search-box-container label {
-                    font-weight: 500;
-                    margin-bottom: 4px;
-                    display: block;
-                }
-            </style>
-        </head>
+        .location-info.error {
+            background: oklch(0.96 0.03 23);
+            color: var(--destructive);
+        }
 
-        <body>
+        .location-coords {
+            font-weight: 600;
+        }
 
-            <div class="signup-wrapper">
-                <div class="card">
-                    <div class="left">
-                        <h2>Store Account</h2>
+        .map-instructions {
+            font-size: 0.8rem;
+            color: var(--muted-foreground);
+            margin-top: 8px;
+            padding: 10px 12px;
+            background: var(--muted);
+            border-radius: var(--radius-md);
+        }
 
-                        <c:if test="${not empty errorMsg}">
-                            <div class="error">${errorMsg}</div>
-                        </c:if>
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--muted-foreground);
+            font-size: 0.85rem;
+        }
 
-                        <form id="registerForm" method="post" action="${pageContext.request.contextPath}/registerStore"
-                            onsubmit="return submitForm(event);">
-                            <!-- Hidden fields for coordinates -->
-                            <input type="hidden" name="latitude" id="latitude">
-                            <input type="hidden" name="longitude" id="longitude">
+        .login-link a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+        }
 
-                            <!-- User fields -->
-                            <div class="section-title">Owner details</div>
-                            <div class="input-row">
-                                <div>
-                                    <label>First name</label>
-                                    <input class="small" type="text" name="firstName" id="firstName" required>
-                                </div>
-                                <div>
-                                    <label>Last name</label>
-                                    <input class="small" type="text" name="lastName" id="lastName" required>
-                                </div>
-                            </div>
+        .login-link a:hover {
+            text-decoration: underline;
+        }
 
-                            <div class="input-row" style="margin-top:12px;">
-                                <div>
-                                    <label>Username</label>
-                                    <input class="small" type="text" name="username" id="username" required>
-                                </div>
-                                <div>
-                                    <label>Password</label>
-                                    <input class="small" type="password" name="password" id="password" required>
-                                </div>
-                            </div>
+        @media (max-width: 900px) {
+            .register-card {
+                flex-direction: column;
+            }
 
-                            <div style="margin-top:12px;">
-                                <label>Email</label>
-                                <input class="small" type="email" name="email" id="email" required>
-                            </div>
+            .register-right {
+                width: 100%;
+            }
 
-                            <div style="margin-top:12px;">
-                                <label>Phone number</label>
-                                <input class="small" type="text" name="phone" id="phone">
-                            </div>
+            .form-cols {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
 
-                            <div style="margin-top:12px;">
-                                <label>Your City (optional)</label>
-                                <select class="small" name="city">
-                                    <option value="">-- Select city --</option>
-                                    <% String[]
-                                        cities={"Colombo","Kandy","Galle","Jaffna","Kurunegala","Matara","Trincomalee","Batticaloa","Negombo","Anuradhapura","Polonnaruwa","Badulla","Ratnapura","Puttalam","Kilinochchi","Mannar","Hambantota"};
-                                        for (String c : cities) { %>
-                                        <option value="<%=c%>">
-                                            <%=c%>
-                                        </option>
-                                        <% } %>
-                                </select>
-                            </div>
+<body>
 
-                            <!-- Store fields -->
-                            <div class="section-title" style="margin-top:18px;">Store details</div>
+    <div class="register-wrapper">
+        <div class="page-header">
+            <h2>Register Store</h2>
+            <p>Join DailyFixer as a Store Partner</p>
+        </div>
 
-                            <div style="margin-top:6px;">
-                                <label>Store name</label>
-                                <input class="small" type="text" name="storeName" id="storeName" required>
-                            </div>
+        <div class="register-card">
+            <!-- Left: Form -->
+            <div class="register-left form-container">
 
-                            <!-- Store address (Hidden, populated by map) -->
-                            <input type="hidden" name="storeAddress" id="storeAddress">
+                <c:if test="${not empty errorMsg}">
+                    <div class="server-error">${errorMsg}</div>
+                </c:if>
 
+                <form id="registerForm" method="post" action="${pageContext.request.contextPath}/registerStore"
+                    onsubmit="return submitForm(event);">
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+                    <input type="hidden" name="storeAddress" id="storeAddress">
 
-                            <div class="input-row" style="margin-top:12px;">
-                                <div>
-                                    <label>Store city</label>
-                                    <select class="small" name="storeCity" id="storeCity" required>
-                                        <option value="">-- Select city --</option>
-                                        <% for (String c : cities) { %>
-                                            <option value="<%=c%>">
-                                                <%=c%>
-                                            </option>
-                                            <% } %>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label>Store type</label>
-                                    <select class="small" name="storeType" id="storeType" required>
-                                        <option value="">-- Select type --</option>
-                                        <option value="electronics">Electronics</option>
-                                        <option value="hardware">Hardware</option>
-                                        <option value="vehicle repair">Vehicle Repair</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                            </div>
+                    <div class="section-label">Owner Details</div>
 
-                            <div style="margin-top:18px;">
-                                <button type="submit" class="login-btn" id="submitBtn">Register Store</button>
-                            </div>
-                        </form>
+                    <div class="form-cols">
+                        <div class="form-group">
+                            <label>First name</label>
+                            <input type="text" name="firstName" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last name</label>
+                            <input type="text" name="lastName" id="lastName" required>
+                        </div>
                     </div>
 
-                    <div class="right">
-                        <h3>📍 Store Location</h3>
-                        <p style="font-size:13px;color:#666;">Set your store location using the search box or by
-                            clicking on the map.</p>
-
-                        <!-- Search Box for Places Autocomplete -->
-                        <div class="search-box-container">
-                            <label>Search for location:</label>
-                            <input class="small" type="text" id="map-search-input"
-                                placeholder="Type address or place name...">
+                    <div class="form-cols">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" name="username" id="username" required>
                         </div>
-
-                        <!-- Interactive Map -->
-                        <div id="store-map"></div>
-
-                        <div class="map-instructions">
-                            <strong>💡 Tips:</strong><br>
-                            • Type an address in the search box above, OR<br>
-                            • Click directly on the map to pin your store location
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" name="password" id="password" required>
                         </div>
-
-                        <!-- Location Status -->
-                        <div id="locationInfo" class="location-info">
-                            Location not set. Please select your store location on the map.
-                        </div>
-
-                        <hr style="margin-top:20px;">
-
-                        <p>Already have an account? <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp">Log in</a></p>
-                        <p>Or go back <a href="${pageContext.request.contextPath}/index.jsp">Home</a></p>
-
-                        <p style="font-size:12px;color:#888;margin-top:12px;">By registering you agree to our terms and
-                            that information you provide is accurate.</p>
                     </div>
+
+                    <div class="form-cols">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone number</label>
+                            <input type="text" name="phone" id="phone">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Your city (optional)</label>
+                        <select name="city">
+                            <option value="">-- Select city --</option>
+                            <% String[] cities={"Colombo","Kandy","Galle","Jaffna","Kurunegala","Matara","Trincomalee","Batticaloa","Negombo","Anuradhapura","Polonnaruwa","Badulla","Ratnapura","Puttalam","Kilinochchi","Mannar","Hambantota"};
+                               for (String c : cities) { %>
+                                <option value="<%=c%>"><%=c%></option>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div class="section-label">Store Details</div>
+
+                    <div class="form-group">
+                        <label>Store name</label>
+                        <input type="text" name="storeName" id="storeName" required>
+                    </div>
+
+                    <div class="form-cols">
+                        <div class="form-group">
+                            <label>Store city</label>
+                            <select name="storeCity" id="storeCity" required>
+                                <option value="">-- Select city --</option>
+                                <% for (String c : cities) { %>
+                                    <option value="<%=c%>"><%=c%></option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Store type</label>
+                            <select name="storeType" id="storeType" required>
+                                <option value="">-- Select type --</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="hardware">Hardware</option>
+                                <option value="vehicle repair">Vehicle Repair</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="submitBtn" style="width:100%;margin-top:8px;">Register Store</button>
+                </form>
+            </div>
+
+            <!-- Right: Map -->
+            <div class="register-right form-container">
+                <h3 style="color:var(--primary);margin-bottom:6px;">📍 Store Location</h3>
+                <p style="font-size:0.85rem;color:var(--muted-foreground);">Set your store location using the search box or by clicking on the map.</p>
+
+                <div class="form-group" style="margin-top:12px;margin-bottom:0;">
+                    <label>Search for location:</label>
+                    <input type="text" id="map-search-input" placeholder="Type address or place name...">
+                </div>
+
+                <div id="store-map"></div>
+
+                <div class="map-instructions">
+                    <strong>💡 Tips:</strong><br>
+                    • Type an address in the search box above, OR<br>
+                    • Click directly on the map to pin your store location
+                </div>
+
+                <div id="locationInfo" class="location-info">
+                    Location not set. Please select your store location on the map.
+                </div>
+
+                <hr style="margin-top:20px;border-color:var(--border);">
+
+                <div class="login-link">
+                    <p>Already have an account? <a href="${pageContext.request.contextPath}/pages/authentication/login.jsp">Log in</a></p>
+                    <p style="margin-top:6px;">Or go back <a href="${pageContext.request.contextPath}/index.jsp">Home</a></p>
+                    <p style="font-size:0.75rem;color:var(--muted-foreground);margin-top:10px;">By registering you agree to our terms and that information you provide is accurate.</p>
                 </div>
             </div>
+        </div>
+    </div>
 
             <!-- Google Maps API with Places library -->
             <script
